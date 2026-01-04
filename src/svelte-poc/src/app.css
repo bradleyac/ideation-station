@@ -1,0 +1,22 @@
+:root {
+  color-scheme: light dark;
+
+  --base-color: oklch(.65 0.05 170);
+  --text-color: oklch(from var(--base-color) calc(l / 4) calc(c * 1.5) h);
+  --bg-color: oklch(from var(--base-color) l c h);
+  --color-primary: oklch(from var(--base-color) calc(l + .1) calc(c * 1.5) h);
+  --color-secondary: oklch(from var(--base-color) calc(l + .1) calc(c * 2) h);
+
+  @media (prefers-color-scheme: dark) {
+    --text-color: oklch(from var(--base-color) calc(1 - (l / 4)) calc(c * 1.5) h);
+    --bg-color: oklch(from var(--base-color) calc(1 - l) c h);
+    --color-primary: oklch(from var(--base-color) calc(1 - (l + .1)) calc(c * 1.5) h);
+    --color-secondary: oklch(from var(--base-color) calc(1 - (l + .1)) calc(c * 2) h);
+  }
+}
+
+body {
+  margin: 0;
+  color: var(--text-color);
+  /* background-color: var(--bg-color); */
+}

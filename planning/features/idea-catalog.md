@@ -4,3 +4,4 @@ How to visualize ideas? More than one type, or just text? Hierarchical?
 
 Tags?
 
+
