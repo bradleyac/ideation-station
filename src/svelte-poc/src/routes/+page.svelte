@@ -1,3 +1,3 @@
-<h1>Welcome Home!</h1>
+<svelte:head><title>Home</title></svelte:head>
 
-<a href="/ideas">Ideas</a>
+<h1>Welcome Home!</h1>

@@ -5,4 +5,4 @@
 
 <h2>{idea.name}</h2>
 
-<p>{idea.text}</p>
+<p>{idea.desc}</p>

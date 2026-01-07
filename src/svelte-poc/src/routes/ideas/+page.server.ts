@@ -1,26 +1,16 @@
-import { ideas } from '$lib/data.svelte.js';
 import { error } from '@sveltejs/kit';
-
-let id = 0;
-
-export function load({ params }) {
-  const localIdeas = ideas;
-
-  return {
-    localIdeas
-  };
-}
+import { db } from '$lib/db.svelte.js';
 
 export const actions = {
-  default: async ({ cookies, request }) => {
-    const data = await request.formData();
+  default: async (event) => {
+    const data = await event.request.formData();
     const name = data.get('name')?.toString() ?? '';
-    const text = data.get('text')?.toString() ?? '';
+    const desc = data.get('text')?.toString() ?? '';
 
-    if (name === '' || text === '') error(400);
+    if (name === '' || desc === '') error(400);
 
-    const newId = crypto.randomUUID();
+    const id = crypto.randomUUID();
 
-    ideas.set(newId, { id: newId, name: data.get('name')?.toString() ?? '', text: data.get('text')?.toString() ?? '' });
-  }
+    await db.createIdea({ id, name, desc });
+  },
 };

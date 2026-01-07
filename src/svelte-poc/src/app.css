@@ -1,7 +1,18 @@
+html,
+body {
+  box-sizing: border-box;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: inherit;
+}
+
 :root {
   color-scheme: light dark;
 
-  --base-color: oklch(.65 0.05 170);
+  --base-color: oklch(.75 0.05 170);
   --text-color: oklch(from var(--base-color) calc(l / 4) calc(c * 1.5) h);
   --bg-color: oklch(from var(--base-color) l c h);
   --color-primary: oklch(from var(--base-color) calc(l + .1) calc(c * 1.5) h);
@@ -9,9 +20,26 @@
 
   @media (prefers-color-scheme: dark) {
     --text-color: oklch(from var(--base-color) calc(1 - (l / 4)) calc(c * 1.5) h);
-    --bg-color: oklch(from var(--base-color) calc(1 - l) c h);
-    --color-primary: oklch(from var(--base-color) calc(1 - (l + .1)) calc(c * 1.5) h);
-    --color-secondary: oklch(from var(--base-color) calc(1 - (l + .1)) calc(c * 2) h);
+    --text-color: white;
+    --bg-color: oklch(from var(--base-color) calc(1 - l + .1) c h);
+    --color-primary: oklch(from var(--base-color) calc(1 - l + .2) calc(c * 1.5) h);
+    --color-secondary: oklch(from var(--base-color) calc(1 - l + .2) calc(c * 2) h);
+  }
+
+  --color-primary-contrast: oklch(from var(--color-primary) calc(l + 0.1) c h);
+
+  font-family: "Roboto",
+  sans-serif;
+  font-size: 16px;
+
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
+
+  button:hover {
+    cursor: pointer;
   }
 }
 
@@ -19,4 +47,16 @@ body {
   margin: 0;
   color: var(--text-color);
   /* background-color: var(--bg-color); */
+}
+
+.btn-primary {
+  border-radius: 0.5em;
+  padding: 0.5em;
+  width: fit-content;
+  background-color: var(--color-primary-contrast);
+  border: none;
+
+  &:hover {
+    background-color: oklch(from var(--color-primary-contrast) calc(l + 0.05) c h);
+  }
 }
