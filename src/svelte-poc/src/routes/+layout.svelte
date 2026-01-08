@@ -41,7 +41,7 @@
 <style>
 	#__layout-container {
 		> div {
-			margin: 1em;
+			margin: 0 1em;
 		}
 	}
 
