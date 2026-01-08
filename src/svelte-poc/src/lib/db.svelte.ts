@@ -48,13 +48,26 @@ class Db {
       .property('id', prop_id)
       .property('userid', prop_userid)
       .property('name', prop_name)
-      .property('desc', prop_desc)`;
+      .property('desc', prop_desc)
+      ${makePropertyList(idea.categories)}`;
+
+    // TODO: Some better way to do this?
+    // It's parameterized and not vulnerable to injection,
+    // but it's also brittle and ugly.
+    function makePropertyList(cats: string[]): string {
+      return cats.reduce((acc, cur, i) => acc + `.property(list, 'categories', prop_cat${i})`, '');
+    }
+
+    function makeListParams(cats: string[]): any {
+      return cats.map((cat, i) => ({ [`prop_cat${i}`]: cat })).reduce((acc, cur) => ({ ...acc, ...cur }), {});
+    }
 
     let results = await this.submitWithRetry(createIdeaQuery, {
       prop_id: idea.id,
       prop_userid: this.userid,
       prop_name: idea.name,
-      prop_desc: idea.desc
+      prop_desc: idea.desc,
+      ...makeListParams(idea.categories)
     });
   }
 
@@ -117,6 +130,6 @@ class Db {
   }
 }
 
-const mapToIdea = (ideaVertex: any): Idea => ({ id: ideaVertex.id, name: ideaVertex.properties.name[0].value, desc: ideaVertex.properties.desc[0].value });
+const mapToIdea = (ideaVertex: any): Idea => ({ id: ideaVertex.id, name: ideaVertex.properties.name[0].value, desc: ideaVertex.properties.desc[0].value, categories: ideaVertex.properties.categories?.map((cat: any) => cat.value) });
 const db = new Db();
 export { type Db, db };

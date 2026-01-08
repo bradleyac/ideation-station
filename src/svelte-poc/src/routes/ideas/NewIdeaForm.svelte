@@ -1,5 +1,7 @@
 <script>
 	import { enhance } from '$app/forms';
+
+	let numberOfCategories = $state(1);
 </script>
 
 <form method="POST" action="/ideas" use:enhance>
@@ -13,6 +15,23 @@
 		<label>
 			Details
 			<textarea required name="text" placeholder="Idea details"></textarea>
+		</label>
+
+		<label>
+			Categories
+			{#each Array(numberOfCategories).values()}
+				<input list="icecream-flavors" name="categories[]" required />
+			{/each}
+
+			<button type="button" title="Add Category" onclick={() => numberOfCategories++}>+</button>
+
+			<datalist id="icecream-flavors">
+				<option value="Chocolate"></option>
+				<option value="Vanilla"></option>
+				<option value="Strawberry"></option>
+				<option value="Mint Chocolate Chip"></option>
+				<option value="Cookie Dough"></option>
+			</datalist>
 		</label>
 		<button class="btn-primary" type="submit">Create Idea</button>
 	</div>

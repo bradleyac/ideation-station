@@ -37,6 +37,12 @@
 <section class="idea__container">
 	<Idea idea={data.idea} />
 
+	<ul>
+		{#each data.idea.categories?.entries() as [i, category] (i)}
+			<li>{category}</li>
+		{/each}
+	</ul>
+
 	<details open={data.relatedIdeas.length > 0}>
 		<summary>Related Ideas</summary>
 		<ul class="idea-list">
