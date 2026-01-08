@@ -1,10 +1,11 @@
 import gremlin from 'gremlin';
 import { type Idea } from "./data.svelte";
+import { COSMOSDB_HOST, COSMOSDB_KEY } from '$env/static/private';
 
 class Db {
   private userid: string = 'bradleyac';
-  private hostname: string = process.env.COSMOSDB_HOST ?? "";
-  private primaryKey: string = process.env.COSMOSDB_KEY ?? "";
+  private hostname: string = COSMOSDB_HOST;
+  private primaryKey: string = COSMOSDB_KEY;
   private client: gremlin.driver.Client;
   constructor() {
     this.client = this.createClient();
@@ -49,7 +50,7 @@ class Db {
       .property('name', prop_name)
       .property('desc', prop_desc)`;
 
-    await this.client.submit(createIdeaQuery, {
+    let results = await this.submitWithRetry(createIdeaQuery, {
       prop_id: idea.id,
       prop_userid: this.userid,
       prop_name: idea.name,
