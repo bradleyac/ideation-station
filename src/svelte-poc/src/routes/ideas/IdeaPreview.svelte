@@ -3,23 +3,21 @@
 	const { idea }: { idea: Idea } = $props();
 </script>
 
-<section>
-	<h2>{idea.name}</h2>
-	<p>{idea.desc}</p>
-</section>
+<div>
+	<p>{idea.name}</p>
+</div>
 
 <style>
-	section {
+	div {
 		border-radius: 1em 0 0 1em;
-		border: solid 1px var(--color-primary, black);
 		padding: 1em;
 		background-color: var(--cbg-color, var(--bg-color));
+		position: relative;
 
 		display: flex;
 		gap: 1em;
 		flex-direction: column;
 
-		h2,
 		p {
 			margin: 0;
 			overflow: hidden;

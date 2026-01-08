@@ -15,29 +15,33 @@
 
 <svelte:head><title>Idea Catalog</title></svelte:head>
 
-<h1>Welcome to the Idea Catalog!</h1>
+<section class="idea-catalog__container">
+	<h1>Welcome to the Idea Catalog!</h1>
 
-<div class="idea-catalog__top">
-	<NewIdeaForm />
-	<ul class="ideas__container">
-		{#each data.ideas.values() as idea}
-			<li class="idea__item">
-				<p class="idea__badge">{idea.name}</p>
-			</li>
-		{/each}
-	</ul>
-</div>
+	<div class="idea-catalog__top">
+		<NewIdeaForm />
+		<ul class="ideas__container">
+			{#each data.ideas.values() as idea}
+				<li class="idea__item">
+					<p class="idea__badge">{idea.name}</p>
+				</li>
+			{/each}
+		</ul>
+	</div>
 
-<section>
-	<h2>Ideas</h2>
-	<ul class="idea-preview__container">
-		{#each data.ideas.entries() as [_, idea] (idea.id)}
-			<li class="idea-preview__item">
-				<a href="ideas/{idea.id}"><IdeaPreview {idea} /></a>
-				<button class="btn-primary" onclick={() => deleteIdea(idea.id)}>Delete</button>
-			</li>
-		{/each}
-	</ul>
+	<details open>
+		<summary>Ideas</summary>
+		<ul class="idea-preview__container">
+			{#each data.ideas.entries() as [_, idea] (idea.id)}
+				<li class="idea-preview__item">
+					<a href="ideas/{idea.id}"><IdeaPreview {idea} /></a>
+					<button class="btn-primary" title="Delete Idea" onclick={() => deleteIdea(idea.id)}
+						><i class="fi fi-rr-trash"></i></button
+					>
+				</li>
+			{/each}
+		</ul>
+	</details>
 </section>
 
 <style>
@@ -58,18 +62,29 @@
 		}
 	}
 
+	.idea-catalog__container {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+	}
+
 	.idea-preview__container {
 		flex-direction: row;
 		flex-wrap: wrap;
+		margin: 1em;
+		gap: 1em;
 	}
 
 	.idea-preview__item {
 		display: flex;
 		flex-direction: row;
 		border-radius: 1em;
+		box-shadow: 0 0 1px black;
 
 		button {
 			border-radius: 0 1em 1em 0;
+			display: flex;
+			place-items: center;
 		}
 	}
 

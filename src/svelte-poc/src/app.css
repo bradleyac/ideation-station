@@ -56,7 +56,59 @@ body {
   background-color: var(--color-primary-contrast);
   border: none;
 
+  &:not(:has(i)) {
+    box-shadow: 0 0 1px black;
+  }
+
   &:hover {
     background-color: oklch(from var(--color-primary-contrast) calc(l + 0.05) c h);
   }
+}
+
+details {
+  position: relative;
+  background-color: var(--color-primary);
+  border-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 1px black;
+
+  summary {
+    list-style-type: none;
+    display: flex;
+    /* font-weight: bold; */
+    /* font-size: 1.5em; */
+    user-select: none;
+    padding: 1em;
+  }
+
+  summary::before {
+    font-family: uicons-regular-rounded !important;
+    font-style: normal;
+    font-weight: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: inline-block;
+    /* fi-rr-angle-right */
+    content: '\e08f';
+    transition: transform .25s;
+    place-self: center;
+    margin-right: 1em;
+  }
+
+  &[open] summary {
+    background-color: var(--color-primary-contrast);
+    border-radius: 1em 1em 0 0;
+
+    &::before {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+button .fi {
+  margin-bottom: -.25em;
 }

@@ -34,40 +34,88 @@
 
 <svelte:head><title>{data.title}</title></svelte:head>
 
-<Idea idea={data.idea} />
+<section class="idea__container">
+	<Idea idea={data.idea} />
 
-<section>
-	<h2>Related Ideas</h2>
-	<ul class="idea-list">
-		{#each data.relatedIdeas as otherIdea (otherIdea.id)}
-			<button onclick={() => removeRelatedIdea(otherIdea)}><IdeaPreview idea={otherIdea} /></button>
-		{/each}
-	</ul>
-</section>
+	<details open={data.relatedIdeas.length > 0}>
+		<summary>Related Ideas</summary>
+		<ul class="idea-list">
+			{#if data.relatedIdeas.length === 0}
+				<p>No related ideas found.</p>
+			{:else}
+				{#each data.relatedIdeas as otherIdea (otherIdea.id)}
+					<li class="idea-preview__item">
+						<a href="/ideas/{otherIdea.id}"><IdeaPreview idea={otherIdea} /></a>
+						<button
+							class="btn-primary"
+							title="Mark Unrelated"
+							onclick={() => removeRelatedIdea(otherIdea)}
+							><i class="fi fi-rr-link-slash"></i></button
+						>
+					</li>
+				{/each}
+			{/if}
+		</ul>
+	</details>
 
-<section>
-	<h2>Unrelated Ideas</h2>
-	<ul class="idea-list">
-		{#each unrelatedIdeas as otherIdea (otherIdea.id)}
-			<button onclick={() => addRelatedIdea(otherIdea)}><IdeaPreview idea={otherIdea} /></button>
-		{/each}
-	</ul>
+	<details>
+		<summary>Unrelated Ideas</summary>
+		<ul class="idea-list">
+			{#if unrelatedIdeas.length === 0}
+				<p>No unrelated ideas found.</p>
+			{:else}
+				{#each unrelatedIdeas as otherIdea (otherIdea.id)}
+					<li class="idea-preview__item">
+						<a href="/ideas/{otherIdea.id}"><IdeaPreview idea={otherIdea} /></a>
+						<button
+							class="btn-primary"
+							style:place-items="center"
+							title="Mark Related"
+							onclick={() => addRelatedIdea(otherIdea)}><i class="fi fi-rr-link"></i></button
+						>
+					</li>
+				{/each}
+			{/if}
+		</ul>
+	</details>
 </section>
 
 <style>
+	.idea__container {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+	}
+
+	.idea-preview__item {
+		display: flex;
+		flex-direction: row;
+		border-radius: 1em;
+		box-shadow: 0 0 1px 0px black;
+
+		button {
+			border-radius: 0 1em 1em 0;
+			display: flex;
+			place-items: center;
+		}
+
+		a {
+			text-decoration: none;
+			color: inherit;
+
+			&:hover {
+				--cbg-color: oklch(from var(--bg-color) calc(l + 0.1) c h);
+			}
+		}
+	}
+
 	.idea-list {
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
 		padding: 0;
-		margin: 0;
+		margin: 1em;
 		list-style-type: none;
 		gap: 1em;
-
-		button {
-			border: none;
-			padding: 0;
-			background-color: transparent;
-		}
 	}
 </style>

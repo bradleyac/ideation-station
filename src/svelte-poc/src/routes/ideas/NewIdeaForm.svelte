@@ -28,6 +28,7 @@
 		background-color: var(--color-primary);
 		border-radius: 0.5em;
 		padding: 1em;
+		box-shadow: 0 0 1px black;
 
 		label > * {
 			margin-top: 0.25em;
