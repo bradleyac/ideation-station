@@ -4,6 +4,7 @@ export async function load({ depends, params }) {
   depends("data:ideas");
 
   return {
-    ideas: await db.getAllIdeas()
+    ideas: await db.getAllIdeas(),
+    categories: await db.getAllCategories(),
   }
 }

@@ -12,7 +12,7 @@ body {
 :root {
   color-scheme: light dark;
 
-  --base-color: oklch(.75 0.05 170);
+  --base-color: oklch(71.603% 0.0376 240.576);
   --text-color: oklch(from var(--base-color) calc(l / 4) calc(c * 1.5) h);
   --bg-color: oklch(from var(--base-color) l c h);
   --color-primary: oklch(from var(--base-color) calc(l + .1) calc(c * 1.5) h);
@@ -40,6 +40,10 @@ body {
 
   button:hover {
     cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
   }
 }
 
@@ -49,66 +53,67 @@ body {
   /* background-color: var(--bg-color); */
 }
 
+/* .font-honk {
+  font-family: "Honk", system-ui;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "MORF" 15,
+    "SHLN" 50;
+} */
+
 .btn-primary {
   border-radius: 0.5em;
   padding: 0.5em;
   width: fit-content;
   background-color: var(--color-primary-contrast);
   border: none;
+  display: flex;
 
   &:not(:has(i)) {
     box-shadow: 0 0 1px black;
   }
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: oklch(from var(--color-primary-contrast) calc(l + 0.05) c h);
-  }
-}
-
-details {
-  position: relative;
-  background-color: var(--color-primary);
-  border-radius: 1em;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 0 1px black;
-
-  summary {
-    list-style-type: none;
-    display: flex;
-    /* font-weight: bold; */
-    /* font-size: 1.5em; */
-    user-select: none;
-    padding: 1em;
-  }
-
-  summary::before {
-    font-family: uicons-regular-rounded !important;
-    font-style: normal;
-    font-weight: normal !important;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    display: inline-block;
-    /* fi-rr-angle-right */
-    content: '\e08f';
-    transition: transform .25s;
-    place-self: center;
-    margin-right: 1em;
-  }
-
-  &[open] summary {
-    background-color: var(--color-primary-contrast);
-    border-radius: 1em 1em 0 0;
-
-    &::before {
-      transform: rotate(90deg);
-    }
   }
 }
 
 button .fi {
   margin-bottom: -.25em;
+}
+
+input {
+  border-radius: 0.5em;
+  width: 100%;
+}
+
+input,
+textarea {
+  padding: 0.5em;
+}
+
+textarea {
+  border-radius: 0.5em 0.5em 0 0.5em;
+  padding: 0.5em;
+  width: 100%;
+  height: 10em;
+  resize: vertical;
+}
+
+pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.tippy-box[data-theme~='idea-catalog'] {
+  background-color: var(--color-primary-contrast);
+  color: var(--text-color);
+  box-shadow: 0 0 1px black;
+
+  .tippy-content {
+    padding: .75em;
+  }
 }

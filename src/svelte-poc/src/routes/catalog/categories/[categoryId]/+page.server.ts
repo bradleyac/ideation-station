@@ -1,0 +1,17 @@
+import { db } from '$lib/db.svelte.js';
+import { error } from '@sveltejs/kit';
+
+export async function load({ depends, params, parent }) {
+  depends(`data:category/${params.categoryId}`);
+  const ideaIds = params.categoryId === 'Uncategorized' ? await db.getUncategorizedIdeaIds() : await db.getIdeaIdsByCategory(params.categoryId);
+
+  const category = params.categoryId === 'Uncategorized' ? { id: 'Uncategorized', name: 'Uncategorized', count: ideaIds.length } : await db.getCategoryById(params.categoryId);
+
+  if (!category) error(404);
+
+  return {
+    ideaIds,
+    category,
+    title: "Category: " + category.name,
+  };
+}
