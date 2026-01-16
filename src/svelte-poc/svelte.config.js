@@ -18,6 +18,11 @@ const config = {
 						route: '/catalog/*',
 						allowedRoles: ['authenticated'],
 						allowedMethods: ['GET', 'POST', 'PUT', 'DELETE']
+					},
+					{
+						route: '/catalog/idea/*',
+						allowedRoles: ['authenticated'],
+						allowedMethods: ['GET', 'POST', 'PUT', 'DELETE']
 					}
 				],
 				responseOverrides: {
