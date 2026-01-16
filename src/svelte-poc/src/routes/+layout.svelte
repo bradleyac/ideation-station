@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
-	import path from 'path';
 	import '../app.css';
 	import 'tippy.js/dist/tippy.css';
 
