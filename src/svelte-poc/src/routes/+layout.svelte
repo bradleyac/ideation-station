@@ -18,7 +18,7 @@
 <div id="__layout-container">
 	<nav>
 		<ul>
-			{#each [{ path: '/', name: 'Home', subPages: [] }, { path: '/catalog', name: 'Idea Catalog', subPages: ['/ideas/[id]', '/categories/[category]'] }] as { path, name, subPages }}
+			{#each [{ path: '/', name: 'Home', subPages: [] }, { path: '/catalog', name: 'Idea Catalog', subPages: ['/ideas/[ideaId]', '/categories/[categoryId]'] }] as { path, name, subPages }}
 				<li style:display="flex" style:gap=".5em">
 					{#if route.id === path}
 						{name}

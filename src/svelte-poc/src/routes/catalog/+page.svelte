@@ -51,12 +51,6 @@
 </section>
 
 <style>
-	h1 {
-		text-align: center;
-		font-size: 4em;
-		margin: 0.25em 0 0 0;
-	}
-
 	ul {
 		list-style-type: none;
 		padding: 0;

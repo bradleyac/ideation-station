@@ -40,6 +40,11 @@
 {/key}
 
 <style>
+	section {
+		display: flex;
+		gap: 1em;
+		flex-direction: column;
+	}
 	.text-ticker__container {
 		position: absolute;
 		top: 0.75em;
