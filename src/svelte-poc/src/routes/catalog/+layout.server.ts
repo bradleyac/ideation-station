@@ -12,8 +12,6 @@ export async function load({ depends, params, platform }) {
     }
   }
 
-  console.log("Platform info in layout.server.ts:", platform);
-
   return {
     ideas: await db.getAllIdeas(),
     categories: await db.getAllCategories(),

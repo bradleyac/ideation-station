@@ -82,10 +82,7 @@
 </div>
 
 <div class="idea-preview__container">
-	<a
-		href="/catalog/catalog/ideas/{idea.id}"
-		{@attach tooltip({ content: menu, interactive: true })}
-	>
+	<a href="/catalog/ideas/{idea.id}" {@attach tooltip({ content: menu, interactive: true })}>
 		{idea.name}
 	</a>
 </div>
