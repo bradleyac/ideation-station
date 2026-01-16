@@ -12,7 +12,7 @@
 
 	async function deleteIdea(idea: Idea) {
 		if (confirm(`Really delete "${idea.name}"?`)) {
-			await fetch(`/api/ideas/${idea.id}`, {
+			await fetch(`/ideas/${idea.id}`, {
 				method: 'DELETE'
 			});
 			invalidateAll();
@@ -20,7 +20,7 @@
 	}
 
 	async function linkCategory() {
-		await fetch(`/api/ideas/${idea.id}/categories/${categoryId}`, {
+		await fetch(`/ideas/${idea.id}/categories/${categoryId}`, {
 			method: 'PUT'
 		});
 		invalidateAll();
@@ -28,7 +28,7 @@
 
 	async function unlinkCategory() {
 		if (confirm(`Really remove "${idea.name}" from category?`)) {
-			await fetch(`/api/ideas/${idea.id}/categories/${categoryId}`, {
+			await fetch(`/ideas/${idea.id}/categories/${categoryId}`, {
 				method: 'DELETE'
 			});
 			invalidateAll();
@@ -36,14 +36,14 @@
 	}
 
 	async function linkIdea() {
-		await fetch(`/api/ideas/${idea.id}/related/${otherIdea?.id}`, {
+		await fetch(`/ideas/${idea.id}/related/${otherIdea?.id}`, {
 			method: 'PUT'
 		});
 		invalidateAll();
 	}
 
 	async function unlinkIdea() {
-		await fetch(`/api/ideas/${idea.id}/related/${otherIdea?.id}`, {
+		await fetch(`/ideas/${idea.id}/related/${otherIdea?.id}`, {
 			method: 'DELETE'
 		});
 		invalidateAll();
