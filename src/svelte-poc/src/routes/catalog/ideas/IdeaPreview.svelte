@@ -12,7 +12,7 @@
 
 	async function deleteIdea(idea: Idea) {
 		if (confirm(`Really delete "${idea.name}"?`)) {
-			await fetch(`/ideas/${idea.id}`, {
+			await fetch(`/catalog/ideas/${idea.id}`, {
 				method: 'DELETE'
 			});
 			invalidateAll();
@@ -20,7 +20,7 @@
 	}
 
 	async function linkCategory() {
-		await fetch(`/ideas/${idea.id}/categories/${categoryId}`, {
+		await fetch(`/catalog/ideas/${idea.id}/categories/${categoryId}`, {
 			method: 'PUT'
 		});
 		invalidateAll();
@@ -28,7 +28,7 @@
 
 	async function unlinkCategory() {
 		if (confirm(`Really remove "${idea.name}" from category?`)) {
-			await fetch(`/ideas/${idea.id}/categories/${categoryId}`, {
+			await fetch(`/catalog/ideas/${idea.id}/categories/${categoryId}`, {
 				method: 'DELETE'
 			});
 			invalidateAll();
@@ -36,14 +36,14 @@
 	}
 
 	async function linkIdea() {
-		await fetch(`/ideas/${idea.id}/related/${otherIdea?.id}`, {
+		await fetch(`/catalog/ideas/${idea.id}/related/${otherIdea?.id}`, {
 			method: 'PUT'
 		});
 		invalidateAll();
 	}
 
 	async function unlinkIdea() {
-		await fetch(`/ideas/${idea.id}/related/${otherIdea?.id}`, {
+		await fetch(`/catalog/ideas/${idea.id}/related/${otherIdea?.id}`, {
 			method: 'DELETE'
 		});
 		invalidateAll();
@@ -82,7 +82,10 @@
 </div>
 
 <div class="idea-preview__container">
-	<a href="/catalog/ideas/{idea.id}" {@attach tooltip({ content: menu, interactive: true })}>
+	<a
+		href="/catalog/catalog/ideas/{idea.id}"
+		{@attach tooltip({ content: menu, interactive: true })}
+	>
 		{idea.name}
 	</a>
 </div>

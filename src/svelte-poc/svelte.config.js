@@ -15,12 +15,9 @@ const config = {
 			customStaticWebAppConfig: {
 				routes: [
 					{
-						route: '/ideas/*',
-						allowedRoles: ['authenticated']
-					},
-					{
 						route: '/catalog/*',
-						allowedRoles: ['authenticated']
+						allowedRoles: ['authenticated'],
+						allowedMethods: ['GET', 'POST', 'PUT', 'DELETE']
 					}
 				],
 				responseOverrides: {
