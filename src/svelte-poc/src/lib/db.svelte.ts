@@ -4,8 +4,8 @@ import { env } from '$env/dynamic/private';
 
 class Db {
   private userid: string = 'bradleyac';
-  private hostname: string = env.COSMOSDB_HOST ?? "";
-  private primaryKey: string = env.COSMOSDB_KEY ?? "";
+  private hostname: string = env.COSMOSDB_HOST ?? "ideationstation";
+  private primaryKey: string = env.COSMOSDB_KEY ?? "insertkeyhere";
   private client: gremlin.driver.Client;
   constructor() {
     this.client = this.createClient();
