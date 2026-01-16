@@ -13,6 +13,16 @@ const config = {
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: azure({
 			customStaticWebAppConfig: {
+				routes: [
+					{
+						route: '/ideas/*',
+						allowedRoles: ['authenticated']
+					},
+					{
+						route: '/catalog/*',
+						allowedRoles: ['authenticated']
+					}
+				],
 				responseOverrides: {
 					401: {
 						statusCode: 302,
