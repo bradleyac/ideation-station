@@ -5,6 +5,7 @@ import { redirect } from "@sveltejs/kit";
 export async function load({ depends, params, platform }) {
   depends("data:ideas");
 
+  // TODO: Does this work at all? It doesn't prevent the 500.
   if (!dev) {
     if (!platform?.clientPrincipal) {
       redirect(302, '/.auth/login/aad');

@@ -15,7 +15,7 @@
 </svelte:head>
 
 <div id="__layout-container">
-	<nav>
+	<nav data-sveltekit-reload>
 		<ul>
 			{#each [{ path: '/', name: 'Home', subPages: [] }, { path: '/catalog', name: 'Idea Catalog', subPages: ['/ideas/[ideaId]', '/categories/[categoryId]'] }] as { path, name, subPages }}
 				<li style:display="flex" style:gap=".5em">
