@@ -2,7 +2,8 @@
 	import { enhance } from '$app/forms';
 	import type { Category, Idea } from '$lib/types.js';
 	import type { ActionResult } from '@sveltejs/kit';
-	let {
+	let props = $props();
+	const {
 		extantCategories,
 		existingIdea,
 		defaultCategoryId,
@@ -18,13 +19,14 @@
 			update: () => Promise<void>;
 			result: ActionResult;
 		}) => Promise<void>;
-	} = $props();
-	let title = $derived(existingIdea ? 'Edit Idea' : 'Create New Idea');
-	let action = $derived(existingIdea ? `/catalog/ideas/${existingIdea.id}` : '/catalog/ideas');
-	// TODO: Is this (state referenced locally warning) a warning I should pay attention to every time?
-	// Is there a better way to do this that doesn't generate the warning?
+	} = props;
+	let title = $derived(props.existingIdea ? 'Edit Idea' : 'Create New Idea');
+	let action = $derived(
+		props.existingIdea ? `/catalog/ideas/${props.existingIdea.id}` : '/catalog/ideas'
+	);
 	let categories: string[] = $state([
-		...(existingIdea?.categoryIds || (defaultCategoryId ? [defaultCategoryId] : []))
+		...(props.existingIdea?.categoryIds ||
+			(props.defaultCategoryId ? [props.defaultCategoryId] : []))
 	]);
 
 	let formKey = $state(0);
