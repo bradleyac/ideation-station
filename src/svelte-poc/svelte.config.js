@@ -17,7 +17,7 @@ const config = {
 					{
 						route: '/catalog/*',
 						allowedRoles: ['authenticated'],
-						allowedMethods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
+						methods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
 						rewrite: "/api/__render"
 					},
 				],
