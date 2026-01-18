@@ -17,7 +17,7 @@ const config = {
 					{
 						route: '/catalog/*',
 						allowedRoles: ['authenticated'],
-						rewrite: "/api/__render"
+						rewrite: "/api/sk_render"
 					},
 				],
 				responseOverrides: {
