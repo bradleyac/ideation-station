@@ -15,14 +15,16 @@
 </svelte:head>
 
 <div>
-	<nav data-sveltekit-reload class="p-4 bg-eucalyptus-500 overflow-hidden h-16 content-center">
-		<ul class="p-0 m-0 flex gap-4 overflow-hidden text-eucalyptus-800 dark:text-eucalyptus-200">
+	<nav data-sveltekit-reload class="p-4 bg-eucalyptus-500 h-16 content-center">
+		<ul class="p-0 m-0 list-none flex gap-4 text-eucalyptus-800 dark:text-eucalyptus-200">
 			{#each [{ path: '/', name: 'Home', subPages: [] }, { path: '/catalog', name: 'Idea Catalog', subPages: ['/ideas/[ideaId]', '/categories/[categoryId]'] }] as { path, name, subPages }}
-				<li class="flex gap-2 list-none">
+				<li class="flex gap-2 last:overflow-hidden">
 					{#if route.id === path}
 						{name}
 					{:else}
-						<a class="text-eucalyptus-900 dark:text-eucalyptus-100" href={path}>{name}</a>
+						<a class="text-eucalyptus-900 dark:text-eucalyptus-100 whitespace-nowrap" href={path}
+							>{name}</a
+						>
 						{#each subPages as subPath}
 							{#if route.id === `${path}${subPath}`}
 								<div class="border-e"></div>
