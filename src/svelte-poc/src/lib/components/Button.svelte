@@ -8,7 +8,7 @@
 	{...props}
 	class={[
 		'p-2',
-		'rounded-lg',
+		'rounded-sm',
 		'w-max',
 		'place-items-center',
 		'gap-2',

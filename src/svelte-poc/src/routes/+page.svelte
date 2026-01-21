@@ -1,3 +1,3 @@
 <svelte:head><title>Home</title></svelte:head>
 
-<h1>Welcome Home!</h1>
+<h1 class="m-3">Welcome Home!</h1>

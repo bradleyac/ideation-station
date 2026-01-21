@@ -1,44 +1,24 @@
 <script lang="ts">
-	const { children, title, open = false } = $props();
+	const props = $props();
 </script>
 
-<details {open} class="bg-eucalyptus-100 dark:bg-eucalyptus-900">
+<details {...props} class="group relative rounded-sm flex flex-col border-1 h-auto open:h-fit">
+	<!-- TODO does summary have :open applied to it as well? -->
+	<!-- Answer: It does not, but you can use in-open: as if it did. -->
 	<summary
-		class="inline-block p-4 select-none bg-eucalyptus-400 dark:bg-eucalyptus-600 hover:bg-eucalyptus-300 dark:hover:bg-eucalyptus-700"
-		>{title}</summary
+		class="flex p-4 group-open:border-b-1 group-open:before:transform-[rotate(90deg)] hover:cursor-pointer select-none"
+		>{props.title}</summary
 	>
-	<div class="flex m-4">
-		{@render children()}
+	<div class="flex m-2">
+		{@render props.children?.()}
 	</div>
 </details>
 
 <style>
 	/* Not replacing this with tailwind, at least not yet. Too much going on.*/
 	details {
-		position: relative;
-		border-radius: 0;
-		@media (width >= 64rem) {
-			border-radius: 1em;
-		}
-		display: flex;
-		flex-direction: column;
-		box-shadow: 0 0 1px black;
-		max-width: 100%;
-
-		&:not([open]) {
-			height: fit-content;
-		}
-
 		summary {
-			list-style-type: none;
-			display: flex;
-			user-select: none;
-			border-radius: 0;
-			@media (width >= 64rem) {
-				border-radius: 1em;
-			}
 			&:hover {
-				cursor: pointer;
 			}
 		}
 
@@ -57,17 +37,6 @@
 			transition: transform 0.25s;
 			place-self: center;
 			margin-right: 0.5em;
-		}
-
-		&[open] summary {
-			border-radius: 0;
-			@media (width >= 64rem) {
-				border-radius: 1em 1em 0 0;
-			}
-
-			&::before {
-				transform: rotate(90deg);
-			}
 		}
 	}
 </style>

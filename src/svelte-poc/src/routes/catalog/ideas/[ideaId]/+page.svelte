@@ -55,7 +55,7 @@
 </Modal>
 
 {#key data.idea.id}
-	<section class="flex flex-col gap-4">
+	<section class="flex flex-col gap-4 m-3">
 		<Button type="button" title="Edit Idea" onclick={() => (showModal = !showModal)}
 			><i class="fi fi-rr-edit"></i> Edit Idea</Button
 		>

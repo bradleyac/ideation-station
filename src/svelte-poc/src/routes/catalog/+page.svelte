@@ -24,7 +24,7 @@
 	{/key}
 </Modal>
 
-<section class="flex flex-col gap-4">
+<section class="flex flex-col gap-4 m-3">
 	<h1>Idea Catalog</h1>
 
 	<Button
@@ -35,7 +35,7 @@
 		title="Open Create Idea Form"><i class="block fi fi-rr-add"></i>New Idea</Button
 	>
 
-	<div class="absolute top-3 right-4 invisible lg:visible">
+	<div class="top-2.5 right-4 invisible lg:visible z-2 fixed">
 		<TextTicker
 			labels={data.ideas
 				.filter((idea) => idea.categoryIds?.includes(aspirationsCategoryId))

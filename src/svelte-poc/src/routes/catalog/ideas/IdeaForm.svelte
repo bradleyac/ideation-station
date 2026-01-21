@@ -39,7 +39,7 @@
 
 {#key formKey}
 	<form
-		class="flex flex-col overflow-clip lg:rounded-2xl w-full lg:w-1/2"
+		class="flex flex-col overflow-clip lg:rounded-sm w-full max-w-lg"
 		method="POST"
 		{action}
 		use:enhance={enhanceCallback ??
@@ -53,8 +53,8 @@
 				};
 			})}
 	>
-		<h2 class="bg-eucalyptus-300 dark:bg-eucalyptus-700 p-4">{title}</h2>
-		<div class="bg-neutral-200 dark:bg-neutral-800 p-4 gap-4 flex flex-col">
+		<h2 class="bg-eucalyptus-300 dark:bg-eucalyptus-700 p-3">{title}</h2>
+		<div class="bg-neutral-200 dark:bg-neutral-800 p-3 gap-4 flex flex-col">
 			<label>
 				Name
 				<input

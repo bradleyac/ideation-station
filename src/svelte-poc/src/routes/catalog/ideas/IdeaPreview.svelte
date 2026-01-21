@@ -86,7 +86,7 @@
 </div>
 
 <a
-	class="inline-block rounded-lg shadow-amber-500/30 shadow-sm px-4 py-3 bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800"
+	class="inline-block rounded-sm shadow-amber-500/30 shadow-sm px-4 py-3 bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800"
 	tabindex="0"
 	href="/catalog/ideas/{idea.id}"
 	{@attach tooltip({ content: menu, interactive: true })}

@@ -28,11 +28,11 @@
 </Modal>
 
 {#key params.categoryId}
-	<div class="absolute top-3 right-4 invisible lg:visible">
+	<div class="fixed z-2 top-2.5 right-4 invisible lg:visible">
 		<TextTicker labels={relatedIdeas.map((idea) => idea.name)} period={5000} />
 	</div>
 
-	<section class="flex flex-col gap-4">
+	<section class="flex flex-col gap-4 m-3">
 		<h1>{data.category.name}</h1>
 		<Button
 			class="flex place-items-center w-max p-2"
