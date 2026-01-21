@@ -17,7 +17,7 @@
 	details {
 		position: relative;
 		border-radius: 0;
-		@media (width >= 48rem) {
+		@media (width >= 64rem) {
 			border-radius: 1em;
 		}
 		display: flex;
@@ -34,7 +34,7 @@
 			display: flex;
 			user-select: none;
 			border-radius: 0;
-			@media (width >= 48rem) {
+			@media (width >= 64rem) {
 				border-radius: 1em;
 			}
 			&:hover {
@@ -52,8 +52,6 @@
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
 			display: inline-block;
-			/* fi-rr-angle-small-right */
-			/* content: '\e092'; */
 			/* fi-rr-angle-right */
 			content: '\e08f';
 			transition: transform 0.25s;
@@ -62,9 +60,8 @@
 		}
 
 		&[open] summary {
-			/* background-color: var(--color-primary-contrast); */
 			border-radius: 0;
-			@media (width >= 48rem) {
+			@media (width >= 64rem) {
 				border-radius: 1em 1em 0 0;
 			}
 
