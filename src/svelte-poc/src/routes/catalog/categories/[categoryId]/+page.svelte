@@ -28,7 +28,7 @@
 </Modal>
 
 {#key params.categoryId}
-	<div class="absolute top-3 right-4">
+	<div class="absolute top-3 right-4 invisible sm:visible">
 		<TextTicker labels={relatedIdeas.map((idea) => idea.name)} period={5000} />
 	</div>
 

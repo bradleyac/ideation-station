@@ -35,7 +35,7 @@
 		title="Open Create Idea Form"><i class="block fi fi-rr-add"></i>New Idea</Button
 	>
 
-	<div class="absolute top-3 right-4">
+	<div class="absolute top-3 right-4 invisible sm:visible">
 		<TextTicker
 			labels={data.ideas
 				.filter((idea) => idea.categoryIds?.includes(aspirationsCategoryId))
