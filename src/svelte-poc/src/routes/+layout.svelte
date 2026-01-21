@@ -36,7 +36,7 @@
 			{/each}
 		</ul>
 	</nav>
-	<div class="m-4">
+	<div class="my-4 md:mx-4">
 		{@render children()}
 	</div>
 </div>
