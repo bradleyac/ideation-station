@@ -26,7 +26,7 @@
 						{#each subPages as subPath}
 							{#if route.id === `${path}${subPath}`}
 								<div class="border-e"></div>
-								<span class="max-w-100 overflow-hidden text-ellipsis whitespace-nowrap">
+								<span class="max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
 									{title ?? ''}
 								</span>
 							{/if}
