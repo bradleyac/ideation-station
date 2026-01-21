@@ -16,7 +16,10 @@
 	/* Not replacing this with tailwind, at least not yet. Too much going on.*/
 	details {
 		position: relative;
-		border-radius: 1em;
+		border-radius: 0;
+		@media (width >= 48rem) {
+			border-radius: 1em;
+		}
 		display: flex;
 		flex-direction: column;
 		box-shadow: 0 0 1px black;
@@ -30,8 +33,10 @@
 			list-style-type: none;
 			display: flex;
 			user-select: none;
-			border-radius: 1em;
-
+			border-radius: 0;
+			@media (width >= 48rem) {
+				border-radius: 1em;
+			}
 			&:hover {
 				cursor: pointer;
 			}
@@ -58,7 +63,10 @@
 
 		&[open] summary {
 			/* background-color: var(--color-primary-contrast); */
-			border-radius: 1em 1em 0 0;
+			border-radius: 0;
+			@media (width >= 48rem) {
+				border-radius: 1em 1em 0 0;
+			}
 
 			&::before {
 				transform: rotate(90deg);
