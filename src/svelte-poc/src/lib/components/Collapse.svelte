@@ -2,39 +2,38 @@
 	const { children, title, open = false } = $props();
 </script>
 
-<details {open}>
-	<summary>{title}</summary>
-	<div class="children__container">
+<details {open} class="bg-eucalyptus-100 dark:bg-eucalyptus-900">
+	<summary
+		class="inline-block p-4 select-none bg-eucalyptus-400 dark:bg-eucalyptus-600 hover:bg-eucalyptus-300 dark:hover:bg-eucalyptus-700"
+		>{title}</summary
+	>
+	<div class="flex m-4">
 		{@render children()}
 	</div>
 </details>
 
 <style>
-	.children__container {
-		display: flex;
-		margin: 1em;
-	}
-
+	/* Not replacing this with tailwind, at least not yet. Too much going on.*/
 	details {
 		position: relative;
-		background-color: var(--color-primary);
 		border-radius: 1em;
 		display: flex;
 		flex-direction: column;
 		box-shadow: 0 0 1px black;
+		max-width: 100%;
+
+		&:not([open]) {
+			height: fit-content;
+		}
 
 		summary {
 			list-style-type: none;
 			display: flex;
-			/* font-weight: bold; */
-			/* font-size: 1.5em; */
 			user-select: none;
-			padding: 0.5em;
 			border-radius: 1em;
 
 			&:hover {
 				cursor: pointer;
-				background-color: var(--color-primary-contrast);
 			}
 		}
 
@@ -48,15 +47,17 @@
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
 			display: inline-block;
+			/* fi-rr-angle-small-right */
+			/* content: '\e092'; */
 			/* fi-rr-angle-right */
-			content: '\e092';
+			content: '\e08f';
 			transition: transform 0.25s;
 			place-self: center;
 			margin-right: 0.5em;
 		}
 
 		&[open] summary {
-			background-color: var(--color-primary-contrast);
+			/* background-color: var(--color-primary-contrast); */
 			border-radius: 1em 1em 0 0;
 
 			&::before {

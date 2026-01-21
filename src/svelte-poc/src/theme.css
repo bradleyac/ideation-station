@@ -1,0 +1,49 @@
+@theme {
+  --color-waikawa-gray-50: #f2f6fb;
+  --color-waikawa-gray-100: #e6f0f9;
+  --color-waikawa-gray-200: #d2e1f3;
+  --color-waikawa-gray-300: #b7cdea;
+  --color-waikawa-gray-400: #9ab1df;
+  --color-waikawa-gray-500: #8097d4;
+  --color-waikawa-gray-600: #6779c4;
+  --color-waikawa-gray-700: #6371b2;
+  --color-waikawa-gray-800: #48558b;
+  --color-waikawa-gray-900: #3f4970;
+  --color-waikawa-gray-950: #252a41;
+
+  --color-eucalyptus-50: #edfcf5;
+  --color-eucalyptus-100: #d4f7e6;
+  --color-eucalyptus-200: #adedd2;
+  --color-eucalyptus-300: #78ddb7;
+  --color-eucalyptus-400: #41c698;
+  --color-eucalyptus-500: #1eab7f;
+  --color-eucalyptus-600: #118b68;
+  --color-eucalyptus-700: #0e6e55;
+  --color-eucalyptus-800: #0d5845;
+  --color-eucalyptus-900: #0c4839;
+  --color-eucalyptus-950: #052921;
+
+  --animate-zoom: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  @keyframes zoom {
+    from {
+      transform: scale(0.95);
+    }
+
+    to {
+      transform: scale(1);
+    }
+  }
+
+  --animate-fade: fade 0.2s ease-out;
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+}

@@ -45,8 +45,11 @@
 		"vitest-browser-svelte": "^2.0.1"
 	},
 	"dependencies": {
+		"@tailwindcss/vite": "^4.1.18",
+		"@zag-js/focus-trap": "^1.32.0",
 		"gremlin": "^3.4.13",
 		"rxjs": "^7.8.2",
+		"tailwindcss": "^4.1.18",
 		"tippy.js": "^6.3.7"
 	}
 }

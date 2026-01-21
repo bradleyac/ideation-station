@@ -14,19 +14,21 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div id="__layout-container">
-	<nav data-sveltekit-reload>
-		<ul>
+<div>
+	<nav data-sveltekit-reload class="p-4 bg-eucalyptus-500 overflow-hidden h-16 content-center">
+		<ul class="p-0 m-0 flex gap-4 overflow-hidden text-eucalyptus-800 dark:text-eucalyptus-200">
 			{#each [{ path: '/', name: 'Home', subPages: [] }, { path: '/catalog', name: 'Idea Catalog', subPages: ['/ideas/[ideaId]', '/categories/[categoryId]'] }] as { path, name, subPages }}
-				<li style:display="flex" style:gap=".5em">
+				<li class="flex gap-2 list-none">
 					{#if route.id === path}
 						{name}
 					{:else}
-						<a href={path}>{name}</a>
+						<a class="text-eucalyptus-900 dark:text-eucalyptus-100" href={path}>{name}</a>
 						{#each subPages as subPath}
 							{#if route.id === `${path}${subPath}`}
-								<div style:border-right="1px solid var(--text-color)"></div>
-								{title ?? ''}
+								<div class="border-e"></div>
+								<span class="max-w-100 overflow-hidden text-ellipsis whitespace-nowrap">
+									{title ?? ''}
+								</span>
 							{/if}
 						{/each}
 					{/if}
@@ -34,45 +36,7 @@
 			{/each}
 		</ul>
 	</nav>
-	<div>
+	<div class="m-4">
 		{@render children()}
 	</div>
 </div>
-
-<template></template>
-
-<style>
-	#__layout-container {
-		> div {
-			margin: 0 1em 1em 1em;
-		}
-	}
-
-	nav {
-		padding: 1em;
-		background: var(--color-secondary);
-		overflow: hidden;
-		height: 4em;
-		align-content: center;
-
-		ul {
-			list-style: none;
-			padding: 0;
-			margin: 0;
-			display: flex;
-			gap: 1em;
-			overflow: hidden;
-		}
-
-		a {
-			color: inherit;
-		}
-
-		li {
-			max-width: 50em;
-			overflow: hidden;
-			text-wrap: nowrap;
-			text-overflow: ellipsis;
-		}
-	}
-</style>

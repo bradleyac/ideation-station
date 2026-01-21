@@ -52,22 +52,10 @@
 	let current = $derived(labels[index]);
 </script>
 
-<div class="text-ticker">
+<div class="text-3xl grid place-items-end">
 	{#key current}
-		<p in:fade={{ delay: 1000 }} out:fade={{ duration: 750 }}>
+		<p class="m-0" in:fade={{ delay: 1000 }} out:fade={{ duration: 750 }}>
 			{current}
 		</p>
 	{/key}
 </div>
-
-<style>
-	.text-ticker {
-		font-size: 2em;
-		display: grid;
-		place-items: end;
-
-		p {
-			margin: 0;
-		}
-	}
-</style>

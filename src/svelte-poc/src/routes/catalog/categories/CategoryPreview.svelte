@@ -4,39 +4,16 @@
 	const { category }: { category: Category } = $props();
 </script>
 
-<a class="category__badge" href="/catalog/categories/{category.id}">
+<a
+	tabindex="0"
+	class="grid grid-cols-[auto_min-content] grid-flow-col shadow-amber-500/30 shadow-sm bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800 py-3 px-4 rounded-full"
+	href="/catalog/categories/{category.id}"
+>
 	<span>
 		{category.name}
 	</span>
-	<div style:margin="-.25em .5em" style:border-right=".5px solid black"></div>
+	<div class="-my-3 mx-3 border-e"></div>
 	<span>
 		{category.count ?? 0}
 	</span>
 </a>
-
-<style>
-	.category__badge {
-		display: grid;
-		grid-template-columns: auto min-content;
-		grid-auto-flow: column;
-		text-decoration: none;
-		color: inherit;
-		background-color: var(--color-primary);
-		padding: 0.25em 0.75em;
-		border-radius: 1em;
-		box-shadow: 0 0 1px 0 black;
-
-		max-width: 100%;
-		&:hover {
-			box-shadow: 0 0 0.25em 0 black;
-			z-index: 1;
-			transform: scale(1.05);
-		}
-
-		span {
-			text-overflow: ellipsis;
-			text-wrap: nowrap;
-			overflow: hidden;
-		}
-	}
-</style>
