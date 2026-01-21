@@ -15,7 +15,7 @@
 </script>
 
 <dialog
-	class="mx-auto! top-20 bg-transparent w-full open:flex open:flex-col open:place-items-center open:animate-zoom backdrop:bg-black/50 open:backdrop:animate-fade"
+	class="top-0 md:top-20 bg-transparent max-w-full! w-full open:flex open:flex-col open:place-items-center open:animate-zoom backdrop:bg-black/50 open:backdrop:animate-fade"
 	bind:this={dialog}
 	onclose={() => (showModal = false)}
 	onclick={(e) => {
