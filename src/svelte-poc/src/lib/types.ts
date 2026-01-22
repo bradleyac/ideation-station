@@ -11,4 +11,11 @@ interface Category {
   count: number,
 }
 
-export type { Idea, Category };
+interface CategoryFull {
+  id: string,
+  name: string,
+  desc: string,
+  ideaIds: string[],
+}
+
+export type { Idea, Category, CategoryFull };

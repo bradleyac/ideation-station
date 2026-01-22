@@ -15,3 +15,15 @@ export async function load({ depends, params, parent }) {
     title: "Category: " + category.name,
   };
 }
+
+export const actions = {
+  default: async (event) => {
+    const data = await event.request.formData();
+    const name = data.get('name')?.toString() ?? '';
+    const desc = data.get('desc')?.toString() ?? '';
+
+    if (name === '' || desc === '') error(400);
+
+    await db.updateCategory({ id: event.params.categoryId, name, desc, ideaIds: [] });
+  },
+};

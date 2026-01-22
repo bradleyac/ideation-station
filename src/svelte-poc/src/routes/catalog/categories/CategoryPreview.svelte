@@ -12,7 +12,7 @@
 	<span>
 		{category.name}
 	</span>
-	<div class="-my-3 mx-3 border-e"></div>
+	<div class="-my-3 mx-4 border-e"></div>
 	<span>
 		{category.count ?? 0}
 	</span>

@@ -6,34 +6,54 @@
 	import CategoryPreview from './categories/CategoryPreview.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import CategoryForm from './categories/CategoryForm.svelte';
 
 	const { data } = $props();
 	const aspirationsCategoryId = $derived(
 		data.categories.find((cat) => cat.name === 'Aspirations')!.id
 	);
 
-	let showModal = $state(false);
+	let showIdeaModal = $state(false);
 	let ideaKey = $state(0);
+
+	let showCategoryModal = $state(false);
+	let categoryKey = $state(0);
 </script>
 
 <svelte:head><title>Idea Catalog</title></svelte:head>
 
-<Modal bind:showModal>
+<Modal bind:showModal={showIdeaModal}>
 	{#key ideaKey}
 		<IdeaForm extantCategories={data.categories} />
+	{/key}
+</Modal>
+
+<Modal bind:showModal={showCategoryModal}>
+	{#key categoryKey}
+		<CategoryForm />
 	{/key}
 </Modal>
 
 <section class="flex flex-col gap-4 m-3">
 	<h1>Idea Catalog</h1>
 
-	<Button
-		onclick={() => {
-			showModal = !showModal;
-			ideaKey++;
-		}}
-		title="Open Create Idea Form"><i class="block fi fi-rr-add"></i>New Idea</Button
-	>
+	<div class="flex gap-2">
+		<Button
+			onclick={() => {
+				showIdeaModal = !showIdeaModal;
+				ideaKey++;
+			}}
+			title="Open Create Idea Form"><i class="block fi fi-rr-add"></i>New Idea</Button
+		>
+
+		<Button
+			onclick={() => {
+				showCategoryModal = !showCategoryModal;
+				categoryKey++;
+			}}
+			title="Open Create Category Form"><i class="block fi fi-rr-add"></i>New Category</Button
+		>
+	</div>
 
 	<div class="top-2.5 right-4 invisible lg:visible z-2 fixed">
 		<TextTicker

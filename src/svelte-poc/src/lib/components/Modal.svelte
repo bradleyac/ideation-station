@@ -22,11 +22,13 @@
 		if (e.target === dialog) dialog?.close();
 	}}
 >
-	{@render children?.()}
-	<button
-		onclick={() => dialog?.close()}
-		tabindex="-1"
-		class="absolute border-none top-2.5 right-2"
-		title="Close Dialog"><i class="fi fi-rr-cross"></i></button
-	>
+	<div class="flex place-items-center relative w-lg">
+		{@render children?.()}
+		<button
+			onclick={() => dialog?.close()}
+			tabindex="-1"
+			class="absolute border-none top-1 right-1"
+			title="Close Dialog"><i class="fi fi-rr-cross"></i></button
+		>
+	</div>
 </dialog>

@@ -1,5 +1,5 @@
 import gremlin from 'gremlin';
-import { type Category, type Idea } from "./types.js";
+import { type Category, type CategoryFull, type Idea } from "./types.js";
 import { env } from '$env/dynamic/private';
 
 class Db {
@@ -102,6 +102,34 @@ class Db {
         prop_userid: this.userid,
         prop_categoryid: categoryId,
       });
+    });
+  }
+
+  public async createCategory(category: CategoryFull): Promise<void> {
+    const createCategoryQuery = `g.addV('category')
+      .property('id', prop_id)
+      .property('userid', prop_userid)
+      .property('name', prop_name)
+      .property('desc', prop_desc)`
+
+    let results = await this.submitWithRetry(createCategoryQuery, {
+      prop_id: category.id,
+      prop_userid: this.userid,
+      prop_name: category.name,
+      prop_desc: category.desc,
+    });
+  }
+
+  public async updateCategory(category: CategoryFull): Promise<void> {
+    const updateCategoryQuery = `g.V([prop_userid, prop_id])
+      .property('name', prop_name)
+      .property('desc', prop_desc)`;
+
+    let results = await this.submitWithRetry(updateCategoryQuery, {
+      prop_id: category.id,
+      prop_userid: this.userid,
+      prop_name: category.name,
+      prop_desc: category.desc,
     });
   }
 
