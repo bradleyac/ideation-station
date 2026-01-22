@@ -6,8 +6,14 @@
 	const {
 		idea,
 		categoryId,
-		otherIdea
-	}: { idea: Idea; categoryId?: string; otherIdea?: { id: string; related: boolean } } = $props();
+		otherIdea,
+		mode = 'default'
+	}: {
+		idea: Idea;
+		categoryId?: string;
+		otherIdea?: { id: string; related: boolean };
+		mode?: 'default' | 'compact';
+	} = $props();
 
 	let menu = $state<HTMLElement | null>(null);
 
@@ -85,14 +91,24 @@
 	</div>
 </div>
 
-<a
-	class="inline-block rounded-sm shadow-amber-500/30 shadow-sm px-4 py-3 bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800"
-	tabindex="0"
-	href="/catalog/ideas/{idea.id}"
-	{@attach tooltip({ content: menu, interactive: true })}
->
-	{idea.name}
-</a>
+{#if mode === 'default'}
+	<a
+		class="inline-block rounded-sm shadow-amber-500/30 shadow-sm px-4 py-3 bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800"
+		tabindex="0"
+		href="/catalog/ideas/{idea.id}"
+		{@attach tooltip({ content: menu, interactive: true })}
+	>
+		{idea.name}
+	</a>
+{:else if mode === 'compact'}
+	<a
+		class="inline-block p-1 w-full bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800"
+		href="/catalog/ideas/{idea.id}"
+		{@attach tooltip({ content: menu, interactive: true })}
+	>
+		{idea.name}
+	</a>
+{/if}
 
 <style>
 	/* Not replacing with tailwind */

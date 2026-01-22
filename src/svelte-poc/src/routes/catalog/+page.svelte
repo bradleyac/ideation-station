@@ -18,6 +18,8 @@
 
 	let showCategoryModal = $state(false);
 	let categoryKey = $state(0);
+
+	let mode = $state<'default' | 'compact'>('default');
 </script>
 
 <svelte:head><title>Idea Catalog</title></svelte:head>
@@ -74,11 +76,21 @@
 		</ul>
 	</Collapse>
 
-	<Collapse title="All Ideas" open={true}>
-		<ul class="list-none m-0 gap-2 flex flex-row flex-wrap">
+	<Collapse class="relative" title="All Ideas" open={true}>
+		<Button
+			class="absolute top-1.5 right-1.5"
+			onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}>{mode}</Button
+		>
+		<ul
+			class={[
+				'list-none flex',
+				mode === 'default' && 'flex-row flex-wrap gap-2',
+				mode === 'compact' && 'flex-col w-full divide-y'
+			]}
+		>
 			{#each data.ideas as idea (idea.id)}
-				<li>
-					<IdeaPreview {idea} />
+				<li class={[mode === 'compact' && 'ring-1']}>
+					<IdeaPreview {idea} {mode} />
 				</li>
 			{/each}
 		</ul>

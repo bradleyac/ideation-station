@@ -21,17 +21,20 @@
 	>
 		<ul class="p-0 m-0 list-none flex gap-4">
 			{#each [{ path: '/', name: 'Home', subPages: [] }, { path: '/catalog', name: 'Idea Catalog', subPages: ['/ideas/[ideaId]', '/categories/[categoryId]'] }] as { path, name, subPages }}
-				<li class="flex gap-2 last:overflow-hidden">
+				<li class="flex gap-2 last:overflow-hidden block border-black">
 					{#if route.id === path}
-						{name}
+						<span class="border-b-2 border-eucalyptus-500">{name}</span>
 					{:else}
 						<a class="whitespace-nowrap" href={path}>{name}</a>
 						{#each subPages as subPath}
 							{#if route.id === `${path}${subPath}`}
 								<div class="border-e"></div>
-								<span class="max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+								<a
+									href={page.url.href}
+									class="max-w-full border-b-2 border-eucalyptus-500 overflow-hidden text-ellipsis whitespace-nowrap"
+								>
 									{title ?? ''}
-								</span>
+								</a>
 							{/if}
 						{/each}
 					{/if}
