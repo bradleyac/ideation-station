@@ -3,7 +3,7 @@ import { type Category, type CategoryFull, type Idea } from "./types.js";
 import { env } from '$env/dynamic/private';
 
 class Db {
-  private hostname: string = env.COSMOSDB_HOST || "ideationstation";
+  private hostname: string = env.COSMOSDB_HOST || "ideation-station";
   private primaryKey: string = env.COSMOSDB_KEY || "insertkeyhere";
   private client: gremlin.driver.Client;
   constructor() {
