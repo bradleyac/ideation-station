@@ -10,7 +10,7 @@
 
 	const { data } = $props();
 	const aspirationsCategoryId = $derived(
-		data.categories.find((cat) => cat.name === 'Aspirations')!.id
+		data.categories.find((cat) => cat.name === 'Aspirations')?.id ?? ''
 	);
 
 	let showIdeaModal = $state(false);

@@ -1,10 +1,12 @@
 import { db } from '$lib/db.svelte.js';
+import getUserId from '$lib/getUserId';
 import { error } from '@sveltejs/kit';
 
-export async function load({ depends, params }) {
+export async function load({ depends, params, platform }) {
   depends(`data:idea/${params.ideaId}`);
-  const idea = await db.getIdea(params.ideaId);
-  const relatedIdeas = await db.getRelatedIdeas(params.ideaId);
+  const userid = getUserId(platform);
+  const idea = await db.getIdea(userid, params.ideaId);
+  const relatedIdeas = await db.getRelatedIdeas(userid, params.ideaId);
 
   if (!idea) error(404);
 
@@ -17,6 +19,7 @@ export async function load({ depends, params }) {
 
 export const actions = {
   default: async (event) => {
+    const userid = getUserId(event.platform);
     const data = await event.request.formData();
     const name = data.get('name')?.toString() ?? '';
     const desc = data.get('desc')?.toString() ?? '';
@@ -28,6 +31,6 @@ export const actions = {
 
     if (name === '' || desc === '') error(400);
 
-    await db.updateIdea({ id: event.params.ideaId, name, desc, categoryIds });
+    await db.updateIdea(userid, { id: event.params.ideaId, name, desc, categoryIds });
   },
 };

@@ -1,8 +1,10 @@
 import { error } from '@sveltejs/kit';
 import { db } from '$lib/db.svelte.js';
+import getUserId from '$lib/getUserId';
 
 export const actions = {
   default: async (event) => {
+    const userid = getUserId(event.platform);
     const data = await event.request.formData();
     const name = data.get('name')?.toString() ?? '';
     const desc = data.get('desc')?.toString() ?? '';
@@ -16,6 +18,6 @@ export const actions = {
 
     const id = crypto.randomUUID();
 
-    await db.createIdea({ id, name, desc, categoryIds });
+    await db.createIdea(userid, { id, name, desc, categoryIds });
   },
 };

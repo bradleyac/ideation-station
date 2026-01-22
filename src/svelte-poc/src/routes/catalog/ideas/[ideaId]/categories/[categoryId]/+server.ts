@@ -1,16 +1,19 @@
 import { db } from "$lib/db.svelte";
+import getUserId from "$lib/getUserId";
 import { error, type RequestHandler } from "@sveltejs/kit";
 
-export const DELETE: RequestHandler = async ({ params }) => {
+export const DELETE: RequestHandler = async ({ params, platform }) => {
+  const userid = getUserId(platform);
   const { ideaId, categoryId } = params;
   if (!ideaId || !categoryId) error(400);
-  await db.removeCategoryFromIdea(ideaId, categoryId);
+  await db.removeCategoryFromIdea(userid, ideaId, categoryId);
   return new Response();
 };
 
-export const PUT: RequestHandler = async ({ params }) => {
+export const PUT: RequestHandler = async ({ params, platform }) => {
+  const userid = getUserId(platform);
   const { ideaId, categoryId } = params;
   if (!ideaId || !categoryId) error(400);
-  await db.addCategoryToIdea(ideaId, categoryId);
+  await db.addCategoryToIdea(userid, ideaId, categoryId);
   return new Response();
 }
