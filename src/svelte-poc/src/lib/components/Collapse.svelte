@@ -17,11 +17,6 @@
 <style>
 	/* Not replacing this with tailwind, at least not yet. Too much going on.*/
 	details {
-		summary {
-			&:hover {
-			}
-		}
-
 		summary::before {
 			font-family: uicons-regular-rounded !important;
 			font-style: normal;
