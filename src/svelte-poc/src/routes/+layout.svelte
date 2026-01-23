@@ -2,7 +2,6 @@
 	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
 	import '../app.css';
-	import 'tippy.js/dist/tippy.css';
 
 	let { children } = $props();
 
