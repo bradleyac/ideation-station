@@ -7,6 +7,9 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import CategoryForm from './categories/CategoryForm.svelte';
+	import { type Idea } from '$lib/types.js';
+	import { invalidateAll } from '$app/navigation';
+	import { tooltipAttachment } from '$lib/attachments/floatingui.svelte';
 
 	const { data } = $props();
 	const aspirationsCategoryId = $derived(
@@ -36,6 +39,53 @@
 					: 0
 		)
 	);
+
+	let idea = $state<Idea | undefined>(undefined);
+
+	function setCurrent(id: string) {
+		idea = data.ideas.filter((idea) => idea.id === id)[0];
+	}
+
+	let menu = $state<HTMLElement | null>(null);
+
+	async function deleteIdea(idea: Idea) {
+		if (confirm(`Really delete "${idea.name}"?`)) {
+			await fetch(`/catalog/ideas/${idea.id}`, {
+				method: 'DELETE'
+			});
+			invalidateAll();
+		}
+	}
+
+	async function linkCategory(idea: Idea, categoryId: string) {
+		await fetch(`/catalog/ideas/${idea.id}/categories/${categoryId}`, {
+			method: 'PUT'
+		});
+		invalidateAll();
+	}
+
+	async function unlinkCategory(idea: Idea, categoryId: string) {
+		if (confirm(`Really remove "${idea.name}" from category?`)) {
+			await fetch(`/catalog/ideas/${idea.id}/categories/${categoryId}`, {
+				method: 'DELETE'
+			});
+			invalidateAll();
+		}
+	}
+
+	async function linkIdea(idea: Idea, otherIdea: { id: string; related: boolean }) {
+		await fetch(`/catalog/ideas/${idea.id}/related/${otherIdea?.id}`, {
+			method: 'PUT'
+		});
+		invalidateAll();
+	}
+
+	async function unlinkIdea(idea: Idea, otherIdea: { id: string; related: boolean }) {
+		await fetch(`/catalog/ideas/${idea.id}/related/${otherIdea?.id}`, {
+			method: 'DELETE'
+		});
+		invalidateAll();
+	}
 </script>
 
 <svelte:head><title>Idea Catalog</title></svelte:head>
@@ -92,7 +142,60 @@
 		</ul>
 	</Collapse>
 
-	<Collapse class="relative" title="All Ideas" open={true}>
+	<div
+		bind:this={menu}
+		class="absolute z-2 w-max max-w-md top-0 left-0 hidden flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4"
+	>
+		{#if idea}
+			{@render tooltip({ idea })}
+		{/if}
+	</div>
+
+	{#snippet tooltip({
+		idea,
+		categoryId,
+		otherIdea
+	}: {
+		idea: Idea;
+		categoryId?: string;
+		otherIdea?: { id: string; related: boolean };
+	})}
+		<pre class="pre-wrap">{idea.desc}</pre>
+		<div class="flex w-full justify-end idea-preview-Buttons__container gap-2">
+			<Button class="btn-primary" title="Delete Idea" onclick={() => deleteIdea(idea)}>
+				<i class="fi fi-rr-trash"></i>
+			</Button>
+			{#if categoryId}
+				{#if idea.categoryIds?.includes(categoryId)}
+					<Button title="Remove From Category" onclick={unlinkCategory}>
+						<i class="fi fi-rr-link-slash"></i>
+					</Button>
+				{:else}
+					<Button title="Add To Category" onclick={linkCategory}>
+						<i class="fi fi-rr-link"></i>
+					</Button>
+				{/if}
+			{/if}
+			{#if otherIdea}
+				{#if otherIdea.related}
+					<Button class="btn-primary" title="Unlink Related Idea" onclick={unlinkIdea}>
+						<i class="fi fi-rr-link-slash"></i>
+					</Button>
+				{:else}
+					<Button class="btn-primary" title="Link Related Idea" onclick={linkIdea}>
+						<i class="fi fi-rr-link"></i>
+					</Button>
+				{/if}
+			{/if}
+		</div>
+	{/snippet}
+
+	<Collapse
+		class="relative"
+		title="All Ideas"
+		open={true}
+		{@attach tooltipAttachment({ tip: menu, setCurrent })}
+	>
 		<div class="absolute top-1.5 right-1.5 flex gap-1.5">
 			<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}>{mode}</Button>
 			<Button onclick={() => (sort = sort === 'alpha' ? 'alphaR' : 'alpha')}

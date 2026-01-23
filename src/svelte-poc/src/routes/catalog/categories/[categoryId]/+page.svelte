@@ -66,10 +66,7 @@
 		<ul class="flex gap-2 flex-wrap">
 			{#each relatedIdeas as idea (idea.id)}
 				<li>
-					<IdeaPreview
-						{idea}
-						categoryId={params.categoryId === 'Uncategorized' ? undefined : params.categoryId}
-					/>
+					<IdeaPreview {idea} />
 				</li>
 			{/each}
 		</ul>

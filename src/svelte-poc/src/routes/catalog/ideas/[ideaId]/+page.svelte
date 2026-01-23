@@ -95,7 +95,7 @@
 				{:else}
 					{#each data.relatedIdeas as relatedIdea (relatedIdea.id)}
 						<li>
-							<IdeaPreview idea={relatedIdea} otherIdea={{ id: data.idea.id, related: true }} />
+							<IdeaPreview idea={relatedIdea} />
 						</li>
 					{/each}
 				{/if}
@@ -109,7 +109,7 @@
 				{:else}
 					{#each unrelatedIdeas as unrelatedIdea (unrelatedIdea.id)}
 						<li>
-							<IdeaPreview idea={unrelatedIdea} otherIdea={{ id: data.idea.id, related: false }} />
+							<IdeaPreview idea={unrelatedIdea} />
 						</li>
 					{/each}
 				{/if}
