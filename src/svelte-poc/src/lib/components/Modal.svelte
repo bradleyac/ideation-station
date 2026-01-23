@@ -22,7 +22,7 @@
 		if (e.target === dialog) dialog?.close();
 	}}
 >
-	<div class="flex place-items-center relative w-lg">
+	<div class="flex place-items-center relative w-full max-w-lg">
 		{@render children?.()}
 		<button
 			onclick={() => dialog?.close()}
