@@ -31,6 +31,9 @@
 	]);
 
 	let formKey = $state(0);
+	let sortedExtantCategories = $derived(
+		extantCategories.toSorted((a, b) => (a.name < b.name ? -1 : 1))
+	);
 
 	function removeCategory(i: number) {
 		categories.splice(i, 1);
@@ -83,13 +86,13 @@
 					{#each categories as category, i (i)}
 						<div class="flex w-full gap-2">
 							<select
-								class="w-full bg-neutral-300 dark:bg-neutral-700"
+								class="w-full bg-neutral-300 dark:bg-neutral-700 rounded-sm"
 								name="categories[]"
 								required
 								bind:value={categories[i]}
 							>
 								<option value="" disabled selected>Select category</option>
-								{#each extantCategories as extantCategory}
+								{#each sortedExtantCategories as extantCategory}
 									<option value={extantCategory.id}>{extantCategory.name}</option>
 								{/each}
 							</select>
@@ -120,12 +123,6 @@
 			>
 				{existingIdea ? 'Save' : 'Create'}
 			</Button>
-
-			<datalist id="existing-categories">
-				{#each extantCategories as category}
-					<option value={category.name}></option>
-				{/each}
-			</datalist>
 		</div>
 	</form>
 {/key}

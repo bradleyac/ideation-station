@@ -132,6 +132,15 @@ class Db {
     });
   }
 
+  public async deleteCategory(userid: string, categoryid: string): Promise<void> {
+    const deleteCategoryQuery = `g.V([prop_userid, prop_id]).hasLabel('category').drop()`;
+
+    let results = await this.submitWithRetry(deleteCategoryQuery, {
+      prop_id: categoryid,
+      prop_userid: userid
+    });
+  }
+
   public async getAllCategories(userid: string): Promise<Category[]> {
     const getAllCategoriesQuery = `g.V().hasLabel('category').has('userid', prop_userid)
       .project('id','name','count')

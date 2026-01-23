@@ -20,6 +20,22 @@
 	let categoryKey = $state(0);
 
 	let mode = $state<'default' | 'compact'>('default');
+
+	let sort = $state<'alpha' | 'alphaR'>('alpha');
+
+	const sortedIdeas = $derived(
+		data.ideas.toSorted((a, b) =>
+			sort === 'alpha'
+				? a.name > b.name
+					? 1
+					: -1
+				: sort === 'alphaR'
+					? a.name > b.name
+						? -1
+						: 1
+					: 0
+		)
+	);
 </script>
 
 <svelte:head><title>Idea Catalog</title></svelte:head>
@@ -77,10 +93,18 @@
 	</Collapse>
 
 	<Collapse class="relative" title="All Ideas" open={true}>
-		<Button
-			class="absolute top-1.5 right-1.5"
-			onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}>{mode}</Button
-		>
+		<div class="absolute top-1.5 right-1.5 flex gap-1.5">
+			<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}>{mode}</Button>
+			<Button onclick={() => (sort = sort === 'alpha' ? 'alphaR' : 'alpha')}
+				><i
+					class={[
+						'fi',
+						sort === 'alpha' && 'fi-rr-sort-alpha-down',
+						sort === 'alphaR' && 'fi-rr-sort-alpha-up'
+					]}
+				></i></Button
+			>
+		</div>
 		<ul
 			class={[
 				'list-none flex',
@@ -88,7 +112,7 @@
 				mode === 'compact' && 'flex-col w-full divide-y'
 			]}
 		>
-			{#each data.ideas as idea (idea.id)}
+			{#each sortedIdeas as idea (idea.id)}
 				<li class={[mode === 'compact' && 'ring-1']}>
 					<IdeaPreview {idea} {mode} />
 				</li>

@@ -2,12 +2,12 @@
 	import { type Category, type Idea as IdeaT } from '$lib/types.js';
 	import Idea from '../Idea.svelte';
 	import IdeaPreview from '../IdeaPreview.svelte';
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import Collapse from '$lib/components/Collapse.svelte';
 	import IdeaForm from '../IdeaForm.svelte';
 	import CategoryPreview from '../../categories/CategoryPreview.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import type { ActionResult } from '@sveltejs/kit';
+	import { redirect, type ActionResult } from '@sveltejs/kit';
 	import Button from '$lib/components/Button.svelte';
 	const { data } = $props();
 
@@ -44,6 +44,16 @@
 			await update();
 		};
 	}
+
+	async function deleteIdea() {
+		if (confirm(`Really delete "${data.idea.name}"?`)) {
+			await fetch(`/catalog/ideas/${data.idea.id}`, {
+				method: 'DELETE'
+			});
+			await goto('/catalog');
+			await invalidateAll();
+		}
+	}
 </script>
 
 <svelte:head><title>{data.title}</title></svelte:head>
@@ -56,11 +66,17 @@
 
 {#key data.idea.id}
 	<section class="flex flex-col gap-4 m-3">
-		<Button type="button" title="Edit Idea" onclick={() => (showModal = !showModal)}
-			><i class="fi fi-rr-edit"></i> Edit Idea</Button
-		>
-
 		<Idea idea={data.idea} />
+
+		<div class="flex gap-2">
+			<Button type="button" title="Edit Idea" onclick={() => (showModal = !showModal)}
+				><i class="fi fi-rr-edit"></i> Edit Idea</Button
+			>
+
+			<Button type="button" title="Delete Idea" onclick={deleteIdea}>
+				<i class="fi fi-rr-trash"></i>Delete Idea</Button
+			>
+		</div>
 
 		<ul class="flex gap-2 flex-wrap">
 			{#if !data.idea.categoryIds || data.idea.categoryIds.length === 0}
