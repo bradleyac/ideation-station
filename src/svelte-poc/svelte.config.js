@@ -23,7 +23,7 @@ const config = {
 				responseOverrides: {
 					401: {
 						statusCode: 302,
-						redirect: "/.auth/login/aad"
+						"redirect": "/.auth/login/aad?post_login_redirect_uri=.referrer",
 					}
 				},
 			}
