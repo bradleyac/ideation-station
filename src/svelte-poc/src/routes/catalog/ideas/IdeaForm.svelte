@@ -82,7 +82,12 @@
 				<div class="flex flex-col gap-2">
 					{#each categories as category, i (i)}
 						<div class="flex w-full gap-2">
-							<select class="w-full" name="categories[]" required bind:value={categories[i]}>
+							<select
+								class="w-full bg-neutral-300 dark:bg-neutral-700"
+								name="categories[]"
+								required
+								bind:value={categories[i]}
+							>
 								<option value="" disabled selected>Select category</option>
 								{#each extantCategories as extantCategory}
 									<option value={extantCategory.id}>{extantCategory.name}</option>
