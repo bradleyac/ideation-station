@@ -54,6 +54,9 @@
 			await fetch(`/catalog/ideas/${idea.id}`, {
 				method: 'DELETE'
 			});
+			if (menu) {
+				menu.style.display = '';
+			}
 			invalidateAll();
 		}
 	}
