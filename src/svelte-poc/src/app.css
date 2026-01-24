@@ -82,3 +82,8 @@ pre {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+button,
+a {
+  touch-action: manipulation;
+}
