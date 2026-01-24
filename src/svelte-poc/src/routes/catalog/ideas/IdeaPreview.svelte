@@ -9,7 +9,6 @@
 	} = $props();
 
 	function ontouchend(e: TouchEvent) {
-		if (e.touches.length > 0) return;
 		let el = e.target as HTMLElement;
 		if (el !== document.activeElement) {
 			e.preventDefault();
