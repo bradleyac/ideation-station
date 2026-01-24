@@ -18,7 +18,7 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
     const outTooltip$ = fromEvent<MouseEvent>(tip, 'mouseleave');
     const focusIn$ = fromEvent<FocusEvent>(node, 'focusin');
     const focusOut$ = fromEvent<FocusEvent>(node, 'focusout');
-    const touchEnd$ = fromEvent<MouseEvent>(node, 'touchend');
+    const touchEnd$ = fromEvent<TouchEvent>(node, 'touchend');
 
     const relevantFocusIn$ = focusIn$.pipe(map<FocusEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, (evt.target as HTMLElement).dataset?.['ideaid'] ?? ""]),
       filter(e => e[2] !== ""));
@@ -30,17 +30,6 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
       );
     // focusin: show focusout: hide touchend: maybe block the default?
 
-    const isInTooltip$ = inTooltip$.pipe
-      (
-        map(_ => "in" as const),
-        mergeWith(outTooltip$.pipe
-          (
-            map(_ => "out" as const)
-          )
-        ),
-        map(inOrOut => inOrOut === "in")
-      );
-
     const lastOver$ = mouseOver$.pipe
       (
         map<MouseEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, (evt.target as HTMLElement).dataset?.['ideaid'] ?? ""]),
@@ -51,16 +40,6 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
       (
         filter(evt => (evt.target as HTMLElement).dataset?.['ideaid'] !== undefined),
         map(evt => evt.timeStamp)
-      );
-
-    const wasOutLast$ = lastOver$.pipe
-      (
-        map(_ => "in" as const),
-        mergeWith(lastOut$.pipe
-          (
-            map(_ => "out" as const)
-          )),
-        map(inOrOut => inOrOut === "out")
       );
 
     const show$ = lastOver$.pipe(mergeWith(relevantFocusIn$));
@@ -95,6 +74,17 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
         mergeWith(esc$)
       ).subscribe(hideTooltip)
     );
+
+    sub.add(
+      touchEnd$.pipe
+        (
+          map<TouchEvent, [TouchEvent, HTMLAnchorElement | null]>(e => [e, (e.target as HTMLElement).nodeName === 'A' ? e.target as HTMLAnchorElement : null]),
+          filter(([e, node]) => node !== null && node !== document.activeElement),
+        ).subscribe(([e, node]) => {
+          e.preventDefault();
+          node?.focus();
+        })
+    )
 
     function update(target: HTMLElement) {
       if (!tip) return;
