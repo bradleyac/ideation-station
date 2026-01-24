@@ -8,6 +8,22 @@
 		idea: Idea;
 		mode?: 'default' | 'compact';
 	} = $props();
+
+	function attachTouchFocus(node: HTMLElement) {
+		return on(
+			node,
+			'touchstart',
+			(e) => {
+				if (e.changedTouches.length === 1) return;
+				let el = e.target as HTMLElement;
+				if (el !== document.activeElement) {
+					e.preventDefault();
+					el.focus();
+				}
+			},
+			{ passive: false }
+		);
+	}
 </script>
 
 {#if mode === 'default'}
@@ -16,20 +32,7 @@
 		tabindex="0"
 		href="/catalog/ideas/{idea.id}"
 		data-ideaid={idea.id}
-		{@attach (node) => {
-			return on(
-				node,
-				'touchstart',
-				(e) => {
-					let el = e.target as HTMLElement;
-					if (el !== document.activeElement) {
-						e.preventDefault();
-						el.focus();
-					}
-				},
-				{ passive: false }
-			);
-		}}
+		{@attach attachTouchFocus}
 	>
 		{idea.name}
 	</a>
@@ -38,20 +41,7 @@
 		class="inline-block p-1 w-full bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800"
 		href="/catalog/ideas/{idea.id}"
 		data-ideaid={idea.id}
-		{@attach (node) => {
-			return on(
-				node,
-				'touchstart',
-				(e) => {
-					let el = e.target as HTMLElement;
-					if (el !== document.activeElement) {
-						e.preventDefault();
-						el.focus();
-					}
-				},
-				{ passive: false }
-			);
-		}}
+		{@attach attachTouchFocus}
 	>
 		{idea.name}
 	</a>
