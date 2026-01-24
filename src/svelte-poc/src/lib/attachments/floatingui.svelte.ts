@@ -1,5 +1,5 @@
 import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
-import { asyncScheduler, debounceTime, distinctUntilChanged, filter, fromEvent, map, mergeWith, Observable, Subscription, tap, throttleTime, withLatestFrom } from "rxjs";
+import { asyncScheduler, debounceTime, distinctUntilChanged, filter, fromEvent, map, mergeWith, NEVER, Observable, Subscription, tap, throttleTime, withLatestFrom } from "rxjs";
 
 // data-ideaid set on the nodes
 // When a node should be the current node, call "setCurrent" with the contents of data-ideaid
@@ -8,18 +8,25 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
   return (node: HTMLElement) => {
     if (!tip) return;
     // Do this with Rx not with event listeners directly.
+    // function isTouchPointer() {
+    //   return matchMedia("(pointer: coarse)").matches;
+    // }
+
+    const isTouchPointer = matchMedia("(pointer: coarse)").matches;
 
     let sub = new Subscription();
 
     const esc$ = fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter(e => e.key === 'Escape'));
+    // Mouse events only when !isTouchPointer
     const mouseOver$ = fromEvent<MouseEvent>(node, 'mouseover');
     const mouseOut$ = fromEvent<MouseEvent>(node, 'mouseout');
     const inTooltip$ = fromEvent<MouseEvent>(tip, 'mouseenter');
     const outTooltip$ = fromEvent<MouseEvent>(tip, 'mouseleave');
-    const focusIn$ = fromEvent<FocusEvent>(node, 'focusin');
-    const focusOut$ = fromEvent<FocusEvent>(node, 'focusout');
+    // Touch events only when isTouchPointer
     const touchEnd$ = fromEvent<TouchEvent>(node, 'touchend');
     const touchTooltip$ = fromEvent<TouchEvent>(tip, 'touchend');
+    const focusIn$ = fromEvent<FocusEvent>(node, 'focusin');
+    const focusOut$ = fromEvent<FocusEvent>(node, 'focusout');
 
     const relevantFocusIn$ = focusIn$.pipe(map<FocusEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, (evt.target as HTMLElement).dataset?.['ideaid'] ?? ""]),
       filter(e => e[2] !== ""));
@@ -42,18 +49,21 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
         map(evt => evt.timeStamp)
       );
 
-    const show$ = lastOver$.pipe(mergeWith(relevantFocusIn$));
+    const show$ = isTouchPointer ? relevantFocusIn$ : lastOver$.pipe(mergeWith(relevantFocusIn$));
     const showTime$ = show$.pipe(map(e => e[0]))
-    const hide$ = lastOut$.pipe
-      (
-        mergeWith(relevantFocusOut$),
-        mergeWith(outTooltip$.pipe(map(tt => tt.timeStamp))),
-      );
+
+    const hide$ = isTouchPointer
+      ? relevantFocusOut$
+      : lastOut$.pipe
+        (
+          mergeWith(relevantFocusOut$),
+          mergeWith(outTooltip$.pipe(map(tt => tt.timeStamp))),
+        );
 
     sub.add(
       show$.pipe
         (
-          debounceTime(300, asyncScheduler),
+          debounceTime(200, asyncScheduler),
         )
         .subscribe(([time, target, id]) => {
           setCurrent(id);
@@ -65,11 +75,12 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
         debounceTime(300, asyncScheduler),
         withLatestFrom(showTime$.pipe
           (
-            mergeWith(inTooltip$.pipe(map(e => e.timeStamp))),
-            mergeWith(touchTooltip$.pipe(map(e => e.timeStamp + 500)))
+            mergeWith(isTouchPointer
+              ? touchTooltip$.pipe(map(e => e.timeStamp + 500))
+              : inTooltip$.pipe(map(e => e.timeStamp))),
           )
         ),
-        // tap(([outTime, inTime]) => console.log(`out: ${outTime}, in: ${inTime}`)),
+        tap(([outTime, inTime]) => console.log(`out: ${outTime}, in: ${inTime}`)),
         filter(([outTime, inTime]) => outTime > inTime),
         mergeWith(esc$)
       ).subscribe(hideTooltip)
@@ -109,6 +120,11 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
       if (!tip) return;
       tip.style.display = '';
     }
+
+    focusOut$.subscribe(console.log);
+    touchTooltip$.subscribe(console.log);
+    inTooltip$.subscribe(console.log);
+    showTime$.subscribe(console.log);
 
     return () => sub.unsubscribe();
   };
