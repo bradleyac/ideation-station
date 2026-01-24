@@ -1,5 +1,5 @@
 import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
-import { asyncScheduler, distinctUntilChanged, filter, fromEvent, map, mergeWith, Observable, Subscription, throttleTime, withLatestFrom } from "rxjs";
+import { asyncScheduler, debounceTime, distinctUntilChanged, filter, fromEvent, map, mergeWith, Observable, Subscription, tap, throttleTime, withLatestFrom } from "rxjs";
 
 // data-ideaid set on the nodes
 // When a node should be the current node, call "setCurrent" with the contents of data-ideaid
@@ -16,6 +16,20 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
     const mouseOut$ = fromEvent<MouseEvent>(node, 'mouseout');
     const inTooltip$ = fromEvent<MouseEvent>(tip, 'mouseenter');
     const outTooltip$ = fromEvent<MouseEvent>(tip, 'mouseleave');
+    const focusIn$ = fromEvent<FocusEvent>(node, 'focusin');
+    const focusOut$ = fromEvent<FocusEvent>(node, 'focusout');
+    const touchEnd$ = fromEvent<MouseEvent>(node, 'touchend');
+
+    const relevantFocusIn$ = focusIn$.pipe(map<FocusEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, (evt.target as HTMLElement).dataset?.['ideaid'] ?? ""]),
+      filter(e => e[2] !== ""));
+
+    const relevantFocusOut$ = focusOut$.pipe
+      (
+        filter(evt => (evt.target as HTMLElement).dataset?.['ideaid'] !== undefined),
+        map(evt => evt.timeStamp)
+      );
+    // focusin: show focusout: hide touchend: maybe block the default?
+
     const isInTooltip$ = inTooltip$.pipe
       (
         map(_ => "in" as const),
@@ -29,14 +43,14 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
 
     const lastOver$ = mouseOver$.pipe
       (
-        map<MouseEvent, [HTMLElement, string]>(evt => [evt.target as HTMLElement, (evt.target as HTMLElement).dataset?.['ideaid'] ?? ""]),
-        filter(e => e[1] !== "")
+        map<MouseEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, (evt.target as HTMLElement).dataset?.['ideaid'] ?? ""]),
+        filter(e => e[2] !== "")
       );
 
     const lastOut$ = mouseOut$.pipe
       (
-        map<MouseEvent, [HTMLElement, string]>(evt => [evt.target as HTMLElement, (evt.target as HTMLElement).dataset?.['ideaid'] ?? ""]),
-        filter(e => e[1] !== "")
+        filter(evt => (evt.target as HTMLElement).dataset?.['ideaid'] !== undefined),
+        map(evt => evt.timeStamp)
       );
 
     const wasOutLast$ = lastOver$.pipe
@@ -49,31 +63,44 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
         map(inOrOut => inOrOut === "out")
       );
 
-    sub.add(
-      lastOver$.subscribe(([target, id]) => {
-        setCurrent(id);
-        showTooltip(target);
-      }));
+    const show$ = lastOver$.pipe(mergeWith(relevantFocusIn$));
+    const hide$ = lastOut$.pipe
+      (
+        mergeWith(relevantFocusOut$),
+        mergeWith(outTooltip$.pipe(map(tt => tt.timeStamp))),
+      );
+
+    // show$.subscribe(e => console.log(`show: ${e[0]}`))
+    // inTooltip$.subscribe(e => console.log(`intt: ${e.timeStamp}`))
+    // outTooltip$.subscribe(console.log);
+    // relevantFocusOut$.subscribe(console.log);
+
 
     sub.add(
-      lastOut$.pipe
+      show$.pipe
         (
-          throttleTime(200, asyncScheduler, { leading: false, trailing: true }),
-          withLatestFrom(lastOver$, wasOutLast$, isInTooltip$),
-        ).subscribe(([[el, id], [_, lastOverId], outLast, isInTooltip]) => {
-          if (id === lastOverId && outLast && !isInTooltip) {
-            hideTooltip();
-          }
-        })
-    );
+          debounceTime(300, asyncScheduler),
+        )
+        .subscribe(([time, target, id]) => {
+          setCurrent(id);
+          showTooltip(target);
+        }));
 
-    sub.add(outTooltip$.pipe(map(_ => { }), mergeWith(esc$.pipe(map(_ => { })))).subscribe(hideTooltip));
+    sub.add(
+      hide$.pipe(
+        debounceTime(300, asyncScheduler),
+        withLatestFrom(show$.pipe(map(e => e[0]), mergeWith(inTooltip$.pipe(map(e => e.timeStamp))))),
+        // tap(([outTime, inTime]) => console.log(`out: ${outTime}, in: ${inTime}`)),
+        filter(([outTime, inTime]) => outTime > inTime),
+        mergeWith(esc$)
+      ).subscribe(hideTooltip)
+    );
 
     function update(target: HTMLElement) {
       if (!tip) return;
       computePosition(target, tip, {
-        placement: 'bottom-end',
-        middleware: [offset(8), flip(), shift({ padding: 8 })]
+        placement: 'bottom-start',
+        middleware: [flip(), shift({ padding: 8 })]
       }).then(({ x, y }) => {
         Object.assign(tip.style, {
           left: `${x}px`,
@@ -93,35 +120,35 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
       tip.style.display = '';
     }
 
-    node.addEventListener('focusin', e => {
-      const id = (e.target as HTMLElement)?.dataset?.['ideaid'];
-      if (id !== undefined) {
-        setCurrent(id);
-        showTooltip((e.target as HTMLElement));
-      }
-    });
+    // node.addEventListener('focusin', e => {
+    //   const id = (e.target as HTMLElement)?.dataset?.['ideaid'];
+    //   if (id !== undefined) {
+    //     setCurrent(id);
+    //     showTooltip((e.target as HTMLElement));
+    //   }
+    // });
 
-    node.addEventListener('focusout', e => {
-      let el = e.target as HTMLElement;
-      if (el?.dataset?.['ideaid'] !== undefined && el?.dataset?.['modaltooltip'] === undefined) {
-        hideTooltip();
-      }
-      else if (el === node) {
-        hideTooltip();
-      }
-    });
+    // node.addEventListener('focusout', e => {
+    //   let el = e.target as HTMLElement;
+    //   if (el?.dataset?.['ideaid'] !== undefined && el?.dataset?.['modaltooltip'] === undefined) {
+    //     hideTooltip();
+    //   }
+    //   else if (el === node) {
+    //     hideTooltip();
+    //   }
+    // });
 
-    node.addEventListener('touchend', e => {
-      let el = e.target as HTMLElement;
-      if (el?.dataset?.['ideaid'] === undefined) {
-        hideTooltip();
-      }
-      else if (el !== document.activeElement && e.cancelable && el?.dataset?.['ideaid'] !== undefined) {
-        e.preventDefault();
-        el.setAttribute("data-modaltooltip", "");
-        el.focus();
-      }
-    });
+    // node.addEventListener('touchend', e => {
+    //   let el = e.target as HTMLElement;
+    //   if (el?.dataset?.['ideaid'] === undefined) {
+    //     hideTooltip();
+    //   }
+    //   else if (el !== document.activeElement && e.cancelable && el?.dataset?.['ideaid'] !== undefined) {
+    //     e.preventDefault();
+    //     el.setAttribute("data-modaltooltip", "");
+    //     el.focus();
+    //   }
+    // });
 
     return () => sub.unsubscribe();
   };
