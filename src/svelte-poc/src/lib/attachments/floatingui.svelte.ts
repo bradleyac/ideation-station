@@ -12,6 +12,10 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
     //   return matchMedia("(pointer: coarse)").matches;
     // }
 
+    function getIdeaId(target: any) {
+      return (target as HTMLElement).dataset?.['ideaid']
+    }
+
     const isTouchPointer = matchMedia("(pointer: coarse)").matches;
 
     let sub = new Subscription();
@@ -25,35 +29,40 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
     // Touch events only when isTouchPointer
     const touchEnd$ = fromEvent<TouchEvent>(node, 'touchend');
     const touchTooltip$ = fromEvent<TouchEvent>(tip, 'touchend');
+    // Focus events for both
     const focusIn$ = fromEvent<FocusEvent>(node, 'focusin');
     const focusOut$ = fromEvent<FocusEvent>(node, 'focusout');
 
-    const relevantFocusIn$ = focusIn$.pipe(map<FocusEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, (evt.target as HTMLElement).dataset?.['ideaid'] ?? ""]),
+    const relevantFocusIn$ = focusIn$.pipe(map<FocusEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, getIdeaId(evt.target) ?? ""]),
       filter(e => e[2] !== ""));
 
     const relevantFocusOut$ = focusOut$.pipe
       (
-        filter(evt => (evt.target as HTMLElement).dataset?.['ideaid'] !== undefined),
+        filter(evt => getIdeaId(evt.target) !== undefined),
         map(evt => evt.timeStamp)
       );
 
     const lastOver$ = mouseOver$.pipe
       (
-        map<MouseEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, (evt.target as HTMLElement).dataset?.['ideaid'] ?? ""]),
+        map<MouseEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, getIdeaId(evt.target) ?? ""]),
         filter(e => e[2] !== "")
       );
 
     const lastOut$ = mouseOut$.pipe
       (
-        filter(evt => (evt.target as HTMLElement).dataset?.['ideaid'] !== undefined),
+        filter(evt => getIdeaId(evt.target) !== undefined),
         map(evt => evt.timeStamp)
       );
 
     const show$ = isTouchPointer ? relevantFocusIn$ : lastOver$.pipe(mergeWith(relevantFocusIn$));
     const showTime$ = show$.pipe(map(e => e[0]))
+    const errantTouch$ = touchEnd$.pipe(filter(e => e.target !== tip && getIdeaId(e.target) === undefined), map(e => e.timeStamp));
 
     const hide$ = isTouchPointer
-      ? relevantFocusOut$
+      ? relevantFocusOut$.pipe
+        (
+          mergeWith(errantTouch$)
+        )
       : lastOut$.pipe
         (
           mergeWith(relevantFocusOut$),
@@ -80,7 +89,7 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
               : inTooltip$.pipe(map(e => e.timeStamp))),
           )
         ),
-        tap(([outTime, inTime]) => console.log(`out: ${outTime}, in: ${inTime}`)),
+        // tap(([outTime, inTime]) => console.log(`out: ${outTime}, in: ${inTime}`)),
         filter(([outTime, inTime]) => outTime > inTime),
         mergeWith(esc$)
       ).subscribe(hideTooltip)
@@ -121,10 +130,10 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
       tip.style.display = '';
     }
 
-    focusOut$.subscribe(console.log);
-    touchTooltip$.subscribe(console.log);
-    inTooltip$.subscribe(console.log);
-    showTime$.subscribe(console.log);
+    // focusOut$.subscribe(console.log);
+    // touchTooltip$.subscribe(console.log);
+    // inTooltip$.subscribe(console.log);
+    // showTime$.subscribe(console.log);
 
     return () => sub.unsubscribe();
   };
