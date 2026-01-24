@@ -26,53 +26,42 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
     let sub = new Subscription();
 
     const esc$ = fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter(e => e.key === 'Escape'));
-    // Mouse events only when !isTouchPointer
-    const mouseOver$ = fromEvent<MouseEvent>(node, 'mouseover');
-    const mouseOut$ = fromEvent<MouseEvent>(node, 'mouseout');
-    const inTooltip$ = fromEvent<MouseEvent>(tip, 'mouseenter');
-    const outTooltip$ = fromEvent<MouseEvent>(tip, 'mouseleave');
-    // Touch events only when isTouchPointer
-    const touchEnd$ = fromEvent<TouchEvent>(node, 'touchend');
-    const touchTooltip$ = fromEvent<TouchEvent>(tip, 'touchend');
-    // Focus events for both
-    const focusIn$ = fromEvent<FocusEvent>(node, 'focusin');
-    const focusOut$ = fromEvent<FocusEvent>(node, 'focusout');
 
-    const relevantFocusIn$ = focusIn$.pipe(map<FocusEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, getIdeaId(evt.target) ?? ""]),
-      filter(e => e[2] !== ""));
-
-    const relevantFocusOut$ = focusOut$.pipe
-      (
-        filter(evt => getIdeaId(evt.target) !== undefined),
-        map(evt => evt.timeStamp)
-      );
-
-    const lastOver$ = mouseOver$.pipe
+    const lastOver$ = fromEvent<MouseEvent>(node, 'mouseover').pipe
       (
         map<MouseEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, getIdeaId(evt.target) ?? ""]),
         filter(e => e[2] !== "")
       );
+    const lastOut$ = fromEvent<MouseEvent>(node, 'mouseout').pipe
+      (
+        filter(evt => getIdeaId(evt.target) !== undefined),
+        map(evt => evt.timeStamp)
+      );
+    const inTooltip$ = fromEvent<MouseEvent>(tip, 'mouseenter').pipe(map(e => e.timeStamp));
+    const outTooltip$ = fromEvent<MouseEvent>(tip, 'mouseleave').pipe(map(tt => tt.timeStamp));
 
-    const lastOut$ = mouseOut$.pipe
+    const touchEnd$ = fromEvent<TouchEvent>(node, 'touchend');
+    // Buffered 500ms because lose focus happens right after.
+    const touchTooltip$ = fromEvent<TouchEvent>(tip, 'touchend').pipe(map(e => e.timeStamp + 500));
+
+    const lastFocusIn$ = fromEvent<FocusEvent>(node, 'focusin').pipe
+      (
+        map<FocusEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, getIdeaId(evt.target) ?? ""]),
+        filter(e => e[2] !== "")
+      );
+    const lastFocusOut$ = fromEvent<FocusEvent>(node, 'focusout').pipe
       (
         filter(evt => getIdeaId(evt.target) !== undefined),
         map(evt => evt.timeStamp)
       );
 
-    const show$ = isTouchPointer ? relevantFocusIn$ : lastOver$.pipe(mergeWith(relevantFocusIn$));
+    const show$ = isTouchPointer ? lastFocusIn$ : lastOver$.pipe(mergeWith(lastFocusIn$));
     const showTime$ = show$.pipe(map(e => e[0]))
     const errantTouch$ = touchEnd$.pipe(filter(e => e.target !== tip && getIdeaId(e.target) === undefined), map(e => e.timeStamp));
 
     const hide$ = isTouchPointer
-      ? relevantFocusOut$.pipe
-        (
-          mergeWith(errantTouch$)
-        )
-      : lastOut$.pipe
-        (
-          mergeWith(relevantFocusOut$),
-          mergeWith(outTooltip$.pipe(map(tt => tt.timeStamp))),
-        );
+      ? lastFocusOut$.pipe(mergeWith(errantTouch$))
+      : lastOut$.pipe(mergeWith(lastFocusOut$), mergeWith(outTooltip$),);
 
     sub.add(
       show$.pipe
@@ -90,11 +79,10 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
         withLatestFrom(showTime$.pipe
           (
             mergeWith(isTouchPointer
-              ? touchTooltip$.pipe(map(e => e.timeStamp + 500))
-              : inTooltip$.pipe(map(e => e.timeStamp))),
+              ? touchTooltip$
+              : inTooltip$),
           )
         ),
-        // tap(([outTime, inTime]) => console.log(`out: ${outTime}, in: ${inTime}`)),
         filter(([outTime, inTime]) => outTime > inTime),
         mergeWith(esc$)
       ).subscribe(hideTooltip)
@@ -117,8 +105,8 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
     function update(target: HTMLElement) {
       if (!tip) return;
       computePosition(target, tip, {
-        placement: 'bottom-start',
-        middleware: [flip(), shift({ padding: 8 })]
+        placement: 'top',
+        middleware: [flip(), shift()]
       }).then(({ x, y }) => {
         Object.assign(tip.style, {
           left: `${x}px`,
@@ -137,11 +125,6 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
       if (!tip) return;
       tip.style.display = '';
     }
-
-    // focusOut$.subscribe(console.log);
-    // touchTooltip$.subscribe(console.log);
-    // inTooltip$.subscribe(console.log);
-    // showTime$.subscribe(console.log);
 
     return () => sub.unsubscribe();
   };

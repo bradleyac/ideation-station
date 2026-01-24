@@ -7,9 +7,10 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import CategoryForm from './categories/CategoryForm.svelte';
-	import { type Idea } from '$lib/types.js';
+	import { type Idea as IdeaT } from '$lib/types.js';
 	import { invalidateAll } from '$app/navigation';
 	import { tooltipAttachment } from '$lib/attachments/floatingui.svelte';
+	import Idea from './ideas/Idea.svelte';
 
 	const { data } = $props();
 	const aspirationsCategoryId = $derived(
@@ -40,7 +41,7 @@
 		)
 	);
 
-	let idea = $state<Idea | undefined>(undefined);
+	let idea = $state<IdeaT | undefined>(undefined);
 
 	function setCurrent(id: string) {
 		idea = data.ideas.filter((idea) => idea.id === id)[0];
@@ -48,7 +49,7 @@
 
 	let menu = $state<HTMLElement | null>(null);
 
-	async function deleteIdea(idea: Idea) {
+	async function deleteIdea(idea: IdeaT) {
 		if (confirm(`Really delete "${idea.name}"?`)) {
 			await fetch(`/catalog/ideas/${idea.id}`, {
 				method: 'DELETE'
@@ -57,14 +58,14 @@
 		}
 	}
 
-	async function linkCategory(idea: Idea, categoryId: string) {
+	async function linkCategory(idea: IdeaT, categoryId: string) {
 		await fetch(`/catalog/ideas/${idea.id}/categories/${categoryId}`, {
 			method: 'PUT'
 		});
 		invalidateAll();
 	}
 
-	async function unlinkCategory(idea: Idea, categoryId: string) {
+	async function unlinkCategory(idea: IdeaT, categoryId: string) {
 		if (confirm(`Really remove "${idea.name}" from category?`)) {
 			await fetch(`/catalog/ideas/${idea.id}/categories/${categoryId}`, {
 				method: 'DELETE'
@@ -73,14 +74,14 @@
 		}
 	}
 
-	async function linkIdea(idea: Idea, otherIdea: { id: string; related: boolean }) {
+	async function linkIdea(idea: IdeaT, otherIdea: { id: string; related: boolean }) {
 		await fetch(`/catalog/ideas/${idea.id}/related/${otherIdea?.id}`, {
 			method: 'PUT'
 		});
 		invalidateAll();
 	}
 
-	async function unlinkIdea(idea: Idea, otherIdea: { id: string; related: boolean }) {
+	async function unlinkIdea(idea: IdeaT, otherIdea: { id: string; related: boolean }) {
 		await fetch(`/catalog/ideas/${idea.id}/related/${otherIdea?.id}`, {
 			method: 'DELETE'
 		});
@@ -144,7 +145,7 @@
 
 	<div
 		bind:this={menu}
-		class="absolute z-2 w-max max-w-full md:max-w-md top-0 left-0 hidden flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4"
+		class="absolute z-2 shadow-black shadow-sm rounded-sm w-max max-w-full md:max-w-md top-0 left-0 hidden flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4"
 	>
 		{#if idea}
 			{@render tooltip({ idea })}
@@ -156,11 +157,11 @@
 		categoryId,
 		otherIdea
 	}: {
-		idea: Idea;
+		idea: IdeaT;
 		categoryId?: string;
 		otherIdea?: { id: string; related: boolean };
 	})}
-		<pre class="pre-wrap">{idea.desc}</pre>
+		<Idea {idea} />
 		<div class="flex w-full justify-end idea-preview-Buttons__container gap-2">
 			<Button class="btn-primary" title="Delete Idea" onclick={() => deleteIdea(idea)}>
 				<i class="fi fi-rr-trash"></i>
