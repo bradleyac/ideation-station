@@ -19,6 +19,7 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
     const focusIn$ = fromEvent<FocusEvent>(node, 'focusin');
     const focusOut$ = fromEvent<FocusEvent>(node, 'focusout');
     const touchEnd$ = fromEvent<TouchEvent>(node, 'touchend');
+    const touchTooltip$ = fromEvent<TouchEvent>(tip, 'touchend');
 
     const relevantFocusIn$ = focusIn$.pipe(map<FocusEvent, [number, HTMLElement, string]>(evt => [evt.timeStamp, evt.target as HTMLElement, (evt.target as HTMLElement).dataset?.['ideaid'] ?? ""]),
       filter(e => e[2] !== ""));
@@ -28,7 +29,6 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
         filter(evt => (evt.target as HTMLElement).dataset?.['ideaid'] !== undefined),
         map(evt => evt.timeStamp)
       );
-    // focusin: show focusout: hide touchend: maybe block the default?
 
     const lastOver$ = mouseOver$.pipe
       (
@@ -43,17 +43,12 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
       );
 
     const show$ = lastOver$.pipe(mergeWith(relevantFocusIn$));
+    const showTime$ = show$.pipe(map(e => e[0]))
     const hide$ = lastOut$.pipe
       (
         mergeWith(relevantFocusOut$),
         mergeWith(outTooltip$.pipe(map(tt => tt.timeStamp))),
       );
-
-    // show$.subscribe(e => console.log(`show: ${e[0]}`))
-    // inTooltip$.subscribe(e => console.log(`intt: ${e.timeStamp}`))
-    // outTooltip$.subscribe(console.log);
-    // relevantFocusOut$.subscribe(console.log);
-
 
     sub.add(
       show$.pipe
@@ -68,7 +63,12 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
     sub.add(
       hide$.pipe(
         debounceTime(300, asyncScheduler),
-        withLatestFrom(show$.pipe(map(e => e[0]), mergeWith(inTooltip$.pipe(map(e => e.timeStamp))))),
+        withLatestFrom(showTime$.pipe
+          (
+            mergeWith(inTooltip$.pipe(map(e => e.timeStamp))),
+            mergeWith(touchTooltip$.pipe(map(e => e.timeStamp)))
+          )
+        ),
         // tap(([outTime, inTime]) => console.log(`out: ${outTime}, in: ${inTime}`)),
         filter(([outTime, inTime]) => outTime > inTime),
         mergeWith(esc$)
@@ -109,36 +109,6 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
       if (!tip) return;
       tip.style.display = '';
     }
-
-    // node.addEventListener('focusin', e => {
-    //   const id = (e.target as HTMLElement)?.dataset?.['ideaid'];
-    //   if (id !== undefined) {
-    //     setCurrent(id);
-    //     showTooltip((e.target as HTMLElement));
-    //   }
-    // });
-
-    // node.addEventListener('focusout', e => {
-    //   let el = e.target as HTMLElement;
-    //   if (el?.dataset?.['ideaid'] !== undefined && el?.dataset?.['modaltooltip'] === undefined) {
-    //     hideTooltip();
-    //   }
-    //   else if (el === node) {
-    //     hideTooltip();
-    //   }
-    // });
-
-    // node.addEventListener('touchend', e => {
-    //   let el = e.target as HTMLElement;
-    //   if (el?.dataset?.['ideaid'] === undefined) {
-    //     hideTooltip();
-    //   }
-    //   else if (el !== document.activeElement && e.cancelable && el?.dataset?.['ideaid'] !== undefined) {
-    //     e.preventDefault();
-    //     el.setAttribute("data-modaltooltip", "");
-    //     el.focus();
-    //   }
-    // });
 
     return () => sub.unsubscribe();
   };
