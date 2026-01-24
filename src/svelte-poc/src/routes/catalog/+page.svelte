@@ -144,7 +144,7 @@
 
 	<div
 		bind:this={menu}
-		class="absolute z-2 w-max max-w-md top-0 left-0 hidden flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4"
+		class="absolute z-2 w-max max-w-full md:max-w-md top-0 left-0 hidden flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4"
 	>
 		{#if idea}
 			{@render tooltip({ idea })}

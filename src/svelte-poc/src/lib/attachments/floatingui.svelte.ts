@@ -9,6 +9,8 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
     if (!tip) return;
     // Do this with Rx not with event listeners directly.
 
+    //TODO: also listen to taps to focus the tapped element and not follow the link the first time (mobile only)
+
     let sub = new Subscription();
 
     const esc$ = fromEvent<KeyboardEvent>(document, 'keydown').pipe(filter(e => e.key === 'Escape'));
