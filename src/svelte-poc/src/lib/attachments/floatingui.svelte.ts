@@ -7,7 +7,12 @@ import { asyncScheduler, debounceTime, distinctUntilChanged, filter, fromEvent, 
 export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCurrent: (id: string) => void }) {
   return (node: HTMLElement) => {
     if (!tip) return;
-    // Do this with Rx not with event listeners directly.
+
+    // TODO: ALMOST THERE! Still need to dismiss the popup when the idea it's for disappears.
+
+    // TODO: Can this be simplified by swapping out streams we don't want on this device with NEVER and then doing everything the same way for both?
+    // No reason we can't have a subscription to touchEnd$ when using a mouse when touchEnd$ is NEVER.
+
     // function isTouchPointer() {
     //   return matchMedia("(pointer: coarse)").matches;
     // }
@@ -95,16 +100,19 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
       ).subscribe(hideTooltip)
     );
 
-    sub.add(
-      touchEnd$.pipe
-        (
-          map<TouchEvent, [TouchEvent, HTMLAnchorElement | null]>(e => [e, (e.target as HTMLElement).nodeName === 'A' ? e.target as HTMLAnchorElement : null]),
-          filter(([e, node]) => node !== null && node !== document.activeElement),
-        ).subscribe(([e, node]) => {
-          e.preventDefault();
-          node?.focus();
-        })
-    )
+    // Listen to touchEnd$ on mobile to allow focusing on the links since you can't hover.
+    if (isTouchPointer) {
+      sub.add(
+        touchEnd$.pipe
+          (
+            map<TouchEvent, [TouchEvent, HTMLAnchorElement | null]>(e => [e, (e.target as HTMLElement).nodeName === 'A' ? e.target as HTMLAnchorElement : null]),
+            filter(([e, node]) => node !== null && node !== document.activeElement),
+          ).subscribe(([e, node]) => {
+            e.preventDefault();
+            node?.focus();
+          })
+      );
+    }
 
     function update(target: HTMLElement) {
       if (!tip) return;
