@@ -14,7 +14,7 @@
 			node,
 			'touchend',
 			(e) => {
-				if (e.touches.length === 1) return;
+				if (e.touches.length >= 1) return;
 				let el = e.target as HTMLElement;
 				if (el !== document.activeElement) {
 					e.preventDefault();
