@@ -66,7 +66,7 @@ export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCu
         withLatestFrom(showTime$.pipe
           (
             mergeWith(inTooltip$.pipe(map(e => e.timeStamp))),
-            mergeWith(touchTooltip$.pipe(map(e => e.timeStamp)))
+            mergeWith(touchTooltip$.pipe(map(e => e.timeStamp + 100)))
           )
         ),
         // tap(([outTime, inTime]) => console.log(`out: ${outTime}, in: ${inTime}`)),
