@@ -3,6 +3,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import Collapse from '$lib/components/Collapse.svelte';
 	import { type Idea as IdeaT } from '$lib/types';
+	import { flip } from 'svelte/animate';
 	import IdeaMenu from './IdeaMenu.svelte';
 	import IdeaPreview from './IdeaPreview.svelte';
 
@@ -18,7 +19,7 @@
 
 	let mode = $state<'default' | 'compact'>('default');
 
-	let sort = $state<'alpha' | 'alphaR'>('alpha');
+	let sort = $state<'alpha' | 'alphaR' | 'shake1' | 'shake2'>('alpha');
 
 	const sortedIdeas = $derived(
 		ideas.toSorted((a, b) =>
@@ -30,7 +31,9 @@
 					? a.name > b.name
 						? -1
 						: 1
-					: 0
+					: sort === 'shake1' || sort === 'shake2'
+						? Math.random() - 0.5
+						: 0
 		)
 	);
 
@@ -41,12 +44,14 @@
 	}
 
 	let menu = $state<HTMLElement>();
+	const any = $derived(ideas?.length > 0);
 </script>
 
 <Collapse
 	class="relative"
 	title={props.title}
-	open={true}
+	open={any}
+	disabled={!any}
 	{@attach tooltipAttachment({ tip: menu, setCurrent })}
 >
 	<IdeaMenu
@@ -57,12 +62,15 @@
 	/>
 	<div class="absolute top-1.5 right-1.5 flex gap-1.5">
 		<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}>{mode}</Button>
+		<Button onclick={() => (sort = sort === 'shake1' ? 'shake2' : 'shake1')}>Randomize Order</Button
+		>
 		<Button onclick={() => (sort = sort === 'alpha' ? 'alphaR' : 'alpha')}
 			><i
 				class={[
 					'fi',
 					sort === 'alpha' && 'fi-rr-sort-alpha-down',
-					sort === 'alphaR' && 'fi-rr-sort-alpha-up'
+					sort === 'alphaR' && 'fi-rr-sort-alpha-up',
+					(sort === 'shake1' || sort === 'shake2') && 'fi-rr-scribble'
 				]}
 			></i></Button
 		>
@@ -75,7 +83,7 @@
 		]}
 	>
 		{#each sortedIdeas as idea (idea.id)}
-			<li class={[mode === 'compact' && 'ring-1']}>
+			<li animate:flip={{ duration: 500 }} class={[mode === 'compact' && 'ring-1']}>
 				<IdeaPreview {idea} {mode} />
 			</li>
 		{/each}

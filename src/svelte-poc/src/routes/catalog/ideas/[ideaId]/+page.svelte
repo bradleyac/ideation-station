@@ -95,7 +95,7 @@
 			otherIdea={{ id: data.idea.id, related: true }}
 		/>
 		<IdeaList
-			title="Unrelated Ideaas"
+			title="Unrelated Ideas"
 			ideas={unrelatedIdeas}
 			otherIdea={{ id: data.idea.id, related: false }}
 		/>

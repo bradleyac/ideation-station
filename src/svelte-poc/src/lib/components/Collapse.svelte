@@ -2,14 +2,20 @@
 	const props = $props();
 </script>
 
-<details {...props} class="group relative rounded-sm flex flex-col border-1 h-auto open:h-fit">
-	<!-- TODO does summary have :open applied to it as well? -->
-	<!-- Answer: It does not, but you can use in-open: as if it did. -->
+<!-- // TODO: figure out transitioning open/close -->
+<details
+	{...props}
+	class={[
+		'group relative rounded-sm flex flex-col border-1 h-auto open:h-fit',
+		props.disabled && 'opacity-50'
+	]}
+>
 	<summary
-		class="flex p-4 group-open:border-b-1 group-open:before:transform-[rotate(90deg)] hover:cursor-pointer select-none"
+		inert={props.disabled}
+		class="flex p-4 group-open:border-b-1 group-open:before:transform-[rotateX(180deg)] hover:cursor-pointer select-none"
 		>{props.title}</summary
 	>
-	<div class="flex m-2">
+	<div class="m-2 flex">
 		{@render props.children?.()}
 	</div>
 </details>
@@ -28,8 +34,8 @@
 			-moz-osx-font-smoothing: grayscale;
 			display: inline-block;
 			/* fi-rr-angle-right */
-			content: '\e08f';
-			transition: transform 0.25s;
+			content: '\e098';
+			transition: transform 0.2s;
 			place-self: center;
 			margin-right: 0.5em;
 		}
