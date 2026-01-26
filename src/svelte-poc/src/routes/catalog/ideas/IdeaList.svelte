@@ -62,8 +62,7 @@
 	/>
 	<div class="absolute top-1.5 right-1.5 flex gap-1.5">
 		<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}>{mode}</Button>
-		<Button onclick={() => (sort = sort === 'shake1' ? 'shake2' : 'shake1')}>Randomize Order</Button
-		>
+		<Button onclick={() => (sort = sort === 'shake1' ? 'shake2' : 'shake1')}>Shake!</Button>
 		<Button onclick={() => (sort = sort === 'alpha' ? 'alphaR' : 'alpha')}
 			><i
 				class={[
