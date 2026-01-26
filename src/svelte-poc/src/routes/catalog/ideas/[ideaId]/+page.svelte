@@ -9,6 +9,7 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import { redirect, type ActionResult } from '@sveltejs/kit';
 	import Button from '$lib/components/Button.svelte';
+	import IdeaList from '../IdeaList.svelte';
 	const { data } = $props();
 
 	const unrelatedIdeas: IdeaT[] = $derived(
@@ -88,32 +89,15 @@
 			{/if}
 		</ul>
 
-		<Collapse title="Related Ideas" open={data.relatedIdeas.length > 0}>
-			<ul class="flex flex-wrap gap-2">
-				{#if data.relatedIdeas.length === 0}
-					<p>No related ideas found.</p>
-				{:else}
-					{#each data.relatedIdeas as relatedIdea (relatedIdea.id)}
-						<li>
-							<IdeaPreview idea={relatedIdea} />
-						</li>
-					{/each}
-				{/if}
-			</ul>
-		</Collapse>
-
-		<Collapse title="Unrelated Ideas">
-			<ul class="flex flex-wrap gap-2">
-				{#if unrelatedIdeas.length === 0}
-					<p>No unrelated ideas found.</p>
-				{:else}
-					{#each unrelatedIdeas as unrelatedIdea (unrelatedIdea.id)}
-						<li>
-							<IdeaPreview idea={unrelatedIdea} />
-						</li>
-					{/each}
-				{/if}
-			</ul>
-		</Collapse>
+		<IdeaList
+			title="Related Ideas"
+			ideas={data.relatedIdeas}
+			otherIdea={{ id: data.idea.id, related: true }}
+		/>
+		<IdeaList
+			title="Unrelated Ideaas"
+			ideas={unrelatedIdeas}
+			otherIdea={{ id: data.idea.id, related: false }}
+		/>
 	</section>
 {/key}

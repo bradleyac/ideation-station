@@ -6,6 +6,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import { goto, invalidateAll } from '$app/navigation';
+	import IdeaList from '../../ideas/IdeaList.svelte';
 
 	const { data, params } = $props();
 
@@ -63,12 +64,7 @@
 				>
 			{/if}
 		</div>
-		<ul class="flex gap-2 flex-wrap">
-			{#each relatedIdeas as idea (idea.id)}
-				<li>
-					<IdeaPreview {idea} />
-				</li>
-			{/each}
-		</ul>
+
+		<IdeaList title="Contained Ideas" ideas={relatedIdeas} categoryId={data.category.id} />
 	</section>
 {/key}

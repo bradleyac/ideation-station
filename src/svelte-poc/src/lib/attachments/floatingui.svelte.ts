@@ -1,10 +1,11 @@
 import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
 import { asyncScheduler, debounceTime, distinctUntilChanged, filter, fromEvent, map, mergeWith, NEVER, Observable, Subscription, tap, throttleTime, withLatestFrom } from "rxjs";
+import type { Component } from "svelte";
 
 // data-ideaid set on the nodes
 // When a node should be the current node, call "setCurrent" with the contents of data-ideaid
 
-export function tooltipAttachment({ tip, setCurrent }: { tip: HTMLElement, setCurrent: (id: string) => void }) {
+export function tooltipAttachment({ tip, setCurrent }: { tip?: HTMLElement, setCurrent: (id: string) => void }) {
   return (node: HTMLElement) => {
     if (!tip) return;
 
