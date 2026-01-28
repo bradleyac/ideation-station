@@ -1,19 +1,17 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 	import Collapse from '$lib/components/Collapse.svelte';
-	import { type Idea as IdeaT } from '$lib/types';
+	import { type Category, type Idea as IdeaT } from '$lib/types';
 	import { flip } from 'svelte/animate';
-	import IdeaMenu from './IdeaMenu.svelte';
-	import IdeaPreview from './IdeaPreview.svelte';
+	import CategoryPreview from './CategoryPreview.svelte';
 	import Tooltip from '$lib/components/Tooltip.svelte';
+	import CategoryMenu from './CategoryMenu.svelte';
 
 	const {
-		ideas,
+		categories,
 		...props
 	}: {
-		ideas: IdeaT[];
-		categoryId?: string;
-		otherIdea?: { id: string; related: boolean };
+		categories: Category[];
 		title: string;
 	} = $props();
 
@@ -21,8 +19,8 @@
 
 	let sort = $state<'alpha' | 'alphaR' | 'shake1' | 'shake2'>('alpha');
 
-	const sortedIdeas = $derived(
-		ideas.toSorted((a, b) =>
+	const sortedCategories = $derived(
+		categories.toSorted((a, b) =>
 			sort === 'alpha'
 				? a.name > b.name
 					? 1
@@ -38,11 +36,11 @@
 	);
 
 	let menu = $state<HTMLElement>();
-	const anyIdeas = $derived(ideas?.length > 0);
+	const anyCategories = $derived(categories?.length > 0);
 	let container = $state<HTMLElement>();
 </script>
 
-<Collapse class="relative" title={props.title} open={anyIdeas} disabled={!anyIdeas}>
+<Collapse class="relative" title={props.title} open={anyCategories} disabled={!anyCategories}>
 	<div class="absolute top-1.5 right-1.5 flex gap-1.5">
 		<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}>{mode}</Button>
 		<Button onclick={() => (sort = sort === 'shake1' ? 'shake2' : 'shake1')}>Shake!</Button>
@@ -60,12 +58,7 @@
 	<div bind:this={container} class="relative flex flex-col w-full">
 		<Tooltip parent={container}>
 			{#snippet children(id: string)}
-				<IdeaMenu
-					bind:ref={menu}
-					idea={ideas.filter((idea) => idea.id === id)[0]}
-					categoryId={props.categoryId}
-					otherIdea={props.otherIdea}
-				/>
+				<CategoryMenu bind:ref={menu} category={categories.filter((cat) => cat.id === id)[0]} />
 			{/snippet}
 		</Tooltip>
 		<ul
@@ -75,9 +68,9 @@
 				mode === 'compact' && 'flex-col w-full divide-y'
 			]}
 		>
-			{#each sortedIdeas as idea (idea.id)}
+			{#each sortedCategories as category (category.id)}
 				<li animate:flip={{ duration: 500 }} class={[mode === 'compact' && 'ring-1']}>
-					<IdeaPreview {idea} {mode} />
+					<CategoryPreview {category} {mode} />
 				</li>
 			{/each}
 		</ul>

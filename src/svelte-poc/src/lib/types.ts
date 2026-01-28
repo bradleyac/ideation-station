@@ -8,6 +8,7 @@ interface Idea {
 interface Category {
   id: string,
   name: string,
+  desc: string,
   count: number,
 }
 

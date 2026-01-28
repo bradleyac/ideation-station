@@ -12,6 +12,7 @@
 	import Idea from './ideas/Idea.svelte';
 	import IdeaMenu from './ideas/IdeaMenu.svelte';
 	import IdeaList from './ideas/IdeaList.svelte';
+	import CategoryList from './categories/CategoryList.svelte';
 
 	const { data } = $props();
 	const aspirationsCategoryId = $derived(
@@ -69,15 +70,7 @@
 		/>
 	</div>
 
-	<Collapse title="All Categories" open={true}>
-		<ul class="list-none m-0 gap-2 flex flex-row flex-wrap">
-			{#each data.categories as category (category.id)}
-				<li>
-					<CategoryPreview {category} />
-				</li>
-			{/each}
-		</ul>
-	</Collapse>
+	<CategoryList title="All Categories" categories={data.categories} />
 
 	<IdeaList title="All Ideas" ideas={data.ideas} />
 </section>

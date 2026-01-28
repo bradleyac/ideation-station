@@ -21,35 +21,36 @@
 		return on(document, 'keydown', (e) => e.key === 'Escape' && hideNow());
 	});
 
+	const tipEvents = [
+		['mouseleave', hideTooltip],
+		['mouseenter', showTooltip],
+		['touchend', delayShowTooltip]
+	] as const;
+
+	const parentEvents = [
+		['mouseover', maybeShow],
+		['focusin', maybeShow],
+		['mouseout', maybeHide],
+		['focusout', maybeHide],
+		['touchend', maybeFocusAndPreventDefault]
+	] as const;
+
 	$effect(() => {
-		if (!tip) return;
 		const offs = [
-			on(tip, 'mouseleave', hideTooltip),
-			on(tip, 'mouseenter', showTooltip),
-			on(tip, 'touchend', delayShowTooltip) // This one delayed because focusout on the target happens right after and would close it
+			...(tip ? tipEvents.map(([eventNames, handler]) => on(tip!, eventNames, handler)) : []),
+			...(parent
+				? parentEvents.map(([eventNames, handler]) => on(parent!, eventNames, handler))
+				: [])
 		];
 		return () => {
 			offs.forEach((off) => off());
 		};
 	});
 
-	$effect(() => {
-		if (!parent) return;
-		const offs = [
-			on(parent, 'mouseover', maybeShow),
-			on(parent, 'mouseout', maybeHide),
-			on(parent, 'focusin', maybeShow),
-			on(parent, 'focusout', maybeHide),
-			on(parent, 'touchend', maybeFocusAndPreventDefault)
-		];
-		return () => {
-			offs.forEach((off) => off());
-		};
-	});
-
-	function maybeFocusAndPreventDefault(evt: TouchEvent) {
+	function maybeFocusAndPreventDefault(evt: Event) {
 		const anchor = evt.target as HTMLAnchorElement;
 		if (!!anchor?.href && anchor !== document.activeElement) {
+			console.log('Prevented touchend');
 			evt.preventDefault();
 			anchor.focus();
 		}

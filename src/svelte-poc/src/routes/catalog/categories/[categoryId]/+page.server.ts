@@ -7,7 +7,7 @@ export async function load({ depends, params, platform }) {
   depends(`data:category/${params.categoryId}`);
   const ideaIds = params.categoryId === 'Uncategorized' ? await db.getUncategorizedIdeaIds(userid) : await db.getIdeaIdsByCategory(userid, params.categoryId);
 
-  const category = params.categoryId === 'Uncategorized' ? { id: 'Uncategorized', name: 'Uncategorized', count: ideaIds.length } : await db.getCategoryById(userid, params.categoryId);
+  const category = params.categoryId === 'Uncategorized' ? { id: 'Uncategorized', name: 'Uncategorized', desc: 'Ideas without categories.', count: ideaIds.length } : await db.getCategoryById(userid, params.categoryId);
 
   if (!category) error(404);
 

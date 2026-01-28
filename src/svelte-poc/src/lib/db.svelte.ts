@@ -143,9 +143,10 @@ class Db {
 
   public async getAllCategories(userid: string): Promise<Category[]> {
     const getAllCategoriesQuery = `g.V().hasLabel('category').has('userid', prop_userid)
-      .project('id','name','count')
+      .project('id','name','desc','count')
       .by('id')
       .by('name')
+      .by('desc')
       .by(outE('contains').count())`;
 
     const getUncategorizedCountQuery = `g.V().hasLabel('idea').has('userid', prop_userid)
@@ -161,14 +162,15 @@ class Db {
     });
 
     const uncategorizedCount = uncategorizedCountResult._items[0] || 0;
-    return [...getAllCategoriesResult._items, { id: 'Uncategorized', name: 'Uncategorized', count: uncategorizedCount }];
+    return [...getAllCategoriesResult._items, { id: 'Uncategorized', name: 'Uncategorized', desc: 'Ideas without categories.', count: uncategorizedCount }];
   }
 
   public async getCategoryById(userid: string, categoryId: string): Promise<Category | null> {
     const getCategoryByIdQuery = `g.V([prop_userid, prop_id])
-      .project('id','name','count')
+      .project('id','name','desc','count')
       .by('id')
       .by('name')
+      .by('desc')
       .by(outE('contains').count())`;
 
     let result = await this.submitWithRetry(getCategoryByIdQuery, {
@@ -179,8 +181,6 @@ class Db {
     return result._items[0] || null;
   }
 
-  // TODO: This works, but poorly. It takes forever now (a few seconds) to get all ideas.
-  // Need to optimize this, perhaps by caching category -> idea ids mapping somewhere.
   public async getAllIdeas(userid: string): Promise<Idea[]> {
     const getAllIdeasQuery = `g.V().hasLabel('idea').has('userid', prop_userid)
       .project('id', 'name', 'desc')

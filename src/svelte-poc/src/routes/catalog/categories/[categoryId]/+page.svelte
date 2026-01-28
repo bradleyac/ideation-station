@@ -46,6 +46,7 @@
 
 	<section class="flex flex-col gap-4 m-3">
 		<h1>{data.category.name}</h1>
+		<pre>{data.category.desc}</pre>
 		<div class="flex gap-2">
 			<Button
 				class="flex place-items-center w-max p-2"

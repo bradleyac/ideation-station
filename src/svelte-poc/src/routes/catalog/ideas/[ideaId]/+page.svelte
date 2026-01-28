@@ -10,6 +10,7 @@
 	import { redirect, type ActionResult } from '@sveltejs/kit';
 	import Button from '$lib/components/Button.svelte';
 	import IdeaList from '../IdeaList.svelte';
+	import CategoryList from '../../categories/CategoryList.svelte';
 	const { data } = $props();
 
 	const unrelatedIdeas: IdeaT[] = $derived(
@@ -79,15 +80,7 @@
 			>
 		</div>
 
-		<ul class="flex gap-2 flex-wrap">
-			{#if !data.idea.categoryIds || data.idea.categoryIds.length === 0}
-				<li>Uncategorized</li>
-			{:else}
-				{#each categories as category (category.id)}
-					<li><CategoryPreview {category} /></li>
-				{/each}
-			{/if}
-		</ul>
+		<CategoryList title="Categories" {categories} />
 
 		<IdeaList
 			title="Related Ideas"
