@@ -42,7 +42,7 @@
 
 {#key formKey}
 	<form
-		class="flex flex-col overflow-clip lg:rounded-sm w-full max-w-lg"
+		class="flex flex-col overflow-clip min-[32rem]:rounded-sm w-full max-w-lg"
 		method="POST"
 		{action}
 		use:enhance={enhanceCallback ??
@@ -73,7 +73,7 @@
 			<label>
 				Details
 				<textarea
-					class="bg-neutral-300 dark:bg-neutral-700"
+					class="bg-neutral-300 dark:bg-neutral-700 max-h-[4em] min-[32rem]:max-h-md"
 					required
 					name="desc"
 					placeholder="Idea details">{existingIdea?.desc}</textarea

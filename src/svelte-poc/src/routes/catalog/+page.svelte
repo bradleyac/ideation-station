@@ -9,7 +9,6 @@
 	import CategoryForm from './categories/CategoryForm.svelte';
 	import { type Idea as IdeaT } from '$lib/types.js';
 	import { invalidateAll } from '$app/navigation';
-	import { tooltipAttachment } from '$lib/attachments/floatingui.svelte';
 	import Idea from './ideas/Idea.svelte';
 	import IdeaMenu from './ideas/IdeaMenu.svelte';
 	import IdeaList from './ideas/IdeaList.svelte';

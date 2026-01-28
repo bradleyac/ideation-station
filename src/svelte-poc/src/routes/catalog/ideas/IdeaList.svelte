@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { tooltipAttachment } from '$lib/attachments/floatingui.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Collapse from '$lib/components/Collapse.svelte';
 	import { type Idea as IdeaT } from '$lib/types';
 	import { flip } from 'svelte/animate';
 	import IdeaMenu from './IdeaMenu.svelte';
 	import IdeaPreview from './IdeaPreview.svelte';
+	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	const {
 		ideas,
@@ -45,21 +45,10 @@
 
 	let menu = $state<HTMLElement>();
 	const any = $derived(ideas?.length > 0);
+	let container = $state<HTMLElement>();
 </script>
 
-<Collapse
-	class="relative"
-	title={props.title}
-	open={any}
-	disabled={!any}
-	{@attach tooltipAttachment({ tip: menu, setCurrent })}
->
-	<IdeaMenu
-		bind:ref={menu}
-		idea={currentIdea}
-		categoryId={props.categoryId}
-		otherIdea={props.otherIdea}
-	/>
+<Collapse class="relative" title={props.title} open={any} disabled={!any}>
 	<div class="absolute top-1.5 right-1.5 flex gap-1.5">
 		<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}>{mode}</Button>
 		<Button onclick={() => (sort = sort === 'shake1' ? 'shake2' : 'shake1')}>Shake!</Button>
@@ -74,17 +63,29 @@
 			></i></Button
 		>
 	</div>
-	<ul
-		class={[
-			'list-none flex',
-			mode === 'default' && 'flex-row flex-wrap gap-2',
-			mode === 'compact' && 'flex-col w-full divide-y'
-		]}
-	>
-		{#each sortedIdeas as idea (idea.id)}
-			<li animate:flip={{ duration: 500 }} class={[mode === 'compact' && 'ring-1']}>
-				<IdeaPreview {idea} {mode} />
-			</li>
-		{/each}
-	</ul>
+	<div bind:this={container} class="relative flex flex-col w-full">
+		<Tooltip parent={container}>
+			{#snippet children(id: string)}
+				<IdeaMenu
+					bind:ref={menu}
+					idea={ideas.filter((idea) => idea.id === id)[0]}
+					categoryId={props.categoryId}
+					otherIdea={props.otherIdea}
+				/>
+			{/snippet}
+		</Tooltip>
+		<ul
+			class={[
+				'list-none flex',
+				mode === 'default' && 'flex-row flex-wrap gap-2',
+				mode === 'compact' && 'flex-col w-full divide-y'
+			]}
+		>
+			{#each sortedIdeas as idea (idea.id)}
+				<li animate:flip={{ duration: 500 }} class={[mode === 'compact' && 'ring-1']}>
+					<IdeaPreview {idea} {mode} />
+				</li>
+			{/each}
+		</ul>
+	</div>
 </Collapse>

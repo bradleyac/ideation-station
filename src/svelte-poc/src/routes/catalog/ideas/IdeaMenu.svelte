@@ -5,10 +5,10 @@
 	import { invalidateAll } from '$app/navigation';
 	let { ref = $bindable<HTMLElement>(), ...props } = $props();
 
+	let show = $state(true);
+
 	function hideMenu() {
-		if (ref) {
-			ref.style.display = '';
-		}
+		show = false;
 	}
 
 	async function deleteIdea(idea: IdeaT) {
@@ -58,7 +58,10 @@
 
 <div
 	bind:this={ref}
-	class="absolute z-2 shadow-black shadow-sm rounded-sm w-max max-w-full md:max-w-md top-0 left-0 hidden flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4"
+	class={[
+		'relative shadow-black shadow-sm rounded-sm w-max max-w-full md:max-w-md top-0 left-0 flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4',
+		show ? 'flex' : 'hidden'
+	]}
 >
 	{#if props.idea}
 		<Idea idea={props.idea} />
