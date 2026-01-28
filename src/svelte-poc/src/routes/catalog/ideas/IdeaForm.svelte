@@ -73,7 +73,7 @@
 			<label>
 				Details
 				<textarea
-					class="bg-neutral-300 dark:bg-neutral-700 max-h-[4em] min-[32rem]:max-h-md"
+					class="bg-neutral-300 dark:bg-neutral-700"
 					required
 					name="desc"
 					placeholder="Idea details">{existingIdea?.desc}</textarea

@@ -15,7 +15,7 @@
 </script>
 
 <dialog
-	class="relative top-0 min-[32rem]:top-20 bg-transparent max-w-full! w-full open:flex open:flex-col open:place-items-center open:animate-zoom backdrop:bg-black/50 open:backdrop:animate-fade"
+	class="relative top-0 h-svh min-[32rem]:top-20 bg-transparent max-w-full! w-full open:flex open:flex-col open:place-items-center open:animate-zoom backdrop:bg-black/50 open:backdrop:animate-fade"
 	bind:this={dialog}
 	onclose={() => (showModal = false)}
 	onclick={(e) => {

@@ -2,7 +2,6 @@
 	import { computePosition, flip, shift } from '@floating-ui/dom';
 	import type { Snippet } from 'svelte';
 	import { on } from 'svelte/events';
-	import Button from './Button.svelte';
 	let { children, parent }: { children: Snippet<[string, () => void]>; parent: HTMLElement } =
 		$props();
 	let visible = $state(false);
@@ -86,12 +85,6 @@
 		if (id) {
 			hideTooltip();
 		}
-	}
-
-	function delayShowTooltip() {
-		setTimeout(() => {
-			showTooltip();
-		}, 100);
 	}
 
 	function showTooltip() {

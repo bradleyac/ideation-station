@@ -15,7 +15,7 @@
 		class="flex p-4 group-open:border-b-1 group-open:before:transform-[rotateX(180deg)] hover:cursor-pointer select-none"
 		>{props.title}</summary
 	>
-	<div class="m-2 flex">
+	<div class="flex">
 		{@render props.children?.()}
 	</div>
 </details>

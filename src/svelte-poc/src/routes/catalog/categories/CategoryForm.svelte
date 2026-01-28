@@ -29,7 +29,7 @@
 
 {#key formKey}
 	<form
-		class="flex flex-col overflow-clip lg:rounded-sm w-full max-w-lg"
+		class="flex flex-col overflow-clip min-[32rem]:rounded-sm w-full max-w-lg"
 		method="POST"
 		{action}
 		use:enhance={enhanceCallback ??

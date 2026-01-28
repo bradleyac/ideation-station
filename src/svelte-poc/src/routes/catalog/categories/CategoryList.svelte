@@ -64,7 +64,7 @@
 			</i>
 		</Button>
 	</div>
-	<div bind:this={container} class="relative flex flex-col w-full">
+	<div bind:this={container} class={['relative flex flex-col w-full', mode === 'default' && 'm-2']}>
 		<Tooltip parent={container}>
 			{#snippet children(id: string)}
 				<CategoryMenu bind:ref={menu} category={categories.filter((cat) => cat.id === id)[0]} />
