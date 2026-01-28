@@ -42,18 +42,27 @@
 
 <Collapse class="relative" title={props.title} open={anyCategories} disabled={!anyCategories}>
 	<div class="absolute top-1.5 right-1.5 flex gap-1.5">
-		<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}>{mode}</Button>
-		<Button onclick={() => (sort = sort === 'shake1' ? 'shake2' : 'shake1')}>Shake!</Button>
-		<Button onclick={() => (sort = sort === 'alpha' ? 'alphaR' : 'alpha')}
+		<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}
 			><i
+				class={[
+					'fi',
+					mode === 'default' && 'fi-rr-layout-fluid',
+					mode === 'compact' && 'fi-rr-table-list'
+				]}
+			></i></Button
+		>
+		<Button onclick={() => (sort = sort === 'shake1' ? 'shake2' : 'shake1')}>Shake!</Button>
+		<Button onclick={() => (sort = sort === 'alpha' ? 'alphaR' : 'alpha')}>
+			<i
 				class={[
 					'fi',
 					sort === 'alpha' && 'fi-rr-sort-alpha-down',
 					sort === 'alphaR' && 'fi-rr-sort-alpha-up',
 					(sort === 'shake1' || sort === 'shake2') && 'fi-rr-scribble'
 				]}
-			></i></Button
-		>
+			>
+			</i>
+		</Button>
 	</div>
 	<div bind:this={container} class="relative flex flex-col w-full">
 		<Tooltip parent={container}>

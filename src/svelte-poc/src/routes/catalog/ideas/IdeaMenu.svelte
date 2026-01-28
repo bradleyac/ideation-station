@@ -5,10 +5,8 @@
 	import { invalidateAll } from '$app/navigation';
 	let { ref = $bindable<HTMLElement>(), ...props } = $props();
 
-	let show = $state(true);
-
 	function hideMenu() {
-		show = false;
+		props.close();
 	}
 
 	async function deleteIdea(idea: IdeaT) {
@@ -58,14 +56,14 @@
 
 <div
 	bind:this={ref}
-	class={[
-		'relative shadow-black shadow-sm rounded-sm w-max max-w-full md:max-w-md top-0 left-0 flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4',
-		show ? 'flex' : 'hidden'
-	]}
+	class="relative shadow-black shadow-sm rounded-sm w-max max-w-full md:max-w-md top-0 left-0 flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4"
 >
 	{#if props.idea}
 		<Idea idea={props.idea} />
-		<div class="flex mt-3 w-full justify-end idea-preview-Buttons__container gap-2">
+		<div class="flex mt-3 w-full justify-end gap-2">
+			<Button onclick={() => props.close()} tabindex="-1" title="Close"
+				><i class="fi fi-rr-cross"></i></Button
+			>
 			<Button class="btn-primary" title="Delete Idea" onclick={() => deleteIdea(props.idea)}>
 				<i class="fi fi-rr-trash"></i>
 			</Button>

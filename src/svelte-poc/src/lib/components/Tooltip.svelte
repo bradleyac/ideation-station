@@ -2,14 +2,16 @@
 	import { computePosition, flip, shift } from '@floating-ui/dom';
 	import type { Snippet } from 'svelte';
 	import { on } from 'svelte/events';
-	let { children, parent }: { children: Snippet<[string]>; parent: HTMLElement } = $props();
+	import Button from './Button.svelte';
+	let { children, parent }: { children: Snippet<[string, () => void]>; parent: HTMLElement } =
+		$props();
 	let visible = $state(false);
 	let tip = $state<HTMLDivElement>();
 	let leftPx = $state(0);
 	let topPx = $state(0);
 	let currentId = $state('');
 
-	const debounceTime = 300;
+	const debounceTime = 150;
 
 	let timeoutId: NodeJS.Timeout;
 
@@ -24,7 +26,7 @@
 	const tipEvents = [
 		['mouseleave', hideTooltip],
 		['mouseenter', showTooltip],
-		['touchend', delayShowTooltip]
+		['touchend', () => setTimeout(clear, 50)] // Delayed 50ms because touchend happens before focusout
 	] as const;
 
 	const parentEvents = [
@@ -107,7 +109,12 @@
 	}
 
 	function hideNow() {
+		clearTimeout(timeoutId);
 		visible = false;
+	}
+
+	function clear() {
+		clearTimeout(timeoutId);
 	}
 </script>
 
@@ -117,5 +124,7 @@
 	style:left="{leftPx}px"
 	class={[visible || 'hidden', 'absolute z-5 max-w-full']}
 >
-	{@render children?.(currentId)}
+	{#key currentId}
+		{@render children?.(currentId, hideNow)}
+	{/key}
 </div>

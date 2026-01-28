@@ -44,7 +44,15 @@
 
 <Collapse class="relative" title={props.title} open={anyIdeas} disabled={!anyIdeas}>
 	<div class="absolute top-1.5 right-1.5 flex gap-1.5">
-		<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}>{mode}</Button>
+		<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}
+			><i
+				class={[
+					'fi',
+					mode === 'default' && 'fi-rr-layout-fluid',
+					mode === 'compact' && 'fi-rr-table-list'
+				]}
+			></i></Button
+		>
 		<Button onclick={() => (sort = sort === 'shake1' ? 'shake2' : 'shake1')}>Shake!</Button>
 		<Button onclick={() => (sort = sort === 'alpha' ? 'alphaR' : 'alpha')}
 			><i
@@ -59,12 +67,13 @@
 	</div>
 	<div bind:this={container} class="relative flex flex-col w-full">
 		<Tooltip parent={container}>
-			{#snippet children(id: string)}
+			{#snippet children(id, close)}
 				<IdeaMenu
 					bind:ref={menu}
 					idea={ideas.filter((idea) => idea.id === id)[0]}
 					categoryId={props.categoryId}
 					otherIdea={props.otherIdea}
+					{close}
 				/>
 			{/snippet}
 		</Tooltip>
