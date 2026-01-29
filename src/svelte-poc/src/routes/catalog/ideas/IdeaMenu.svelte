@@ -3,6 +3,7 @@
 	import Idea from './Idea.svelte';
 	import { type Idea as IdeaT } from '$lib/types';
 	import { invalidateAll } from '$app/navigation';
+	import { preventDefault } from 'svelte/legacy';
 	let { ref = $bindable<HTMLElement>(), ...props } = $props();
 
 	function hideMenu() {
@@ -61,24 +62,42 @@
 	{#if props.idea}
 		<Idea idea={props.idea} />
 		<div class="flex mt-3 w-full justify-end gap-2">
-			<Button onclick={() => props.close()} tabindex="-1" title="Close"
-				><i class="fi fi-rr-cross"></i></Button
+			<Button
+				onclick={(e: Event) => {
+					props.close();
+					e.preventDefault();
+				}}
+				tabindex="-1"
+				title="Close"><i class="fi fi-rr-cross"></i></Button
 			>
-			<Button class="btn-primary" title="Delete Idea" onclick={() => deleteIdea(props.idea)}>
+			<Button
+				class="btn-primary"
+				title="Delete Idea"
+				onclick={(e: Event) => {
+					deleteIdea(props.idea);
+					e.preventDefault();
+				}}
+			>
 				<i class="fi fi-rr-trash"></i>
 			</Button>
 			{#if props.categoryId}
 				{#if props.idea.categoryIds?.includes(props.categoryId)}
 					<Button
 						title="Remove From Category"
-						onclick={() => unlinkCategory(props.idea, props.categoryId)}
+						onclick={(e: Event) => {
+							unlinkCategory(props.idea, props.categoryId);
+							e.preventDefault();
+						}}
 					>
 						<i class="fi fi-rr-link-slash"></i>
 					</Button>
 				{:else}
 					<Button
 						title="Add To Category"
-						onclick={() => linkCategory(props.idea, props.categoryId)}
+						onclick={(e: Event) => {
+							linkCategory(props.idea, props.categoryId);
+							e.preventDefault();
+						}}
 					>
 						<i class="fi fi-rr-link"></i>
 					</Button>
@@ -89,7 +108,10 @@
 					<Button
 						class="btn-primary"
 						title="Unlink Related Idea"
-						onclick={() => unlinkIdea(props.idea, props.otherIdea)}
+						onclick={(e: Event) => {
+							unlinkIdea(props.idea, props.otherIdea);
+							e.preventDefault();
+						}}
 					>
 						<i class="fi fi-rr-link-slash"></i>
 					</Button>
@@ -97,7 +119,10 @@
 					<Button
 						class="btn-primary"
 						title="Link Related Idea"
-						onclick={() => linkIdea(props.idea, props.otherIdea)}
+						onclick={(e: Event) => {
+							linkIdea(props.idea, props.otherIdea);
+							e.preventDefault();
+						}}
 					>
 						<i class="fi fi-rr-link"></i>
 					</Button>
