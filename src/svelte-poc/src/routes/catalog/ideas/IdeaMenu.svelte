@@ -3,7 +3,6 @@
 	import Idea from './Idea.svelte';
 	import { type Idea as IdeaT } from '$lib/types';
 	import { invalidateAll } from '$app/navigation';
-	import { preventDefault } from 'svelte/legacy';
 	let { ref = $bindable<HTMLElement>(), ...props } = $props();
 
 	function hideMenu() {
@@ -65,7 +64,7 @@
 			<Button
 				onclick={(e: Event) => {
 					props.close();
-					e.preventDefault();
+					e.stopPropagation();
 				}}
 				tabindex="-1"
 				title="Close"><i class="fi fi-rr-cross"></i></Button
@@ -75,7 +74,7 @@
 				title="Delete Idea"
 				onclick={(e: Event) => {
 					deleteIdea(props.idea);
-					e.preventDefault();
+					e.stopPropagation();
 				}}
 			>
 				<i class="fi fi-rr-trash"></i>
@@ -86,7 +85,7 @@
 						title="Remove From Category"
 						onclick={(e: Event) => {
 							unlinkCategory(props.idea, props.categoryId);
-							e.preventDefault();
+							e.stopPropagation();
 						}}
 					>
 						<i class="fi fi-rr-link-slash"></i>
@@ -96,7 +95,7 @@
 						title="Add To Category"
 						onclick={(e: Event) => {
 							linkCategory(props.idea, props.categoryId);
-							e.preventDefault();
+							e.stopPropagation();
 						}}
 					>
 						<i class="fi fi-rr-link"></i>
@@ -110,7 +109,7 @@
 						title="Unlink Related Idea"
 						onclick={(e: Event) => {
 							unlinkIdea(props.idea, props.otherIdea);
-							e.preventDefault();
+							e.stopPropagation();
 						}}
 					>
 						<i class="fi fi-rr-link-slash"></i>
@@ -121,7 +120,7 @@
 						title="Link Related Idea"
 						onclick={(e: Event) => {
 							linkIdea(props.idea, props.otherIdea);
-							e.preventDefault();
+							e.stopPropagation();
 						}}
 					>
 						<i class="fi fi-rr-link"></i>
