@@ -19,20 +19,30 @@
 
 	let mode = $state<'default' | 'compact'>('default');
 
-	let sort = $state<'alpha' | 'alphaR' | 'shake1' | 'shake2'>('alpha');
+	let sortDir = $state<'alpha' | 'alphaR'>('alpha');
+	let shook = $state<'shake1' | 'shake2' | undefined>();
+
+	function shake() {
+		shook = shook === 'shake1' ? 'shake2' : 'shake1';
+	}
+
+	function sort() {
+		sortDir = sortDir === 'alpha' ? 'alphaR' : 'alpha';
+		shook = undefined;
+	}
 
 	const sortedIdeas = $derived(
 		ideas.toSorted((a, b) =>
-			sort === 'alpha'
-				? a.name > b.name
-					? 1
-					: -1
-				: sort === 'alphaR'
+			shook
+				? Math.random() - 0.5
+				: sortDir === 'alpha'
 					? a.name > b.name
-						? -1
-						: 1
-					: sort === 'shake1' || sort === 'shake2'
-						? Math.random() - 0.5
+						? 1
+						: -1
+					: sortDir === 'alphaR'
+						? a.name > b.name
+							? -1
+							: 1
 						: 0
 		)
 	);
@@ -53,17 +63,19 @@
 				]}
 			></i></Button
 		>
-		<Button onclick={() => (sort = sort === 'shake1' ? 'shake2' : 'shake1')}>Shake!</Button>
-		<Button onclick={() => (sort = sort === 'alpha' ? 'alphaR' : 'alpha')}
-			><i
-				class={[
-					'fi',
-					sort === 'alpha' && 'fi-rr-sort-alpha-down',
-					sort === 'alphaR' && 'fi-rr-sort-alpha-up',
-					(sort === 'shake1' || sort === 'shake2') && 'fi-rr-scribble'
-				]}
-			></i></Button
-		>
+		<div class="flex">
+			<Button lit={!!shook} rounded="start" onclick={shake}><i class="fi fi-rr-shuffle"></i></Button
+			>
+			<Button lit={!shook} rounded="end" onclick={sort}
+				><i
+					class={[
+						'fi',
+						sortDir === 'alpha' && 'fi-rr-sort-alpha-down',
+						sortDir === 'alphaR' && 'fi-rr-sort-alpha-up'
+					]}
+				></i></Button
+			>
+		</div>
 	</div>
 	<div bind:this={container} class={['relative flex flex-col w-full', mode === 'default' && 'm-2']}>
 		<Tooltip parent={container}>
