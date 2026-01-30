@@ -7,7 +7,6 @@
 
 	const route = $derived(page.route);
 	const title = $derived(page.data.title);
-	const catalogs = $derived(page.data.catalogs);
 	// TODO: List out the catalogs in a menu
 </script>
 
