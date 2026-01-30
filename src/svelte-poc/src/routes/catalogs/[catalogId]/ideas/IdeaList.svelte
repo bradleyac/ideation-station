@@ -48,7 +48,6 @@
 		)
 	);
 
-	let menu = $state<HTMLElement>();
 	const anyIdeas = $derived(ideas?.length > 0);
 	let container = $state<HTMLElement>();
 </script>
@@ -82,7 +81,6 @@
 		<Tooltip parent={container}>
 			{#snippet children(id, close)}
 				<IdeaMenu
-					bind:ref={menu}
 					idea={ideas.filter((idea) => idea.id === id)[0]}
 					categoryId={props.categoryId}
 					otherIdea={props.otherIdea}

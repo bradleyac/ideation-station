@@ -3,6 +3,11 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
+	compilerOptions: {
+		experimental: {
+			async: true
+		}
+	},
 	// Consult https://svelte.dev/docs/kit/integrations
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
@@ -14,11 +19,6 @@ const config = {
 		adapter: azure({
 			customStaticWebAppConfig: {
 				routes: [
-					{
-						route: '/home',
-						allowedRoles: ['authenticated'],
-						rewrite: "/api/sk_render"
-					},
 					{
 						route: '/catalogs/*',
 						allowedRoles: ['authenticated'],

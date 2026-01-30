@@ -14,17 +14,18 @@
 	import IdeaList from './ideas/IdeaList.svelte';
 	import CategoryList from './categories/CategoryList.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
+	import { enhance } from '$app/forms';
+	import CatalogForm from '../CatalogForm.svelte';
 
 	const { data, params, ...props } = $props();
 	const aspirationsCategoryId = $derived(
 		data.categories.find((cat) => cat.name === 'Aspirations')?.id ?? ''
 	);
 
-	let showIdeaModal = $state(false);
-	let ideaKey = $state(0);
-
-	let showCategoryModal = $state(false);
-	let categoryKey = $state(0);
+	let showModal = $state(false);
+	let modalKey = $state(0);
+	let whichModal = $state<'edit' | 'category' | 'idea'>('edit');
+	let catalog = $derived(data.catalogs.find((c) => c.id === params.catalogId));
 
 	function enhanceCallback(): ({
 		update,
@@ -35,7 +36,7 @@
 	}) => Promise<void> {
 		return async ({ update, result }) => {
 			if (result?.type === 'success') {
-				showIdeaModal = false;
+				showModal = false;
 				await invalidateAll();
 			}
 			await update();
@@ -45,49 +46,69 @@
 
 <svelte:head><title>Idea Catalog</title></svelte:head>
 
-<Modal bind:showModal={showIdeaModal}>
-	{#key ideaKey}
-		<IdeaForm catalogId={params.catalogId} extantCategories={data.categories} {enhanceCallback} />
+<Modal bind:showModal>
+	{#key modalKey}
+		{#if whichModal === 'idea'}
+			<IdeaForm catalogId={params.catalogId} extantCategories={data.categories} {enhanceCallback} />
+		{:else if whichModal === 'category'}
+			<CategoryForm catalogId={params.catalogId} {enhanceCallback} />
+		{:else if whichModal === 'edit'}
+			<CatalogForm existingCatalog={catalog} {enhanceCallback} />
+		{/if}
 	{/key}
 </Modal>
 
-<Modal bind:showModal={showCategoryModal}>
-	{#key categoryKey}
-		<CategoryForm catalogId={params.catalogId} />
-	{/key}
-</Modal>
+{#if catalog}
+	<section class="flex flex-col gap-4 m-3">
+		<h1>{catalog.name}</h1>
+		<pre>{catalog.desc}</pre>
 
-<section class="flex flex-col gap-4 m-3">
-	<h1>Idea Catalog</h1>
+		<div class="flex gap-2">
+			<Button
+				onclick={() => {
+					showModal = true;
+					modalKey++;
+					whichModal = 'edit';
+				}}
+				title="Edit Catalog"><i class="block fi fi-rr-edit"></i>Edit Catalog</Button
+			>
 
-	<div class="flex gap-2">
-		<Button
-			onclick={() => {
-				showIdeaModal = !showIdeaModal;
-				ideaKey++;
-			}}
-			title="Open Create Idea Form"><i class="block fi fi-rr-add"></i>New Idea</Button
-		>
+			<Button
+				onclick={() => {
+					showModal = true;
+					modalKey++;
+					whichModal = 'idea';
+				}}
+				title="Create Idea"><i class="block fi fi-rr-add"></i>New Idea</Button
+			>
 
-		<Button
-			onclick={() => {
-				showCategoryModal = !showCategoryModal;
-				categoryKey++;
-			}}
-			title="Open Create Category Form"><i class="block fi fi-rr-add"></i>New Category</Button
-		>
-	</div>
+			<Button
+				onclick={() => {
+					showModal = true;
+					modalKey++;
+					whichModal = 'category';
+				}}
+				title="Create Category"><i class="block fi fi-rr-add"></i>New Category</Button
+			>
+		</div>
 
-	<div class="top-2.5 right-4 invisible lg:visible z-2 fixed">
-		<TextTicker
-			labels={data.ideas
-				.filter((idea) => idea.categoryIds?.includes(aspirationsCategoryId))
-				.map((idea) => idea.name)}
-			period={5000}
+		{#if props.categoryId}
+			<div class="top-2.5 right-4 invisible lg:visible z-2 fixed">
+				<TextTicker
+					period={5000}
+					labels={data.ideas
+						.filter((idea) => idea.categoryIds?.includes(aspirationsCategoryId))
+						.map((idea) => idea.name)}
+				/>
+			</div>
+		{/if}
+
+		<CategoryList
+			catalogId={params.catalogId}
+			title="All Categories"
+			categories={data.categories}
 		/>
-	</div>
 
-	<CategoryList catalogId={params.catalogId} title="All Categories" categories={data.categories} />
-
-	<IdeaList catalogId={params.catalogId} title="All Ideas" ideas={data.ideas} />
-</section>
+		<IdeaList catalogId={params.catalogId} title="All Ideas" ideas={data.ideas} />
+	</section>
+{/if}

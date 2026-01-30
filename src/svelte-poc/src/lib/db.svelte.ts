@@ -102,6 +102,20 @@ class Db {
     return results._items;
   }
 
+  public async getCatalog(userid: string, catalogid: string): Promise<Catalog> {
+    const getCatalogQuery = `g.V(prop_userid, prop_catalogid).project('id','name','desc')
+      .by('id')
+      .by('name')
+      .by('desc')`
+
+    let results = await this.submitWithRetry(getCatalogQuery, {
+      prop_userid: userid,
+      prop_catalogid: catalogid
+    })
+
+    return results._items[0];
+  }
+
   public async createIdea(userid: string, catalogid: string, idea: Idea): Promise<void> {
     // TODO: Transaction?
     const createIdeaQuery = `g.addV('idea')
@@ -234,7 +248,7 @@ class Db {
     return [...getAllCategoriesResult._items, { id: 'Uncategorized', name: 'Uncategorized', desc: 'Ideas without categories.', count: uncategorizedCount }];
   }
 
-  public async getCategoryById(userid: string, categoryId: string): Promise<Category | null> {
+  public async getCategoryById(userid: string, categoryId: string): Promise<Category> {
     const getCategoryByIdQuery = `g.V(prop_userid, prop_id)
       .project('id','name','desc','count')
       .by('id')
@@ -247,7 +261,7 @@ class Db {
       prop_id: categoryId,
     });
 
-    return result._items[0] || null;
+    return result._items[0];
   }
 
   public async getAllIdeas(userid: string, catalogid: string): Promise<Idea[]> {

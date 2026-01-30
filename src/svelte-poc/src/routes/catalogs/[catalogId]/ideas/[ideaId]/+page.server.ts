@@ -6,14 +6,14 @@ export async function load({ depends, params, platform }) {
   depends(`data:idea/${params.ideaId}`);
   const userid = getUserId(platform);
   const idea = await db.getIdea(userid, params.ideaId);
-  const relatedIdeas = await db.getRelatedIdeas(userid, params.ideaId);
 
   if (!idea) error(404);
 
   return {
+    parentId: params.catalogId,
     idea,
-    relatedIdeas,
-    title: "Idea: " + idea.name,
+    title: `Idea: ${idea.name}`,
+    relatedIdeas: await db.getRelatedIdeas(userid, params.ideaId),
   };
 }
 

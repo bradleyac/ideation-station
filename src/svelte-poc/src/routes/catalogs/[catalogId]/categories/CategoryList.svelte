@@ -46,7 +46,6 @@
 		)
 	);
 
-	let menu = $state<HTMLElement>();
 	const anyCategories = $derived(categories?.length > 0);
 	let container = $state<HTMLElement>();
 </script>
@@ -82,7 +81,7 @@
 	<div bind:this={container} class={['relative flex flex-col w-full', mode === 'default' && 'm-2']}>
 		<Tooltip parent={container}>
 			{#snippet children(id: string)}
-				<CategoryMenu bind:ref={menu} category={categories.filter((cat) => cat.id === id)[0]} />
+				<CategoryMenu category={categories.filter((cat) => cat.id === id)[0]} />
 			{/snippet}
 		</Tooltip>
 		<ul

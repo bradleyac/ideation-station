@@ -2,6 +2,19 @@ import { db } from "$lib/db.svelte";
 import getUserId from "$lib/getUserId";
 import { error } from "console";
 
+export async function load({ depends, params, platform }) {
+  depends(`data:catalog/${params.catalogId}`);
+  const userid = getUserId(platform);
+  const catalog = await db.getCatalog(userid, params.catalogId);
+
+  if (!catalog) error(404);
+
+  return {
+    catalog: catalog,
+    title: `Catalog: ${catalog.name}`,
+  };
+}
+
 export const actions = {
   default: async (event) => {
     const userid = getUserId(event.platform);

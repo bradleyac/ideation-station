@@ -4,6 +4,7 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
 	import CatalogForm from './CatalogForm.svelte';
+	import CatalogPreview from './CatalogPreview.svelte';
 
 	const { params, data, ...props } = $props();
 	let showModal = $state(false);
@@ -43,20 +44,15 @@
 				showModal = !showModal;
 				catalogKey++;
 			}}
-			title="Open Create Catalog Form"><i class="block fi fi-rr-add"></i>New Catalog</Button
+			title="Create Catalog"><i class="block fi fi-rr-add"></i>New Catalog</Button
 		>
 	</div>
 
-	<div class="flex">
+	<div
+		class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-max sm:auto-rows-fr gap-4"
+	>
 		{#each data.catalogs as catalog (catalog.id)}
-			<div class="flex flex-col">
-				<a href="/catalogs/{catalog.id}"><h2>{catalog.name}</h2></a>
-				<pre>{catalog.desc}</pre>
-			</div>
+			<CatalogPreview {catalog} />
 		{/each}
 	</div>
-
-	<!-- <CategoryList catalogId={params.catalogId} title="All Categories" categories={data.categories} />
-
-	<IdeaList catalogId={params.catalogId} title="All Ideas" ideas={data.ideas} /> -->
 </section>

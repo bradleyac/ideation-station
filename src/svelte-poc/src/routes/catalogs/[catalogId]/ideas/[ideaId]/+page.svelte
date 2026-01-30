@@ -15,10 +15,10 @@
 
 	const unrelatedIdeas: IdeaT[] = $derived(
 		data.ideas.filter(
-			(idea) =>
+			(possiblyRelatedIdea) =>
 				!(
-					idea.id == data.idea.id ||
-					data.relatedIdeas.map((relatedIdea) => relatedIdea.id).includes(idea.id)
+					data.idea.id == possiblyRelatedIdea.id ||
+					data.relatedIdeas.map((relatedIdea) => relatedIdea.id).includes(possiblyRelatedIdea.id)
 				)
 		)
 	);
@@ -47,9 +47,9 @@
 		};
 	}
 
-	async function deleteIdea() {
-		if (confirm(`Really delete "${data.idea.name}"?`)) {
-			await fetch(`/catalogs/${params.catalogId}/ideas/${data.idea.id}`, {
+	async function deleteIdea(idea: IdeaT) {
+		if (confirm(`Really delete "${idea.name}"?`)) {
+			await fetch(`/catalogs/${params.catalogId}/ideas/${idea.id}`, {
 				method: 'DELETE'
 			});
 			await goto(`/catalogs/${params.catalogId}`);
@@ -70,7 +70,6 @@
 		/>
 	{/key}
 </Modal>
-
 {#key data.idea.id}
 	<section class="flex flex-col gap-4 m-3">
 		<Idea idea={data.idea} />
