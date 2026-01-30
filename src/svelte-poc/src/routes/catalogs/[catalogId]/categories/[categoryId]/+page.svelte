@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { Idea } from '$lib/types.js';
-	import IdeaPreview from '../../ideas/IdeaPreview.svelte';
 	import IdeaForm from '../../ideas/IdeaForm.svelte';
 	import TextTicker from '$lib/components/TextTicker.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import { goto, invalidateAll } from '$app/navigation';
 	import IdeaList from '../../ideas/IdeaList.svelte';
+	import type { ActionResult } from '@sveltejs/kit';
 
 	const { data, params } = $props();
 
@@ -16,12 +16,28 @@
 
 	async function deleteCategory() {
 		if (confirm(`Really delete "${data.category.name}"?`)) {
-			await fetch(`/catalog/categories/${data.category.id}`, {
+			await fetch(`/catalogs/${params.catalogId}/categories/${data.category.id}`, {
 				method: 'DELETE'
 			});
-			await goto('/catalog');
+			await goto(`/catalogs/${params.catalogId}`);
 			await invalidateAll();
 		}
+	}
+
+	function enhanceCallback(): ({
+		update,
+		result
+	}: {
+		update: () => Promise<void>;
+		result: ActionResult;
+	}) => Promise<void> {
+		return async ({ update, result }) => {
+			if (result?.type === 'success') {
+				showModal = false;
+				await invalidateAll();
+			}
+			await update();
+		};
 	}
 
 	let showModal = $state(false);
@@ -33,8 +49,10 @@
 <Modal bind:showModal>
 	{#key ideaKey}
 		<IdeaForm
+			catalogId={params.catalogId}
 			extantCategories={data.categories}
 			defaultCategoryId={params.categoryId === 'Uncategorized' ? undefined : params.categoryId}
+			{enhanceCallback}
 		/>
 	{/key}
 </Modal>
@@ -66,6 +84,11 @@
 			{/if}
 		</div>
 
-		<IdeaList title="Contained Ideas" ideas={relatedIdeas} categoryId={data.category.id} />
+		<IdeaList
+			catalogId={params.catalogId}
+			title="Contained Ideas"
+			ideas={relatedIdeas}
+			categoryId={data.category.id}
+		/>
 	</section>
 {/key}

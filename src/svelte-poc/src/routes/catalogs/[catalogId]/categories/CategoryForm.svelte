@@ -6,8 +6,10 @@
 	let props = $props();
 	const {
 		existingCategory,
-		enhanceCallback
+		enhanceCallback,
+		catalogId
 	}: {
+		catalogId: string;
 		existingCategory?: CategoryFull;
 		enhanceCallback?: () => ({
 			update,
@@ -20,8 +22,8 @@
 	let title = $derived(props.existingCategory ? 'Edit Category' : 'Create New Category');
 	let action = $derived(
 		props.existingCategory
-			? `/catalog/categories/${props.existingCategory.id}`
-			: '/catalog/categories'
+			? `/catalogs/${catalogId}/categories/${props.existingCategory.id}`
+			: `/catalogs/${catalogId}/categories`
 	);
 
 	let formKey = $state(0);

@@ -11,7 +11,7 @@
 
 	async function deleteIdea(idea: IdeaT) {
 		if (confirm(`Really delete "${idea.name}"?`)) {
-			await fetch(`/catalog/ideas/${idea.id}`, {
+			await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}`, {
 				method: 'DELETE'
 			});
 			hideMenu();
@@ -20,7 +20,7 @@
 	}
 
 	async function linkCategory(idea: IdeaT, categoryId: string) {
-		await fetch(`/catalog/ideas/${idea.id}/categories/${categoryId}`, {
+		await fetch(`/catalog/${props.catalogId}/ideas/${idea.id}/categories/${categoryId}`, {
 			method: 'PUT'
 		});
 		hideMenu();
@@ -29,7 +29,7 @@
 
 	async function unlinkCategory(idea: IdeaT, categoryId: string) {
 		if (confirm(`Really remove "${idea.name}" from category?`)) {
-			await fetch(`/catalog/ideas/${idea.id}/categories/${categoryId}`, {
+			await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}/categories/${categoryId}`, {
 				method: 'DELETE'
 			});
 			hideMenu();
@@ -38,7 +38,7 @@
 	}
 
 	async function linkIdea(idea: IdeaT, otherIdea: { id: string; related: boolean }) {
-		await fetch(`/catalog/ideas/${idea.id}/related/${otherIdea?.id}`, {
+		await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}/related/${otherIdea?.id}`, {
 			method: 'PUT'
 		});
 		hideMenu();
@@ -46,7 +46,7 @@
 	}
 
 	async function unlinkIdea(idea: IdeaT, otherIdea: { id: string; related: boolean }) {
-		await fetch(`/catalog/ideas/${idea.id}/related/${otherIdea?.id}`, {
+		await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}/related/${otherIdea?.id}`, {
 			method: 'DELETE'
 		});
 		hideMenu();
@@ -63,8 +63,8 @@
 		<div class="flex mt-3 w-full justify-end gap-2">
 			<Button
 				onclick={(e: Event) => {
-					props.close();
 					e.stopPropagation();
+					props.close();
 				}}
 				tabindex="-1"
 				title="Close"><i class="fi fi-rr-cross"></i></Button
@@ -73,8 +73,8 @@
 				class="btn-primary"
 				title="Delete Idea"
 				onclick={(e: Event) => {
-					deleteIdea(props.idea);
 					e.stopPropagation();
+					deleteIdea(props.idea);
 				}}
 			>
 				<i class="fi fi-rr-trash"></i>
@@ -84,8 +84,8 @@
 					<Button
 						title="Remove From Category"
 						onclick={(e: Event) => {
-							unlinkCategory(props.idea, props.categoryId);
 							e.stopPropagation();
+							unlinkCategory(props.idea, props.categoryId);
 						}}
 					>
 						<i class="fi fi-rr-link-slash"></i>
@@ -94,8 +94,8 @@
 					<Button
 						title="Add To Category"
 						onclick={(e: Event) => {
-							linkCategory(props.idea, props.categoryId);
 							e.stopPropagation();
+							linkCategory(props.idea, props.categoryId);
 						}}
 					>
 						<i class="fi fi-rr-link"></i>
@@ -108,8 +108,8 @@
 						class="btn-primary"
 						title="Unlink Related Idea"
 						onclick={(e: Event) => {
-							unlinkIdea(props.idea, props.otherIdea);
 							e.stopPropagation();
+							unlinkIdea(props.idea, props.otherIdea);
 						}}
 					>
 						<i class="fi fi-rr-link-slash"></i>
@@ -119,8 +119,8 @@
 						class="btn-primary"
 						title="Link Related Idea"
 						onclick={(e: Event) => {
-							linkIdea(props.idea, props.otherIdea);
 							e.stopPropagation();
+							linkIdea(props.idea, props.otherIdea);
 						}}
 					>
 						<i class="fi fi-rr-link"></i>

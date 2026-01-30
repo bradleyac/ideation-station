@@ -11,7 +11,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import IdeaList from '../IdeaList.svelte';
 	import CategoryList from '../../categories/CategoryList.svelte';
-	const { data } = $props();
+	const { data, params } = $props();
 
 	const unrelatedIdeas: IdeaT[] = $derived(
 		data.ideas.filter(
@@ -41,7 +41,7 @@
 		return async ({ update, result }) => {
 			if (result?.type === 'success') {
 				showModal = false;
-				invalidate('data:ideas');
+				await invalidateAll();
 			}
 			await update();
 		};
@@ -49,10 +49,10 @@
 
 	async function deleteIdea() {
 		if (confirm(`Really delete "${data.idea.name}"?`)) {
-			await fetch(`/catalog/ideas/${data.idea.id}`, {
+			await fetch(`/catalogs/${params.catalogId}/ideas/${data.idea.id}`, {
 				method: 'DELETE'
 			});
-			await goto('/catalog');
+			await goto(`/catalogs/${params.catalogId}`);
 			await invalidateAll();
 		}
 	}
@@ -62,7 +62,12 @@
 
 <Modal bind:showModal>
 	{#key data.idea}
-		<IdeaForm existingIdea={data.idea} extantCategories={data.categories} {enhanceCallback} />
+		<IdeaForm
+			catalogId={params.catalogId}
+			existingIdea={data.idea}
+			extantCategories={data.categories}
+			{enhanceCallback}
+		/>
 	{/key}
 </Modal>
 
@@ -80,14 +85,16 @@
 			>
 		</div>
 
-		<CategoryList title="Categories" {categories} />
+		<CategoryList catalogId={params.catalogId} title="Categories" {categories} />
 
 		<IdeaList
+			catalogId={params.catalogId}
 			title="Related Ideas"
 			ideas={data.relatedIdeas}
 			otherIdea={{ id: data.idea.id, related: true }}
 		/>
 		<IdeaList
+			catalogId={params.catalogId}
 			title="Unrelated Ideas"
 			ideas={unrelatedIdeas}
 			otherIdea={{ id: data.idea.id, related: false }}

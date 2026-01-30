@@ -15,7 +15,7 @@ const config = {
 			customStaticWebAppConfig: {
 				routes: [
 					{
-						route: '/catalog/*',
+						route: '/*',
 						allowedRoles: ['authenticated'],
 						rewrite: "/api/sk_render"
 					},

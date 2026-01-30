@@ -7,6 +7,8 @@
 
 	const route = $derived(page.route);
 	const title = $derived(page.data.title);
+	const catalogs = $derived(page.data.catalogs);
+	// TODO: List out the catalogs in a menu
 </script>
 
 <svelte:head>
@@ -19,7 +21,8 @@
 		class="p-3 h-12 content-center sticky top-0 z-1 bg-gray-50 dark:bg-gray-900 shadow-black/30 shadow-xs"
 	>
 		<ul class="p-0 m-0 list-none flex gap-4">
-			{#each [{ path: '/', name: 'Home', subPages: [] }, { path: '/catalog', name: 'Idea Catalog', subPages: ['/ideas/[ideaId]', '/categories/[categoryId]'] }] as { path, name, subPages }}
+			<!-- TODO: Revisit this stuff. Adding [catalogId] is going to break it. -->
+			{#each [{ path: '/', name: 'Home', subPages: [] }, { path: '/catalogs', name: 'Idea Catalog', subPages: ['/ideas/[ideaId]', '/categories/[categoryId]'] }] as { path, name, subPages }}
 				<li class="flex gap-2 last:overflow-hidden block border-black">
 					{#if route.id === path}
 						<span class="border-b-2 border-eucalyptus-500">{name}</span>

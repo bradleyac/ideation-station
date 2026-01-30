@@ -4,7 +4,7 @@ import { error, redirect } from "@sveltejs/kit";
 import getUserId from "$lib/getUserId";
 
 export async function load({ depends, params, platform }) {
-  depends("data:ideas");
+  depends("data:catalogs");
   const userid = getUserId(platform);
 
   // TODO: Does this work at all? It doesn't prevent the 500.
@@ -15,7 +15,6 @@ export async function load({ depends, params, platform }) {
   }
 
   return {
-    ideas: await db.getAllIdeas(userid),
-    categories: await db.getAllCategories(userid),
+    catalogs: await db.getAllCatalogs(userid),
   }
 }

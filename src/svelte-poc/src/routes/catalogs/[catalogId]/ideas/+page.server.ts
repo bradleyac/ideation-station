@@ -18,6 +18,6 @@ export const actions = {
 
     const id = crypto.randomUUID();
 
-    await db.createIdea(userid, { id, name, desc, categoryIds });
-  },
+    await db.createIdea(userid, event.params.catalogId, { id, name, desc, categoryIds });
+  }
 };

@@ -3,10 +3,12 @@
 
 	const {
 		category,
-		mode = 'default'
+		mode = 'default',
+		catalogId
 	}: {
 		category: Category;
 		mode?: 'default' | 'compact';
+		catalogId: string;
 	} = $props();
 </script>
 
@@ -14,7 +16,7 @@
 	<a
 		tabindex="0"
 		class="grid grid-cols-[auto_min-content] grid-flow-col shadow-amber-500/30 shadow-sm bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800 py-3 px-4 rounded-sm"
-		href="/catalog/categories/{category.id}"
+		href="/catalogs/{catalogId}/categories/{category.id}"
 		data-id={category.id}
 	>
 		<span inert>
@@ -29,7 +31,7 @@
 	<a
 		tabindex="0"
 		class="divide-x grid grid-cols-[auto_min-content] grid-flow-col shadow-amber-500/30 shadow-sm bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800"
-		href="/catalog/categories/{category.id}"
+		href="/catalogs/{catalogId}/categories/{category.id}"
 		data-id={category.id}
 	>
 		<span class="p-1" inert>

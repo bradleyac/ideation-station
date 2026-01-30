@@ -2,10 +2,10 @@ import { db } from '$lib/db.svelte.js';
 import getUserId from '$lib/getUserId';
 import { error } from '@sveltejs/kit';
 
-export async function load({ depends, params, platform }) {
+export async function load({ depends, params, platform, ...props }) {
   const userid = getUserId(platform);
   depends(`data:category/${params.categoryId}`);
-  const ideaIds = params.categoryId === 'Uncategorized' ? await db.getUncategorizedIdeaIds(userid) : await db.getIdeaIdsByCategory(userid, params.categoryId);
+  const ideaIds = params.categoryId === 'Uncategorized' ? await db.getUncategorizedIdeaIds(userid, params.catalogId) : await db.getIdeaIdsByCategory(userid, params.categoryId);
 
   const category = params.categoryId === 'Uncategorized' ? { id: 'Uncategorized', name: 'Uncategorized', desc: 'Ideas without categories.', count: ideaIds.length } : await db.getCategoryById(userid, params.categoryId);
 

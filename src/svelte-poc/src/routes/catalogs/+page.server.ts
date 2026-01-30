@@ -14,6 +14,6 @@ export const actions = {
 
     const id = crypto.randomUUID();
 
-    await db.createCategory(userid, { id, name, desc, ideaIds: [] });
+    await db.createCatalog(userid, { id, name, desc });
   },
 };

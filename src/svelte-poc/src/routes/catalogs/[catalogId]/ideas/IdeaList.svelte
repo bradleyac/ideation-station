@@ -1,18 +1,21 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 	import Collapse from '$lib/components/Collapse.svelte';
-	import { type Category } from '$lib/types';
+	import { type Idea as IdeaT } from '$lib/types';
 	import { flip } from 'svelte/animate';
-	import CategoryPreview from './CategoryPreview.svelte';
+	import IdeaMenu from './IdeaMenu.svelte';
+	import IdeaPreview from './IdeaPreview.svelte';
 	import Tooltip from '$lib/components/Tooltip.svelte';
-	import CategoryMenu from './CategoryMenu.svelte';
 
 	const {
-		categories,
+		ideas,
 		...props
 	}: {
-		categories: Category[];
+		ideas: IdeaT[];
+		categoryId?: string;
+		otherIdea?: { id: string; related: boolean };
 		title: string;
+		catalogId: string;
 	} = $props();
 
 	let mode = $state<'default' | 'compact'>('default');
@@ -29,8 +32,8 @@
 		shook = undefined;
 	}
 
-	const sortedCategories = $derived(
-		categories.toSorted((a, b) =>
+	const sortedIdeas = $derived(
+		ideas.toSorted((a, b) =>
 			shook
 				? Math.random() - 0.5
 				: sortDir === 'alpha'
@@ -46,15 +49,13 @@
 	);
 
 	let menu = $state<HTMLElement>();
-	const anyCategories = $derived(categories?.length > 0);
+	const anyIdeas = $derived(ideas?.length > 0);
 	let container = $state<HTMLElement>();
 </script>
 
-<Collapse class="relative" title={props.title} open={anyCategories} disabled={!anyCategories}>
+<Collapse class="relative" title={props.title} open={anyIdeas} disabled={!anyIdeas}>
 	<div class="absolute top-1.5 right-1.5 flex gap-1.5">
-		<Button
-			title={mode === 'default' ? 'Fluid' : 'Compact'}
-			onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}
+		<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}
 			><i
 				class={[
 					'fi',
@@ -64,10 +65,9 @@
 			></i></Button
 		>
 		<div class="flex">
-			<Button lit={!!shook} rounded="start" onclick={shake} title="Shuffle"
-				><i class="fi fi-rr-shuffle"></i></Button
+			<Button lit={!!shook} rounded="start" onclick={shake}><i class="fi fi-rr-shuffle"></i></Button
 			>
-			<Button lit={!shook} rounded="end" onclick={sort} title="Sort"
+			<Button lit={!shook} rounded="end" onclick={sort}
 				><i
 					class={[
 						'fi',
@@ -80,8 +80,14 @@
 	</div>
 	<div bind:this={container} class={['relative flex flex-col w-full', mode === 'default' && 'm-2']}>
 		<Tooltip parent={container}>
-			{#snippet children(id: string)}
-				<CategoryMenu bind:ref={menu} category={categories.filter((cat) => cat.id === id)[0]} />
+			{#snippet children(id, close)}
+				<IdeaMenu
+					bind:ref={menu}
+					idea={ideas.filter((idea) => idea.id === id)[0]}
+					categoryId={props.categoryId}
+					otherIdea={props.otherIdea}
+					{close}
+				/>
 			{/snippet}
 		</Tooltip>
 		<ul
@@ -91,9 +97,9 @@
 				mode === 'compact' && 'flex-col w-full divide-y'
 			]}
 		>
-			{#each sortedCategories as category (category.id)}
+			{#each sortedIdeas as idea (idea.id)}
 				<li animate:flip={{ duration: 500 }} class={[mode === 'compact' && 'ring-1']}>
-					<CategoryPreview {category} {mode} />
+					<IdeaPreview catalogId={props.catalogId} {idea} {mode} />
 				</li>
 			{/each}
 		</ul>

@@ -5,11 +5,13 @@
 	import type { ActionResult } from '@sveltejs/kit';
 	let props = $props();
 	const {
+		catalogId,
 		extantCategories,
 		existingIdea,
 		defaultCategoryId,
 		enhanceCallback
 	}: {
+		catalogId: string;
 		extantCategories: Category[];
 		existingIdea?: Idea;
 		defaultCategoryId?: string;
@@ -23,7 +25,9 @@
 	} = props;
 	let title = $derived(props.existingIdea ? 'Edit Idea' : 'Create New Idea');
 	let action = $derived(
-		props.existingIdea ? `/catalog/ideas/${props.existingIdea.id}` : '/catalog/ideas'
+		props.existingIdea
+			? `/catalogs/${props.catalogId}/ideas/${props.existingIdea.id}`
+			: `/catalogs/${props.catalogId}/ideas`
 	);
 	let categories: string[] = $state([
 		...(props.existingIdea?.categoryIds ||

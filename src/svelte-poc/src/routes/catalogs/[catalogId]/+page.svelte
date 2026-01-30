@@ -13,8 +13,9 @@
 	import IdeaMenu from './ideas/IdeaMenu.svelte';
 	import IdeaList from './ideas/IdeaList.svelte';
 	import CategoryList from './categories/CategoryList.svelte';
+	import type { ActionResult } from '@sveltejs/kit';
 
-	const { data } = $props();
+	const { data, params, ...props } = $props();
 	const aspirationsCategoryId = $derived(
 		data.categories.find((cat) => cat.name === 'Aspirations')?.id ?? ''
 	);
@@ -24,19 +25,35 @@
 
 	let showCategoryModal = $state(false);
 	let categoryKey = $state(0);
+
+	function enhanceCallback(): ({
+		update,
+		result
+	}: {
+		update: () => Promise<void>;
+		result: ActionResult;
+	}) => Promise<void> {
+		return async ({ update, result }) => {
+			if (result?.type === 'success') {
+				showIdeaModal = false;
+				await invalidateAll();
+			}
+			await update();
+		};
+	}
 </script>
 
 <svelte:head><title>Idea Catalog</title></svelte:head>
 
 <Modal bind:showModal={showIdeaModal}>
 	{#key ideaKey}
-		<IdeaForm extantCategories={data.categories} />
+		<IdeaForm catalogId={params.catalogId} extantCategories={data.categories} {enhanceCallback} />
 	{/key}
 </Modal>
 
 <Modal bind:showModal={showCategoryModal}>
 	{#key categoryKey}
-		<CategoryForm />
+		<CategoryForm catalogId={params.catalogId} />
 	{/key}
 </Modal>
 
@@ -70,7 +87,7 @@
 		/>
 	</div>
 
-	<CategoryList title="All Categories" categories={data.categories} />
+	<CategoryList catalogId={params.catalogId} title="All Categories" categories={data.categories} />
 
-	<IdeaList title="All Ideas" ideas={data.ideas} />
+	<IdeaList catalogId={params.catalogId} title="All Ideas" ideas={data.ideas} />
 </section>
