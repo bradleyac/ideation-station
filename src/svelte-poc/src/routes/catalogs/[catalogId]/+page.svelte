@@ -16,6 +16,7 @@
 	import type { ActionResult } from '@sveltejs/kit';
 	import { enhance } from '$app/forms';
 	import CatalogForm from '../CatalogForm.svelte';
+	import { fromEventPattern } from 'rxjs';
 
 	const { data, params, ...props } = $props();
 	const aspirationsCategoryId = $derived(
@@ -26,6 +27,15 @@
 	let modalKey = $state(0);
 	let whichModal = $state<'edit' | 'category' | 'idea'>('edit');
 	let catalog = $derived(data.catalogs.find((c) => c.id === params.catalogId));
+
+	function loadConnections() {
+		let form = document.createElement('form');
+		form.action = '?/loadConnections';
+		form.method = 'POST';
+		document.body.appendChild(form);
+		form.submit();
+		document.body.removeChild(form);
+	}
 
 	function enhanceCallback(): ({
 		update,
@@ -90,6 +100,8 @@
 				}}
 				title="Create Category"><i class="block fi fi-rr-add"></i>New Category</Button
 			>
+
+			<Button onclick={loadConnections}><i class="block fi fi-rr-add"></i>From Connections</Button>
 		</div>
 
 		{#if props.categoryId}

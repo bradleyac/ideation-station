@@ -18,7 +18,7 @@
 	} = $props();
 	let title = $derived(props.existingCatalog ? 'Edit Catalog' : 'Create New Catalog');
 	let action = $derived(
-		props.existingCatalog ? `/catalogs/${props.existingCatalog?.id}` : `/catalogs`
+		props.existingCatalog ? `/catalogs/${props.existingCatalog?.id}?/updateCatalog` : `/catalogs`
 	);
 
 	let formKey = $state(0);
