@@ -93,6 +93,7 @@
 			>
 
 			<form action="/catalogs/{params.catalogId}?/loadConnections" method="POST">
+				<input type="text" name="dummy" value="dummy" class="hidden" />
 				<Button type="submit"><i class="block fi fi-rr-add"></i>From Connections</Button>
 			</form>
 		</div>
