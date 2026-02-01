@@ -92,7 +92,7 @@
 				title="Create Category"><i class="block fi fi-rr-add"></i>New Category</Button
 			>
 
-			<form action="/catalogs/{params.catalogId}?/loadConnections" method="POST">
+			<form action="/catalogs/{params.catalogId}?/loadConnections" method="POST" use:enhance>
 				<input type="text" name="dummy" value="dummy" class="hidden" />
 				<Button type="submit"><i class="block fi fi-rr-add"></i>From Connections</Button>
 			</form>
