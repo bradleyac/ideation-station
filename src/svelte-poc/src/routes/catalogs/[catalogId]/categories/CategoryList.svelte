@@ -6,15 +6,12 @@
 	import CategoryPreview from './CategoryPreview.svelte';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import CategoryMenu from './CategoryMenu.svelte';
-	import { enhance } from '$app/forms';
 
 	const {
 		categories,
-		allowAdd = false,
 		...props
 	}: {
 		categories: Category[];
-		allowAdd?: boolean;
 		title: string;
 		catalogId: string;
 	} = $props();
@@ -23,8 +20,6 @@
 
 	let sortDir = $state<'alpha' | 'alphaR'>('alpha');
 	let shook = $state<'shake1' | 'shake2' | undefined>();
-	let adding = $state(false);
-	let formKey = $state(0);
 
 	function shake() {
 		shook = shook === 'shake1' ? 'shake2' : 'shake1';
@@ -33,10 +28,6 @@
 	function sort() {
 		sortDir = sortDir === 'alpha' ? 'alphaR' : 'alpha';
 		shook = undefined;
-	}
-
-	function quickAddCategory() {
-		adding = true;
 	}
 
 	const sortedCategories = $derived(
@@ -105,48 +96,6 @@
 					<CategoryPreview catalogId={props.catalogId} {category} {mode} />
 				</li>
 			{/each}
-			{#if allowAdd}
-				<li>
-					{#if !adding}
-						<Button class="h-full" onclick={() => (adding = true)}
-							><i class="block fi fi-rr-add"></i>New Category</Button
-						>
-					{:else}
-						{#key formKey}
-							<form
-								class="flex flex-row gap-2 h-full"
-								action="/catalogs/{props.catalogId}/categories"
-								method="POST"
-								use:enhance={() => {
-									return async ({ update, result }) => {
-										if (result?.type === 'success') {
-											adding = false;
-											formKey++;
-										}
-										await update({ reset: false });
-									};
-								}}
-							>
-								<input
-									class="bg-neutral-300 dark:bg-neutral-700"
-									required
-									name="name"
-									type="text"
-									placeholder="New Category"
-								/>
-								<Button type="submit">OK</Button>
-								<Button
-									type="button"
-									onclick={() => {
-										adding = false;
-										formKey++;
-									}}><i class="fi fi-rr-cross"></i></Button
-								>
-							</form>
-						{/key}
-					{/if}
-				</li>
-			{/if}
 		</ul>
 	</div>
 </Collapse>
