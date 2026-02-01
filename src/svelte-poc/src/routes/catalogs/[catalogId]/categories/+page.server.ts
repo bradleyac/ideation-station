@@ -10,7 +10,7 @@ export const actions = {
     const name = data.get('name')?.toString() ?? '';
     const desc = data.get('desc')?.toString() ?? '';
 
-    if (name === '' || desc === '') error(400);
+    if (name === '') error(400);
 
     const id = crypto.randomUUID();
 

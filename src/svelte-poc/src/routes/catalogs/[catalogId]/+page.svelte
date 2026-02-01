@@ -119,6 +119,7 @@
 			catalogId={params.catalogId}
 			title="All Categories"
 			categories={data.categories}
+			allowAdd={true}
 		/>
 
 		<IdeaList catalogId={params.catalogId} title="All Ideas" ideas={data.ideas} />
