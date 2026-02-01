@@ -28,15 +28,6 @@
 	let whichModal = $state<'edit' | 'category' | 'idea'>('edit');
 	let catalog = $derived(data.catalogs.find((c) => c.id === params.catalogId));
 
-	function loadConnections() {
-		let form = document.createElement('form');
-		form.action = '?/loadConnections';
-		form.method = 'POST';
-		document.body.appendChild(form);
-		form.submit();
-		document.body.removeChild(form);
-	}
-
 	function enhanceCallback(): ({
 		update,
 		result
@@ -101,7 +92,9 @@
 				title="Create Category"><i class="block fi fi-rr-add"></i>New Category</Button
 			>
 
-			<Button onclick={loadConnections}><i class="block fi fi-rr-add"></i>From Connections</Button>
+			<form action="/catalogs/{params.catalogId}?/loadConnections" method="POST">
+				<Button type="submit"><i class="block fi fi-rr-add"></i>From Connections</Button>
+			</form>
 		</div>
 
 		{#if props.categoryId}
