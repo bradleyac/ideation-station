@@ -8,7 +8,7 @@ interface Idea {
   id: string;
   name: string;
   desc: string;
-  categoryIds: string[];
+  categoryId?: string;
 }
 
 interface Category {

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { Category } from '$lib/types';
+	import type { Category, CategoryFull } from '$lib/types';
 
 	const {
 		category,
 		mode = 'default',
 		catalogId
 	}: {
-		category: Category;
+		category: CategoryFull;
 		mode?: 'default' | 'compact';
 		catalogId: string;
 	} = $props();
@@ -24,7 +24,7 @@
 		</span>
 		<div inert class="-my-3 mx-4 border-e"></div>
 		<span inert>
-			{category.count ?? 0}
+			{category?.ideaIds?.length ?? 0}
 		</span>
 	</a>
 {:else if mode === 'compact'}
@@ -38,7 +38,7 @@
 			{category.name}
 		</span>
 		<span class="p-1 text-center min-w-10" inert>
-			{category.count ?? 0}
+			{category?.ideaIds?.length ?? 0}
 		</span>
 	</a>
 {/if}

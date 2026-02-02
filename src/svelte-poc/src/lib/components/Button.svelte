@@ -2,11 +2,13 @@
 	import type { Snippet } from 'svelte';
 
 	type RoundOptions = 'all' | 'start' | 'end' | 'none';
-	const {
+	let {
 		rounded = 'all',
+		buttonRef = $bindable(),
 		...props
 	}: {
 		rounded?: RoundOptions;
+		buttonRef?: HTMLButtonElement;
 		colorScheme?: 'eucalyptus';
 		disabled?: boolean;
 		class?: string | string[];
@@ -28,6 +30,7 @@
 </script>
 
 <button
+	bind:this={buttonRef}
 	{...props}
 	class={[
 		roundedClass,

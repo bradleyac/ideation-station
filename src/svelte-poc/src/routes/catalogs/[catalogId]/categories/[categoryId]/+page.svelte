@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Category, Idea } from '$lib/types.js';
+	import type { Category, CategoryFull, Idea } from '$lib/types.js';
 	import IdeaForm from '../../ideas/IdeaForm.svelte';
 	import TextTicker from '$lib/components/TextTicker.svelte';
 	import Button from '$lib/components/Button.svelte';
@@ -15,7 +15,7 @@
 		data.ideas.filter((idea) => data.ideaIds.includes(idea.id))
 	);
 
-	async function deleteCategory(category?: Category) {
+	async function deleteCategory(category?: CategoryFull) {
 		if (!category) return;
 		if (confirm(`Really delete "${category.name}"?`)) {
 			await fetch(`/catalogs/${params.catalogId}/categories/${category.id}`, {
@@ -77,7 +77,7 @@
 		<section class="flex flex-col gap-4 m-3">
 			<h1>{data.category.name}</h1>
 			<pre>{data.category.desc}</pre>
-			<div class="flex gap-2">
+			<div class="flex flex-wrap gap-2">
 				<Button
 					type="button"
 					title="Edit Category"

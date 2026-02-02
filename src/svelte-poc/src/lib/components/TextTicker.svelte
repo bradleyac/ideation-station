@@ -5,6 +5,7 @@
 	const { labels, period } = $props();
 	let index = $state(0);
 
+	console.log(labels);
 	onMount(() => {
 		let visibilityChange$ = Rx.fromEvent(document, 'visibilitychange').pipe(
 			Rx.map((x) => document.visibilityState),

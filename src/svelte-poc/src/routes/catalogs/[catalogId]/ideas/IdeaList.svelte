@@ -96,7 +96,7 @@
 			]}
 		>
 			{#each sortedIdeas as idea (idea.id)}
-				<li animate:flip={{ duration: 500 }} class={[mode === 'compact' && 'ring-1']}>
+				<li animate:flip={{ duration: 500 }} class={[mode === 'compact' && 'ring-1', 'flex']}>
 					<IdeaPreview catalogId={props.catalogId} {idea} {mode} />
 				</li>
 			{/each}

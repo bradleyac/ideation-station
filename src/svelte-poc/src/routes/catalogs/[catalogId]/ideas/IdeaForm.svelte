@@ -29,19 +29,12 @@
 			? `/catalogs/${props.catalogId}/ideas/${props.existingIdea.id}`
 			: `/catalogs/${props.catalogId}/ideas`
 	);
-	let categories: string[] = $state([
-		...(props.existingIdea?.categoryIds ||
-			(props.defaultCategoryId ? [props.defaultCategoryId] : []))
-	]);
+	let category = $derived(props.existingIdea?.categoryId || props.defaultCategoryId || undefined);
 
 	let formKey = $state(0);
 	let sortedExtantCategories = $derived(
 		extantCategories.toSorted((a, b) => (a.name < b.name ? -1 : 1))
 	);
-
-	function removeCategory(i: number) {
-		categories.splice(i, 1);
-	}
 </script>
 
 {#key formKey}
@@ -53,7 +46,7 @@
 			(() => {
 				return async ({ update, result }) => {
 					if (result?.type === 'success') {
-						categories = defaultCategoryId ? [defaultCategoryId] : [];
+						category = defaultCategoryId ? [defaultCategoryId] : [];
 						formKey += 1;
 					}
 					await update({ reset: false });
@@ -85,39 +78,23 @@
 			</label>
 
 			<label>
-				Categories
+				Category
 				<div class="flex flex-col gap-2">
-					{#each categories as category, i (i)}
-						<div class="flex w-full gap-2">
-							<select
-								class="w-full bg-neutral-300 dark:bg-neutral-700 rounded-sm"
-								name="categories[]"
-								required
-								bind:value={categories[i]}
-							>
-								<option value="" disabled selected>Select category</option>
-								{#each sortedExtantCategories as extantCategory}
-									<option value={extantCategory.id}>{extantCategory.name}</option>
-								{/each}
-							</select>
-							<Button
-								type="button"
-								class="btn-primary"
-								title="Remove Category"
-								onclick={() => removeCategory(i)}><i class="fi fi-rr-minus-circle"></i></Button
-							>
-						</div>
-					{/each}
+					<div class="flex w-full gap-2">
+						<select
+							class="w-full bg-neutral-300 dark:bg-neutral-700 rounded-sm"
+							name="category"
+							required
+							bind:value={category}
+						>
+							<option value="" disabled selected>Select category</option>
+							{#each sortedExtantCategories as extantCategory}
+								<option value={extantCategory.id}>{extantCategory.name}</option>
+							{/each}
+						</select>
+					</div>
 				</div>
 			</label>
-
-			<Button
-				type="button"
-				title="Add Category"
-				class="place-self-start"
-				disabled={categories.at(-1)?.length === 0}
-				onclick={() => categories.push('')}><i class="fi fi-rr-add"></i></Button
-			>
 
 			<Button
 				tabindex="0"

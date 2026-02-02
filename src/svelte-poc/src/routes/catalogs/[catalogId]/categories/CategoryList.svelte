@@ -1,17 +1,21 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 	import Collapse from '$lib/components/Collapse.svelte';
-	import { type Category } from '$lib/types';
+	import { type Category, type CategoryFull } from '$lib/types';
 	import { flip } from 'svelte/animate';
 	import CategoryPreview from './CategoryPreview.svelte';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import CategoryMenu from './CategoryMenu.svelte';
+	import { enhance } from '$app/forms';
+	import PopoverMenuButton from '$lib/components/PopoverMenuButton.svelte';
 
 	const {
 		categories,
+		allowAdd = false,
 		...props
 	}: {
-		categories: Category[];
+		categories: CategoryFull[];
+		allowAdd?: boolean;
 		title: string;
 		catalogId: string;
 	} = $props();
@@ -20,6 +24,7 @@
 
 	let sortDir = $state<'alpha' | 'alphaR'>('alpha');
 	let shook = $state<'shake1' | 'shake2' | undefined>();
+	let formKey = $state(0);
 
 	function shake() {
 		shook = shook === 'shake1' ? 'shake2' : 'shake1';
@@ -86,7 +91,7 @@
 		</Tooltip>
 		<ul
 			class={[
-				'list-none flex',
+				'list-none flex relative',
 				mode === 'default' && 'flex-row flex-wrap gap-2',
 				mode === 'compact' && 'flex-col w-full divide-y'
 			]}
@@ -96,6 +101,49 @@
 					<CategoryPreview catalogId={props.catalogId} {category} {mode} />
 				</li>
 			{/each}
+			{#if allowAdd}
+				<li>
+					<PopoverMenuButton title="New Category" class="h-full">
+						<i class="fi fi-rr-add"></i>New Category
+						{#snippet menu(closePopover)}
+							{#key formKey}
+								<form
+									class="flex flex-row gap-2 h-full shadow-black shadow-sm rounded-sm p-4 bg-eucalyptus-200 dark:bg-eucalyptus-800"
+									action="/catalogs/{props.catalogId}/categories"
+									method="POST"
+									use:enhance={() => {
+										return async ({ update, result }) => {
+											if (result?.type === 'success') {
+												closePopover();
+												formKey++;
+											}
+											await update({ reset: false });
+										};
+									}}
+								>
+									<!-- svelte-ignore a11y_autofocus -->
+									<input
+										class="bg-neutral-300 dark:bg-neutral-700"
+										required
+										name="name"
+										type="text"
+										placeholder="New Category"
+										autofocus
+									/>
+									<Button type="submit">OK</Button>
+									<Button
+										type="button"
+										onclick={() => {
+											closePopover();
+											formKey++;
+										}}><i class="fi fi-rr-cross"></i></Button
+									>
+								</form>
+							{/key}
+						{/snippet}
+					</PopoverMenuButton>
+				</li>
+			{/if}
 		</ul>
 	</div>
 </Collapse>

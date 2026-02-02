@@ -133,7 +133,7 @@ class Db {
       .addE('belongsTo').from('idea').to('cat')
       .addE('contains').from('cat').to('idea')`;
 
-    let results = await this.submitWithRetry(createIdeaQuery, {
+    await this.submitWithRetry(createIdeaQuery, {
       prop_id: idea.id,
       prop_catalogid: catalogid,
       prop_userid: userid,
@@ -141,13 +141,13 @@ class Db {
       prop_desc: idea.desc,
     });
 
-    idea.categoryIds.forEach(async (categoryId) => {
+    if (idea.categoryId) {
       await this.submitWithRetry(linkCategoriesQuery, {
         prop_id: idea.id,
         prop_userid: userid,
-        prop_categoryid: categoryId,
+        prop_categoryid: idea.categoryId,
       });
-    });
+    }
   }
 
   public async updateIdea(userid: string, idea: Idea): Promise<void> {
@@ -172,12 +172,36 @@ class Db {
       prop_desc: idea.desc,
     });
 
-    idea.categoryIds.forEach(async (categoryId) => {
+    if (idea.categoryId) {
       await this.submitWithRetry(linkCategoriesQuery, {
         prop_id: idea.id,
         prop_userid: userid,
-        prop_categoryid: categoryId,
+        prop_categoryid: idea.categoryId,
       });
+    }
+  }
+
+  public async changeIdeaCategory(userid: string, ideaId: string, categoryId: string): Promise<void> {
+    const adjustIdeaAndDropAllEdgesToCategoriesQuery = `g.V(prop_userid, prop_id)
+      .union(
+        g.V(prop_userid, prop_id).outE('belongsTo').where(inV().hasLabel('category')),
+        g.V().hasLabel('category').has('userid', prop_userid).outE('contains').where(inV().hasId(prop_id))
+      ).drop();`
+
+    const linkCategoriesQuery = `g.V(prop_userid, prop_categoryid).as('cat')
+      .V(prop_userid, prop_id).as('idea')
+      .addE('belongsTo').from('idea').to('cat')
+      .addE('contains').from('cat').to('idea')`;
+
+    let results = await this.submitWithRetry(adjustIdeaAndDropAllEdgesToCategoriesQuery, {
+      prop_id: ideaId,
+      prop_userid: userid,
+    });
+
+    await this.submitWithRetry(linkCategoriesQuery, {
+      prop_id: ideaId,
+      prop_userid: userid,
+      prop_categoryid: categoryId,
     });
   }
 
@@ -223,16 +247,15 @@ class Db {
     });
   }
 
-  public async getAllCategories(userid: string, catalogid: string): Promise<Category[]> {
-    const getAllCategoriesInCatalogQuery = `g.V(prop_userid, prop_catalogid).outE('contains').inV().hasLabel('category').project('id','name','desc','count')
+  public async getAllCategories(userid: string, catalogid: string): Promise<CategoryFull[]> {
+    const getAllCategoriesInCatalogQuery = `g.V(prop_userid, prop_catalogid).outE('contains').inV().hasLabel('category').project('id','name','desc','ideaIds')
       .by('id')
       .by('name')
       .by('desc')
-      .by(outE('contains').count())`
+      .by(coalesce(outE('contains').inV().values('id').fold(), constant([])))`
 
     const getUncategorizedCountQuery = `g.V(prop_userid, prop_catalogid).outE('contains').inV().hasLabel('idea')
-      .where(outE('belongsTo').inV().hasLabel('category').count().is(0))
-      .count()`;
+      .where(outE('belongsTo').inV().hasLabel('category').count().is(0)).values('id')`;
 
     let getAllCategoriesResult = await this.submitWithRetry(getAllCategoriesInCatalogQuery, {
       prop_userid: userid,
@@ -244,17 +267,16 @@ class Db {
       prop_catalogid: catalogid,
     });
 
-    const uncategorizedCount = uncategorizedCountResult._items[0] || 0;
-    return [...getAllCategoriesResult._items, { id: 'Uncategorized', name: 'Uncategorized', desc: 'Ideas without categories.', count: uncategorizedCount }];
+    return [...getAllCategoriesResult._items, { id: 'Uncategorized', name: 'Uncategorized', desc: 'Ideas without categories.', ideaIds: uncategorizedCountResult._items }];
   }
 
-  public async getCategoryById(userid: string, categoryId: string): Promise<Category> {
+  public async getCategoryById(userid: string, categoryId: string): Promise<CategoryFull> {
     const getCategoryByIdQuery = `g.V(prop_userid, prop_id)
-      .project('id','name','desc','count')
+      .project('id','name','desc','ideaIds')
       .by('id')
       .by('name')
       .by('desc')
-      .by(outE('contains').count())`;
+      .by(coalesce(outE('contains').inV().values('id').fold(), constant([])))`;
 
     let result = await this.submitWithRetry(getCategoryByIdQuery, {
       prop_userid: userid,
@@ -268,39 +290,18 @@ class Db {
     // TODO: Revisit performance?
     const getAllIdeasInCatalogQuery = `g.V(prop_userid, prop_catalogid)
       .outE('contains').inV().hasLabel('idea')
-      .project('id', 'name', 'desc')
+      .project('id', 'name', 'desc','categoryId')
       .by('id')
       .by('name')
-      .by('desc')`;
-
-    const getIdeaToCategoryMappingQuery = `g.E().hasLabel('belongsTo')
-      .where(outV().hasLabel('idea').has('userid', prop_userid).where(outE('belongsTo').inV().has('id', prop_catalogid)))
-      .where(inV().hasLabel('category').has('userid', prop_userid).where(outE('belongsTo').inV().has('id', prop_catalogid)))
-      .project('ideaId','categoryId').by(outV().values('id')).by(inV().values('id'))`
+      .by('desc')
+      .by(coalesce(outE('belongsTo').inV().hasLabel('category').values('id').limit(1), constant('')))`;
 
     let ideasResults = await this.submitWithRetry(getAllIdeasInCatalogQuery, {
       prop_userid: userid,
       prop_catalogid: catalogid,
     });
 
-    let ideaToCategoryMappingResults = await this.submitWithRetry(getIdeaToCategoryMappingQuery, {
-      prop_userid: userid,
-      prop_catalogid: catalogid,
-    });
-
-    const resultsArray = ideaToCategoryMappingResults._items as Array<{ ideaId: string, categoryId: string }>;
-
-    const ideaToCategoryIds: Record<string, string[]> = resultsArray.reduce((acc, mapping) => {
-      if (!acc[mapping.ideaId]) {
-        acc[mapping.ideaId] = [];
-      }
-      acc[mapping.ideaId].push(mapping.categoryId);
-      return acc;
-    }, {} as Record<string, string[]>);
-
-    return ideasResults._items.map((item: any) => {
-      return { ...item, categoryIds: (ideaToCategoryIds[item.id] || []) };
-    });
+    return ideasResults._items;
   }
 
   public async getIdeaIdsByCategory(userid: string, categoryId: string): Promise<string[]> {
@@ -325,11 +326,11 @@ class Db {
 
   public async getIdea(userid: string, id: string): Promise<Idea> {
     const getIdeaQuery = `g.V(prop_partition_key, prop_id)
-      .project('id', 'name', 'desc', 'categoryIds')
+      .project('id', 'name', 'desc', 'categoryId')
       .by('id')
       .by('name')
       .by('desc')
-      .by(outE('belongsTo').inV().hasLabel('category').values('id').fold())`;
+      .by(coalesce(outE('belongsTo').inV().hasLabel('category').values('id').limit(1), constant('')))`;
     let result = await this.submitWithRetry(getIdeaQuery, {
       prop_partition_key: userid,
       prop_id: id
@@ -339,10 +340,11 @@ class Db {
 
   public async getRelatedIdeas(userid: string, id: string): Promise<Idea[]> {
     const getRelatedIdeasQuery = `g.V(prop_partition_key, prop_id).out('relatesTo')
-      .project('id', 'name', 'desc')
+      .project('id', 'name', 'desc','categoryId')
       .by('id')
       .by('name')
-      .by('desc')`;
+      .by('desc')
+      .by(coalesce(outE('belongsTo').inV().hasLabel('category').values('id').limit(1), constant('')))`;
     let results = await this.submitWithRetry(getRelatedIdeasQuery, {
       prop_partition_key: userid,
       prop_id: id

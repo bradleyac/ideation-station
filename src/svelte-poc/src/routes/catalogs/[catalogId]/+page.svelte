@@ -17,6 +17,7 @@
 	import { enhance } from '$app/forms';
 	import CatalogForm from '../CatalogForm.svelte';
 	import { fromEventPattern } from 'rxjs';
+	import CategoryDndZone from '$lib/components/dnd/CategoryDndZone.svelte';
 
 	const { data, params, ...props } = $props();
 	const aspirationsCategoryId = $derived(
@@ -27,6 +28,7 @@
 	let modalKey = $state(0);
 	let whichModal = $state<'edit' | 'category' | 'idea'>('edit');
 	let catalog = $derived(data.catalogs.find((c) => c.id === params.catalogId));
+	let sortedCategories = $derived(data.categories.toSorted((a, b) => (a.name > b.name ? 1 : -1)));
 
 	function enhanceCallback(): ({
 		update,
@@ -64,7 +66,7 @@
 		<h1>{catalog.name}</h1>
 		<pre>{catalog.desc}</pre>
 
-		<div class="flex gap-2">
+		<div class="flex flex-wrap gap-2">
 			<Button
 				onclick={() => {
 					showModal = true;
@@ -98,23 +100,26 @@
 			</form>
 		</div>
 
-		{#if props.categoryId}
+		{#if aspirationsCategoryId}
 			<div class="top-2.5 right-4 invisible lg:visible z-2 fixed">
 				<TextTicker
 					period={5000}
 					labels={data.ideas
-						.filter((idea) => idea.categoryIds?.includes(aspirationsCategoryId))
+						.filter((idea) => idea.categoryId === aspirationsCategoryId)
 						.map((idea) => idea.name)}
 				/>
 			</div>
 		{/if}
 
-		<CategoryList
-			catalogId={params.catalogId}
-			title="All Categories"
-			categories={data.categories}
-		/>
-
-		<IdeaList catalogId={params.catalogId} title="All Ideas" ideas={data.ideas} />
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[20rem] gap-4">
+			{#each sortedCategories as category (category.id)}
+				<div class="flex flex-col gap-3 bg-eucalyptus-200 dark:bg-eucalyptus-800 rounded-sm p-3">
+					<h2>{category.name}</h2>
+					<div class="relative h-full overflow-y-scroll overflow-x-clip">
+						<CategoryDndZone {category} ideas={data.ideas} catalogId={params.catalogId} />
+					</div>
+				</div>
+			{/each}
+		</div>
 	</section>
 {/if}

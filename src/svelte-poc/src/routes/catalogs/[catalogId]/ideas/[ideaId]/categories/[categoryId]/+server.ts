@@ -14,6 +14,6 @@ export const PUT: RequestHandler = async ({ params, platform }) => {
   const userid = getUserId(platform);
   const { ideaId, categoryId } = params;
   if (!ideaId || !categoryId) error(400);
-  await db.addCategoryToIdea(userid, ideaId, categoryId);
+  await db.changeIdeaCategory(userid, ideaId, categoryId);
   return new Response();
 }

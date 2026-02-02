@@ -23,14 +23,10 @@ export const actions = {
     const data = await event.request.formData();
     const name = data.get('name')?.toString() ?? '';
     const desc = data.get('desc')?.toString() ?? '';
-    const categoryIds = unique(data.getAll('categories[]')?.map(cat => cat.toString()).filter(cat => cat != 'Uncategorized') ?? []);
-
-    function unique<T>(arr: T[]): T[] {
-      return [...new Set(arr)];
-    }
+    const categoryId = data.get('category')?.toString() ?? undefined;
 
     if (name === '' || desc === '') error(400);
 
-    await db.updateIdea(userid, { id: event.params.ideaId, name, desc, categoryIds });
+    await db.updateIdea(userid, { id: event.params.ideaId, name, desc, categoryId });
   },
 };

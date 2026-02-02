@@ -11,6 +11,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import IdeaList from '../IdeaList.svelte';
 	import CategoryList from '../../categories/CategoryList.svelte';
+	import CategoryDndZone from '$lib/components/dnd/CategoryDndZone.svelte';
 	const { data, params } = $props();
 
 	const unrelatedIdeas: IdeaT[] = $derived(
@@ -23,11 +24,7 @@
 		)
 	);
 
-	const categories: Category[] = $derived(
-		data.idea.categoryIds
-			.map((catId) => data.categories.find((c) => c.id === catId))
-			.filter((c): c is Category => c !== undefined)
-	);
+	const category = $derived(data.categories.find((c) => c.id === data.idea.categoryId));
 
 	let showModal = $state(false);
 
@@ -48,8 +45,8 @@
 	}
 
 	async function deleteIdea(idea: IdeaT) {
-		if (confirm(`Really delete "${idea.name}"?`)) {
-			await fetch(`/catalogs/${params.catalogId}/ideas/${idea.id}`, {
+		if (confirm(`Really delete "${data.idea.name}"?`)) {
+			await fetch(`/catalogs/${params.catalogId}/ideas/${data.idea.id}`, {
 				method: 'DELETE'
 			});
 			await goto(`/catalogs/${params.catalogId}`);
@@ -74,7 +71,7 @@
 	<section class="flex flex-col gap-4 m-3">
 		<Idea idea={data.idea} />
 
-		<div class="flex gap-2">
+		<div class="flex flex-wrap gap-2">
 			<Button type="button" title="Edit Idea" onclick={() => (showModal = !showModal)}
 				><i class="fi fi-rr-edit"></i> Edit Idea</Button
 			>
@@ -84,7 +81,11 @@
 			>
 		</div>
 
-		<CategoryList catalogId={params.catalogId} title="Categories" {categories} />
+		{#if category}
+			<div class="w-max">
+				<CategoryPreview {category} catalogId={params.catalogId} />
+			</div>
+		{/if}
 
 		<IdeaList
 			catalogId={params.catalogId}

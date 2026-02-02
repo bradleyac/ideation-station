@@ -44,7 +44,7 @@ export const actions = {
 
     for (let word of result) {
       const id = crypto.randomUUID();
-      await db.createIdea(userid, event.params.catalogId, { id, name: word, desc: word, categoryIds: [] });
+      await db.createIdea(userid, event.params.catalogId, { id, name: word, desc: word });
     }
   }
 };
