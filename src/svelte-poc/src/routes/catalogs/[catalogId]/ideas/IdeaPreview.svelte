@@ -3,11 +3,14 @@
 	const {
 		idea,
 		mode = 'default',
-		catalogId
+		catalogId,
+		...props
 	}: {
 		idea: Idea;
 		mode?: 'default' | 'compact';
 		catalogId: string;
+		prefix?: boolean;
+		affix?: string;
 	} = $props();
 </script>
 
@@ -18,7 +21,13 @@
 		href="/catalogs/{catalogId}/ideas/{idea.id}"
 		data-id={idea.id}
 	>
+		{#if props.prefix && props.affix}
+			{props.affix}
+		{/if}
 		{idea.name}
+		{#if !props.prefix && props.affix}
+			{props.affix}
+		{/if}
 	</a>
 {:else if mode === 'compact'}
 	<a
@@ -26,6 +35,12 @@
 		href="/catalogs/{catalogId}/ideas/{idea.id}"
 		data-id={idea.id}
 	>
+		{#if props.prefix && props.affix}
+			{props.affix}
+		{/if}
 		{idea.name}
+		{#if !props.prefix && props.affix}
+			{props.affix}
+		{/if}
 	</a>
 {/if}

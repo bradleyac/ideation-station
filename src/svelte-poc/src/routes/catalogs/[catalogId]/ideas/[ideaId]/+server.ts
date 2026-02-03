@@ -1,11 +1,11 @@
 import { error, type RequestHandler } from "@sveltejs/kit";
-import { db } from "$lib/db.svelte";
-import getUserId from "$lib/getUserId";
+import { db } from "$lib/server/db.svelte";
+import getUserId from "$lib/server/getUserId";
 
 export const DELETE: RequestHandler = async ({ params, platform }) => {
-  const userid = getUserId(platform);
+  const userId = getUserId(platform);
   const { ideaId } = params;
   if (!ideaId) error(400);
-  await db.deleteIdea(userid, ideaId);
+  await db.deleteIdea(userId, ideaId);
   return new Response();
 };

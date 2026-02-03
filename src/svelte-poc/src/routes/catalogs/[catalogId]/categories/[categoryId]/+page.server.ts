@@ -1,12 +1,12 @@
-import { db } from '$lib/db.svelte.js';
-import getUserId from '$lib/getUserId';
+import { db } from '$lib/server/db.svelte.js';
+import getUserId from '$lib/server/getUserId';
 import { error } from '@sveltejs/kit';
 
 export async function load({ depends, params, platform, ...props }) {
-  const userid = getUserId(platform);
+  const userId = getUserId(platform);
   depends(`data:category/${params.categoryId}`);
-  const ideaIds = params.categoryId === 'Uncategorized' ? await db.getUncategorizedIdeaIds(userid, params.catalogId) : await db.getIdeaIdsByCategory(userid, params.categoryId);
-  const category = params.categoryId === 'Uncategorized' ? { id: 'Uncategorized', name: 'Uncategorized', desc: 'Ideas without categories.', ideaIds } : await db.getCategoryById(userid, params.categoryId);
+  const ideaIds = params.categoryId === 'Uncategorized' ? await db.getUncategorizedIdeaIds(userId, params.catalogId) : await db.getIdeaIdsByCategory(userId, params.categoryId);
+  const category = params.categoryId === 'Uncategorized' ? { id: 'Uncategorized', name: 'Uncategorized', desc: 'Ideas without categories.', ideaIds } : await db.getCategoryById(userId, params.categoryId);
 
   return {
     parentId: params.catalogId,
@@ -18,7 +18,7 @@ export async function load({ depends, params, platform, ...props }) {
 
 export const actions = {
   default: async (event) => {
-    const userid = getUserId(event.platform);
+    const userId = getUserId(event.platform);
 
     const data = await event.request.formData();
     const name = data.get('name')?.toString() ?? '';
@@ -26,6 +26,6 @@ export const actions = {
 
     if (name === '') error(400);
 
-    await db.updateCategory(userid, { id: event.params.categoryId, name, desc, ideaIds: [] });
+    await db.updateCategory(userId, { id: event.params.categoryId, name, desc, ideaIds: [] });
   },
 };

@@ -1,11 +1,12 @@
-import { db } from "$lib/db.svelte";
+import { db } from "$lib/server/db.svelte";
 import { dev } from "$app/environment";
 import { error, redirect } from "@sveltejs/kit";
-import getUserId from "$lib/getUserId";
+import getUserId from "$lib/server/getUserId";
 
 export async function load({ depends, params, platform }) {
   depends("data:ideas");
-  const userid = getUserId(platform);
+  depends(`data:catalog/${params.catalogId}`);
+  const userId = getUserId(platform);
 
   // TODO: Does this work at all? It doesn't prevent the 500.
   if (!dev) {
@@ -15,7 +16,7 @@ export async function load({ depends, params, platform }) {
   }
 
   return {
-    ideas: await db.getAllIdeas(userid, params.catalogId),
-    categories: await db.getAllCategories(userid, params.catalogId),
+    categories: await db.getAllCategories(userId, params.catalogId),
+    catalog: await db.getCatalog(userId, params.catalogId),
   }
 }

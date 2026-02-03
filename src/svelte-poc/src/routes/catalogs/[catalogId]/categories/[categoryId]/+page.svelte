@@ -8,12 +8,19 @@
 	import IdeaList from '../../ideas/IdeaList.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
 	import CategoryForm from '../CategoryForm.svelte';
+	import { tick } from 'svelte';
+	import { getIdeas } from '$lib/remotes/idea.remote.js';
 
 	const { data, params } = $props();
 
-	const relatedIdeas: Idea[] = $derived(
-		data.ideas.filter((idea) => data.ideaIds.includes(idea.id))
+	const allIdeas = $derived(await getIdeas(params.catalogId));
+
+	let relatedIdeas: Idea[] = $derived(
+		allIdeas?.filter((idea) => data.ideaIds.includes(idea.id)) ?? []
 	);
+	// let relatedIdeas: Idea[] = $derived(
+	// 	allIdeas.filter((idea) => data.ideaIds.includes(idea.id))
+	// );
 
 	async function deleteCategory(category?: CategoryFull) {
 		if (!category) return;
@@ -22,6 +29,19 @@
 				method: 'DELETE'
 			});
 			await goto(`/catalogs/${params.catalogId}`);
+			await invalidateAll();
+		}
+	}
+
+	async function deleteCategoryIdeas(category?: CategoryFull) {
+		if (!category) return;
+		const ideaIds = category.ideaIds;
+		if (confirm(`Really delete all ideas in "${category.name}"?`)) {
+			relatedIdeas = [];
+			await tick();
+			await fetch(`/catalogs/${params.catalogId}/categories/${category.id}/ideas`, {
+				method: 'DELETE'
+			}).catch(() => (category.ideaIds = ideaIds));
 			await invalidateAll();
 		}
 	}
@@ -96,6 +116,12 @@
 						modalKey++;
 					}}
 					title="Create Idea"><i class="block fi fi-rr-add"></i>New Idea</Button
+				>
+
+				<Button
+					class="flex place-items-center w-max p-2"
+					onclick={() => deleteCategoryIdeas(data.category)}
+					title="Delete All Ideas"><i class="fi fi-rr-trash"></i>Delete All Ideas</Button
 				>
 
 				{#if params.categoryId !== 'Uncategorized'}

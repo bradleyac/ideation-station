@@ -1,56 +1,43 @@
 <script lang="ts">
-	import * as Rx from 'rxjs';
+	import { on } from 'svelte/events';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+
 	const { labels, period } = $props();
+
 	let index = $state(0);
+	let running = $state(false);
+	let intervalId = $state<NodeJS.Timeout>();
+	const current = $derived(labels[index]);
 
-	console.log(labels);
 	onMount(() => {
-		let visibilityChange$ = Rx.fromEvent(document, 'visibilitychange').pipe(
-			Rx.map((x) => document.visibilityState),
-			Rx.startWith('visible'),
-			Rx.shareReplay(1)
-		);
-
-		let isVisible$ = visibilityChange$.pipe(
-			Rx.map(() => document.visibilityState === 'visible'),
-			Rx.distinctUntilChanged()
-		);
-
-		let index$ = Rx.connectable<number>(
-			Rx.interval(period).pipe(
-				Rx.map((i) => (i + 1) % labels.length),
-				Rx.startWith(0)
-			),
-			{
-				connector: () => new Rx.ReplaySubject(1),
-				resetOnDisconnect: false
-			}
-		);
-
-		let subs = [];
-
-		subs.push(index$.connect());
-
-		subs.push(
-			isVisible$
-				.pipe(
-					Rx.switchMap((isVisible) =>
-						isVisible
-							? index$.pipe(
-									Rx.throttleTime(period, Rx.asyncScheduler, { leading: true, trailing: true })
-								)
-							: Rx.NEVER
-					)
-				)
-				.subscribe((i) => (index = i))
-		);
-
-		return () => subs.forEach((sub) => sub.unsubscribe());
+		// Turn the interval off when it isn't visible to avoid queuing animations.
+		on(document, 'visibilitychange', () => setRunning(document.visibilityState === 'visible'));
+		setRunning(true);
 	});
 
-	let current = $derived(labels[index]);
+	function setRunning(newRunning: boolean) {
+		if (running !== newRunning) {
+			if (running) {
+				stop();
+			} else {
+				start();
+			}
+			running = newRunning;
+		}
+	}
+
+	function stop() {
+		clearInterval(intervalId);
+	}
+
+	function start() {
+		intervalId = setInterval(next, period);
+	}
+
+	function next() {
+		index = (index + 1) % labels.length;
+	}
 </script>
 
 <div class="text-xl grid place-items-end">

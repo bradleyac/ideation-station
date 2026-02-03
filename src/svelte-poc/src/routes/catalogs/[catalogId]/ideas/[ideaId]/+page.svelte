@@ -12,10 +12,13 @@
 	import IdeaList from '../IdeaList.svelte';
 	import CategoryList from '../../categories/CategoryList.svelte';
 	import CategoryDndZone from '$lib/components/dnd/CategoryDndZone.svelte';
+	import { getIdeas } from '$lib/remotes/idea.remote.js';
 	const { data, params } = $props();
 
+	const allIdeas = $derived(await getIdeas(params.catalogId));
+
 	const unrelatedIdeas: IdeaT[] = $derived(
-		data.ideas.filter(
+		allIdeas.filter(
 			(possiblyRelatedIdea) =>
 				!(
 					data.idea.id == possiblyRelatedIdea.id ||

@@ -4,8 +4,13 @@ import { error, type RequestHandler } from "@sveltejs/kit";
 
 export const DELETE: RequestHandler = async ({ params, platform }) => {
   const userId = getUserId(platform);
-  const { catalogId } = params;
-  if (!catalogId) error(400);
-  await db.deleteCatalog(userId, catalogId);
+  const { categoryId, catalogId } = params;
+  if (!categoryId || !catalogId) error(400);
+  if (categoryId === 'Uncategorized') {
+    await db.deleteUncategorizedIdeas(userId, catalogId)
+  }
+  else {
+    await db.deleteCategoryIdeas(userId, categoryId);
+  }
   return new Response();
 };

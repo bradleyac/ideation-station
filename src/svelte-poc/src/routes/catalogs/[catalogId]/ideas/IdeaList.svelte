@@ -6,11 +6,9 @@
 	import IdeaMenu from './IdeaMenu.svelte';
 	import IdeaPreview from './IdeaPreview.svelte';
 	import Tooltip from '$lib/components/Tooltip.svelte';
+	import { fade } from 'svelte/transition';
 
-	const {
-		ideas,
-		...props
-	}: {
+	const props: {
 		ideas: IdeaT[];
 		categoryId?: string;
 		otherIdea?: { id: string; related: boolean };
@@ -33,7 +31,7 @@
 	}
 
 	const sortedIdeas = $derived(
-		ideas.toSorted((a, b) =>
+		props.ideas.toSorted((a, b) =>
 			shook
 				? Math.random() - 0.5
 				: sortDir === 'alpha'
@@ -48,11 +46,11 @@
 		)
 	);
 
-	const anyIdeas = $derived(ideas?.length > 0);
+	const anyIdeas = $derived(props.ideas?.length > 0);
 	let container = $state<HTMLElement>();
 </script>
 
-<Collapse class="relative" title={props.title} open={anyIdeas} disabled={!anyIdeas}>
+<Collapse class="relative" title={props.title} open={true} disabled={!anyIdeas}>
 	<div class="absolute top-1.5 right-1.5 flex gap-1.5">
 		<Button onclick={() => (mode = mode === 'default' ? 'compact' : 'default')}
 			><i
@@ -81,7 +79,7 @@
 		<Tooltip parent={container}>
 			{#snippet children(id, close)}
 				<IdeaMenu
-					idea={ideas.filter((idea) => idea.id === id)[0]}
+					idea={props.ideas.filter((idea) => idea.id === id)[0]}
 					categoryId={props.categoryId}
 					otherIdea={props.otherIdea}
 					{close}
@@ -96,7 +94,11 @@
 			]}
 		>
 			{#each sortedIdeas as idea (idea.id)}
-				<li animate:flip={{ duration: 500 }} class={[mode === 'compact' && 'ring-1', 'flex']}>
+				<li
+					out:fade={{ duration: 500 }}
+					animate:flip={{ duration: 500 }}
+					class={[mode === 'compact' && 'ring-1', 'flex']}
+				>
 					<IdeaPreview catalogId={props.catalogId} {idea} {mode} />
 				</li>
 			{/each}

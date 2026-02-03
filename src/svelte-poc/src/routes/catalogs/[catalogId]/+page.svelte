@@ -18,11 +18,14 @@
 	import CatalogForm from '../CatalogForm.svelte';
 	import { fromEventPattern } from 'rxjs';
 	import CategoryDndZone from '$lib/components/dnd/CategoryDndZone.svelte';
+	import { getIdeas } from '$lib/remotes/idea.remote.js';
 
 	const { data, params, ...props } = $props();
 	const aspirationsCategoryId = $derived(
 		data.categories.find((cat) => cat.name === 'Aspirations')?.id ?? ''
 	);
+
+	const allIdeas = $derived(await getIdeas(params.catalogId));
 
 	let showModal = $state(false);
 	let modalKey = $state(0);
@@ -104,7 +107,7 @@
 			<div class="top-2.5 right-4 invisible lg:visible z-2 fixed">
 				<TextTicker
 					period={5000}
-					labels={data.ideas
+					labels={allIdeas
 						.filter((idea) => idea.categoryId === aspirationsCategoryId)
 						.map((idea) => idea.name)}
 				/>
@@ -114,9 +117,11 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[20rem] gap-4">
 			{#each sortedCategories as category (category.id)}
 				<div class="flex flex-col gap-3 bg-eucalyptus-200 dark:bg-eucalyptus-800 rounded-sm p-3">
-					<h2>{category.name}</h2>
+					<a href="/catalogs/{params.catalogId}/categories/{category.id}"
+						><h2>{category.name}</h2></a
+					>
 					<div class="relative h-full overflow-y-scroll overflow-x-clip">
-						<CategoryDndZone {category} ideas={data.ideas} catalogId={params.catalogId} />
+						<CategoryDndZone {category} ideas={allIdeas} catalogId={params.catalogId} />
 					</div>
 				</div>
 			{/each}

@@ -7,13 +7,17 @@
 	let { children } = $props();
 
 	const route = $derived(page.route);
-	// const title = $derived(page.data.title);
-	// const parentTitle = $derived(page.data.catalog?.name || 'Whoops!');
-	const title = '';
-	const parentTitle = '';
+	const catalogName = $derived(page.data.catalog?.name);
+	const categoryName = $derived(page.data.category?.name);
+	const ideaName = $derived(page.data.idea?.name);
+	const catalogId = $derived(page.data.catalog?.id);
+	const catalogs = $derived(page.data.catalogs);
 	// TODO: List out the catalogs in a menu
-
-	// TODO: REWRITE THIS ALL. It still doesn't match correctly. Is there an existing solution for this with sveltekit?
+	interface Page {
+		path: string;
+		name: string;
+		subpages: Page[] | string[];
+	}
 </script>
 
 <svelte:head>
@@ -25,30 +29,47 @@
 		data-sveltekit-reload
 		class="p-3 h-12 content-center sticky top-0 z-1 bg-gray-50 dark:bg-gray-900 shadow-black/30 shadow-xs"
 	>
-		<ul class="p-0 m-0 list-none flex gap-4">
-			<!-- TODO: Revisit this stuff. Adding [catalogId] is going to break it. -->
-			{#each [{ path: '/', name: 'Home', subPages: [] }, { path: '/catalogs', name: 'Idea Catalog', subPages: [{ path: '/[catalogId]', subPages: ['/[catalogId]/ideas/[ideaId]', '/[catalogId]/categories/[categoryId]'] }] }] as { path, name, subPages }}
-				<li class="flex gap-2 last:overflow-hidden block border-black">
-					{#if route.id === path}
-						<span class="border-b-2 border-eucalyptus-500">{name}</span>
-					{:else}
-						<a class="whitespace-nowrap" href={path}>{name}</a>
-						{#each subPages as subPage}
-							{#if route.id === `${path}${subPage.path}`}
-								<span class="border-b-2 border-eucalyptus-500">{parentTitle}</span>
-							{:else}
-								<div class="border-e"></div>
-								<a
-									href={page.url.href}
-									class="max-w-full border-b-2 border-eucalyptus-500 overflow-hidden text-ellipsis whitespace-nowrap"
-								>
-									{title ?? ''}
-								</a>
-							{/if}
-						{/each}
+		<ul class="p-0 m-0 list-none flex gap-4 relative">
+			<li class="block border-black">
+				{#if route.id === '/'}
+					<span class="border-b-2 border-eucalyptus-500">Home</span>
+				{:else}
+					<a href="/">Home</a>
+				{/if}
+			</li>
+			<li class="flex gap-2 last:overflow-hidden block border-black">
+				<div class="group">
+					<a href="/catalogs">Idea Catalogs</a>
+					{#if catalogs}
+						<ul
+							class="hidden absolute rounded-sm group-hover:flex z-1 flex-col gap-1 p-2 bg-gray-100 dark:bg-gray-800"
+						>
+							{#each catalogs as catalog (catalog.id)}
+								<li class="w-full flex">
+									<a
+										class="p-2 rounded-sm w-full hover:bg-gray-200 dark:hover:bg-gray-700"
+										href="/catalogs/{catalog.id}">{catalog.name}</a
+									>
+								</li>
+							{/each}
+						</ul>
 					{/if}
-				</li>
-			{/each}
+				</div>
+				{#if route.id?.startsWith('/catalogs/')}
+					/
+					{#if route.id === '/catalogs/[catalogId]'}
+						<span class="border-b-2 border-eucalyptus-500">{catalogName}</span>
+					{:else}
+						<a href="/catalogs/{catalogId}">{catalogName}</a>
+						/
+						{#if route.id === '/catalogs/[catalogId]/categories/[categoryId]'}
+							<span class="border-b-2 border-eucalyptus-500">Category: {categoryName}</span>
+						{:else if route.id === '/catalogs/[catalogId]/ideas/[ideaId]'}
+							<span class="border-b-2 border-eucalyptus-500">Idea: {ideaName}</span>
+						{/if}
+					{/if}
+				{/if}
+			</li>
 		</ul>
 	</nav>
 	<div>

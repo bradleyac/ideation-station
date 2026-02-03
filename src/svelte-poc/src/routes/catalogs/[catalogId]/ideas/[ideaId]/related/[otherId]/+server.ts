@@ -1,21 +1,21 @@
 import { error, type RequestHandler } from "@sveltejs/kit";
-import { db } from "$lib/db.svelte";
-import getUserId from "$lib/getUserId";
+import { db } from "$lib/server/db.svelte";
+import getUserId from "$lib/server/getUserId";
 
 export const DELETE: RequestHandler = async ({ params, platform }) => {
-  const userid = getUserId(platform);
+  const userId = getUserId(platform);
   const id = params.ideaId;
   const otherId = params.otherId;
   if (!id || !otherId || id === otherId) error(400);
-  await db.removeRelation(userid, id, otherId);
-  await db.removeRelation(userid, otherId, id);
+  await db.removeRelation(userId, id, otherId);
+  await db.removeRelation(userId, otherId, id);
   return new Response();
 };
 
 export const PUT: RequestHandler = async ({ params, platform }) => {
-  const userid = getUserId(platform);
+  const userId = getUserId(platform);
   const { ideaId, otherId } = params;
   if (!ideaId || !otherId || ideaId === otherId) error(400);
-  await db.addRelation(userid, ideaId, otherId);
+  await db.addRelation(userId, ideaId, otherId);
   return new Response();
 }
