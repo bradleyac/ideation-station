@@ -1,10 +1,11 @@
-import { query } from "$app/server";
+import { getRequestEvent, query } from "$app/server";
 import { db } from "$lib/server/db.svelte";
 import getUserId from "$lib/server/getUserId";
 import * as v from 'valibot';
 
 export const getIdeas = query(v.string(), async (catalogId) => {
-  const userId = getUserId();
+  const event = getRequestEvent();
+  const userId = getUserId(event.platform);
 
   const ideas = await db.getAllIdeas(userId, catalogId);
 
@@ -12,7 +13,8 @@ export const getIdeas = query(v.string(), async (catalogId) => {
 });
 
 export const getIdea = query(v.string(), async (ideaId) => {
-  const userId = getUserId();
+  const event = getRequestEvent();
+  const userId = getUserId(event.platform);
 
   const idea = await db.getIdea(userId, ideaId);
 
