@@ -47,7 +47,7 @@ class Db {
   public async createCatalog(userId: string, catalog: Catalog): Promise<void> {
     const createCatalogQuery = `g.addV('catalog')
       .property('id',prop_id)
-      .property('userId', prop_userId)
+      .property('userid', prop_userId)
       .property('name', prop_name)
       .property('desc', prop_desc)`;
 
@@ -90,7 +90,7 @@ class Db {
   }
 
   public async getAllCatalogs(userId: string): Promise<Catalog[]> {
-    const getAllCatalogsQuery = `g.V().has('userId',prop_userId).hasLabel('catalog').project('id','name','desc')
+    const getAllCatalogsQuery = `g.V().has('userid',prop_userId).hasLabel('catalog').project('id','name','desc')
     .by('id')
     .by('name')
     .by('desc')`
@@ -120,7 +120,7 @@ class Db {
     // TODO: Transaction?
     const createIdeaQuery = `g.addV('idea')
       .property('id', prop_id)
-      .property('userId', prop_userId)
+      .property('userid', prop_userId)
       .property('name', prop_name)
       .property('desc', prop_desc).as('node')
       .V(prop_userId, prop_catalogId).as('catalog')
@@ -157,7 +157,7 @@ class Db {
       .property('desc', prop_desc)
       .union(
         g.V(prop_userId, prop_id).outE('belongsTo').where(inV().hasLabel('category')),
-        g.V().hasLabel('category').has('userId', prop_userId).outE('contains').where(inV().hasId(prop_id))
+        g.V().hasLabel('category').has('userid', prop_userId).outE('contains').where(inV().hasId(prop_id))
       ).drop();`
 
     const linkCategoriesQuery = `g.V(prop_userId, prop_categoryId).as('cat')
@@ -185,7 +185,7 @@ class Db {
     const adjustIdeaAndDropAllEdgesToCategoriesQuery = `g.V(prop_userId, prop_id)
       .union(
         g.V(prop_userId, prop_id).outE('belongsTo').where(inV().hasLabel('category')),
-        g.V().hasLabel('category').has('userId', prop_userId).outE('contains').where(inV().hasId(prop_id))
+        g.V().hasLabel('category').has('userid', prop_userId).outE('contains').where(inV().hasId(prop_id))
       ).drop();`
 
     const linkCategoriesQuery = `g.V(prop_userId, prop_categoryId).as('cat')
@@ -208,7 +208,7 @@ class Db {
   public async createCategory(userId: string, catalogId: string, category: CategoryFull): Promise<void> {
     const createCategoryQuery = `g.addV('category')
       .property('id', prop_id)
-      .property('userId', prop_userId)
+      .property('userid', prop_userId)
       .property('name', prop_name)
       .property('desc', prop_desc)
       .as('node')
