@@ -3,29 +3,28 @@
 	import { dndzone, type DndEvent, TRIGGERS } from 'svelte-dnd-action';
 	import IdeaPreview from '../../../routes/catalogs/[catalogId]/ideas/IdeaPreview.svelte';
 	import { flip } from 'svelte/animate';
+	import { getIdeas } from '$lib/remotes/idea.remote';
 
-	let { ...props }: { catalogId: string; category: CategoryFull; ideas: Idea[] } = $props();
+	let { ...props }: { catalogId: string; category: CategoryFull } = $props();
 
-	let ideas = $derived(
-		props.category?.ideaIds?.map((id) => props.ideas.find((idea) => idea.id === id)!) ?? []
+	let relatedIdeas = $derived(
+		(await getIdeas(props.catalogId)).filter((idea) => props.category.ideaIds.includes(idea.id)) ??
+			[]
 	);
 
 	let affix = $state('');
 	let prefix = $state(true);
 
 	function onConsider(e: CustomEvent<DndEvent<Idea>>) {
-		ideas = e.detail.items;
+		relatedIdeas = e.detail.items;
 	}
 	function onFinalize(e: CustomEvent<DndEvent<Idea>>) {
-		ideas = e.detail.items;
+		relatedIdeas = e.detail.items;
 		if (e.detail.info.trigger === TRIGGERS.DROPPED_INTO_ZONE) {
-			ideas = e.detail.items;
 			fetch(
 				`/catalogs/${props.catalogId}/ideas/${e.detail.info.id}/categories/${props.category.id}`,
 				{ method: 'PUT' }
 			);
-		} else if (e.detail.info.trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
-			ideas = e.detail.items;
 		}
 	}
 </script>
@@ -46,16 +45,25 @@
 			oninput={(e) => (affix = (e.target as HTMLInputElement)?.value?.toUpperCase())}
 		/>
 	</div>
-	<div
-		use:dndzone={{ items: ideas, useCursorForDetection: true }}
-		onconsider={onConsider}
-		onfinalize={onFinalize}
-		class="flex flex-row flex-wrap divide-y outline rounded-sm overflow-y-auto overflow-x-hidden h-full place-items-start place-content-start -outline-offset-1"
-	>
-		{#each ideas as idea (idea.id)}
-			<div class="flex flex-col w-full max-w-full overflow-hidden" animate:flip={{ duration: 100 }}>
-				<IdeaPreview {prefix} {affix} mode="compact" {idea} catalogId={props.catalogId} />
-			</div>
-		{/each}
-	</div>
+	{#await relatedIdeas}
+		Loading...
+	{:then ideas}
+		<div
+			use:dndzone={{ items: ideas, useCursorForDetection: true, delayTouchStart: true }}
+			onconsider={onConsider}
+			onfinalize={onFinalize}
+			class="flex flex-row flex-wrap divide-y outline rounded-sm overflow-y-auto overflow-x-hidden h-full place-items-start place-content-start -outline-offset-1"
+		>
+			{#each ideas as idea (idea.id)}
+				<div
+					class="flex flex-col w-full max-w-full overflow-hidden"
+					animate:flip={{ duration: 100 }}
+				>
+					<IdeaPreview {prefix} {affix} mode="compact" {idea} catalogId={props.catalogId} />
+				</div>
+			{/each}
+		</div>
+	{:catch}
+		Oops!
+	{/await}
 </div>

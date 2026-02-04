@@ -19,13 +19,12 @@
 	import { fromEventPattern } from 'rxjs';
 	import CategoryDndZone from '$lib/components/dnd/CategoryDndZone.svelte';
 	import { getIdeas } from '$lib/remotes/idea.remote.js';
+	import DeleteIdeaDndZone from '$lib/components/dnd/DeleteIdeaDndZone.svelte';
 
 	const { data, params, ...props } = $props();
 	const aspirationsCategoryId = $derived(
 		data.categories.find((cat) => cat.name === 'Aspirations')?.id ?? ''
 	);
-
-	const allIdeas = $derived(await getIdeas(params.catalogId));
 
 	let showModal = $state(false);
 	let modalKey = $state(0);
@@ -105,12 +104,12 @@
 
 		{#if aspirationsCategoryId}
 			<div class="top-2.5 right-4 invisible lg:visible z-2 fixed">
-				<TextTicker
+				<!-- <TextTicker
 					period={5000}
 					labels={allIdeas
 						.filter((idea) => idea.categoryId === aspirationsCategoryId)
 						.map((idea) => idea.name)}
-				/>
+				/> -->
 			</div>
 		{/if}
 
@@ -121,10 +120,11 @@
 						><h2>{category.name}</h2></a
 					>
 					<div class="relative h-full overflow-y-scroll overflow-x-clip">
-						<CategoryDndZone {category} ideas={allIdeas} catalogId={params.catalogId} />
+						<CategoryDndZone {category} catalogId={params.catalogId} />
 					</div>
 				</div>
 			{/each}
+			<DeleteIdeaDndZone catalogId={params.catalogId} />
 		</div>
 	</section>
 {/if}

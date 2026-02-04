@@ -1,4 +1,4 @@
-import { getRequestEvent, query } from "$app/server";
+import { command, getRequestEvent, query } from "$app/server";
 import { db } from "$lib/server/db.svelte";
 import getUserId from "$lib/server/getUserId";
 import * as v from 'valibot';
@@ -20,3 +20,10 @@ export const getIdea = query(v.string(), async (ideaId) => {
 
   return idea;
 });
+
+export const deleteIdea = command(v.string(), async (ideaId) => {
+  const event = getRequestEvent();
+  const userId = getUserId(event.platform);
+
+  await db.deleteIdea(userId, ideaId);
+})
