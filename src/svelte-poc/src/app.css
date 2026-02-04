@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 @import "./theme.css";
+@import "@flaticon/flaticon-uicons/css/all/all";
 
 :root {
   color-scheme: light dark;

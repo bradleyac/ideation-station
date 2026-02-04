@@ -76,7 +76,7 @@
 
 		<div class="flex flex-wrap gap-2">
 			<Button type="button" title="Edit Idea" onclick={() => (showModal = !showModal)}
-				><i class="fi fi-rr-edit"></i> Edit Idea</Button
+				><i class="text-lg fi fi-rr-edit"></i> Edit Idea</Button
 			>
 
 			<Button type="button" title="Delete Idea" onclick={deleteIdea}>

@@ -115,13 +115,13 @@
 
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[20rem] gap-4">
 			{#each sortedCategories as category (category.id)}
-				<div class="flex flex-col gap-3 bg-eucalyptus-200 dark:bg-eucalyptus-800 rounded-sm p-3">
-					<a href="/catalogs/{params.catalogId}/categories/{category.id}"
+				<div
+					class="grid grid-cols-1 grid-rows-[auto_1fr] gap-3 bg-eucalyptus-200 dark:bg-eucalyptus-800 rounded-sm p-3"
+				>
+					<a class="block" href="/catalogs/{params.catalogId}/categories/{category.id}"
 						><h2>{category.name}</h2></a
 					>
-					<div class="relative h-full overflow-y-scroll overflow-x-clip">
-						<CategoryDndZone {category} catalogId={params.catalogId} />
-					</div>
+					<CategoryDndZone {category} catalogId={params.catalogId} />
 				</div>
 			{/each}
 			<DeleteIdeaDndZone catalogId={params.catalogId} />

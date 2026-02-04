@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { CategoryFull, Idea } from '$lib/types';
-	import { dndzone, type DndEvent, TRIGGERS } from 'svelte-dnd-action';
+	import { dndzone, type DndEvent, TRIGGERS, dragHandleZone, dragHandle } from 'svelte-dnd-action';
 	import IdeaPreview from '../../../routes/catalogs/[catalogId]/ideas/IdeaPreview.svelte';
 	import { flip } from 'svelte/animate';
 	import { getIdeas } from '$lib/remotes/idea.remote';
@@ -29,8 +29,8 @@
 	}
 </script>
 
-<div class="flex flex-col h-full gap-2 -outline-offset-1">
-	<div class="flex gap-2">
+<div class="grid grid-cols-1 grid-rows-[auto_1fr] gap-2 h-full overflow-scroll -outline-offset-1">
+	<div class="flex gap-2 p-1">
 		<input
 			type="checkbox"
 			class="max-w-1 place-self-center ms-1"
@@ -45,25 +45,36 @@
 			oninput={(e) => (affix = (e.target as HTMLInputElement)?.value?.toUpperCase())}
 		/>
 	</div>
-	{#await relatedIdeas}
-		Loading...
-	{:then ideas}
-		<div
-			use:dndzone={{ items: ideas, useCursorForDetection: true, delayTouchStart: true }}
-			onconsider={onConsider}
-			onfinalize={onFinalize}
-			class="flex flex-row flex-wrap divide-y outline rounded-sm overflow-y-auto overflow-x-hidden h-full place-items-start place-content-start -outline-offset-1"
-		>
-			{#each ideas as idea (idea.id)}
-				<div
-					class="flex flex-col w-full max-w-full overflow-hidden"
-					animate:flip={{ duration: 100 }}
-				>
-					<IdeaPreview {prefix} {affix} mode="compact" {idea} catalogId={props.catalogId} />
-				</div>
-			{/each}
-		</div>
-	{:catch}
-		Oops!
-	{/await}
+	<div class="h-full overflow-scroll">
+		{#await relatedIdeas}
+			Loading...
+		{:then ideas}
+			<ul
+				use:dragHandleZone={{ items: ideas, useCursorForDetection: true }}
+				onconsider={onConsider}
+				onfinalize={onFinalize}
+				class="grid grid-cols-1 auto-rows-max p-1 gap-1 h-full rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start -outline-offset-1"
+			>
+				{#each ideas as idea (idea.id)}
+					<li
+						class="flex relative -outline-offset-1 w-full overflow-hidden"
+						animate:flip={{ duration: 50 }}
+					>
+						<div class="flex w-full outline rounded-sm overflow-hidden -outline-offset-1">
+							<div
+								use:dragHandle
+								class="p-1 w-4 flex place-items-center place-content-center w-max bg-eucalyptus-500"
+								aria-label="drag-handle for {idea.name}"
+							>
+								<i class="text-2xl leading-2 fi fi-ts-grip-dots-vertical"></i>
+							</div>
+							<IdeaPreview {prefix} {affix} {idea} catalogId={props.catalogId} />
+						</div>
+					</li>
+				{/each}
+			</ul>
+		{:catch}
+			Oops!
+		{/await}
+	</div>
 </div>

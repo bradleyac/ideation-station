@@ -24,7 +24,25 @@
 
 <div class="flex flex-col h-full gap-2 -outline-offset-1">
 	<div
-		use:dndzone={{ items: ideas, useCursorForDetection: true }}
+		use:dndzone={{
+			items: ideas,
+			useCursorForDetection: true,
+			dropTargetClasses: [
+				'ring',
+				'ring-red-500',
+				'bg-red-100',
+				'before:block',
+				'before:fi',
+				'before:fi-rr-trash',
+				'before:w-full',
+				'before:h-10',
+				'before:block',
+				'before:absolute',
+				'before:p-4',
+				'before:content-["Drag_Ideas_here_to_delete_them."]'
+			],
+			transformDraggedElement: (e, d, i) => (e!.style.textDecorationLine = 'line-through')
+		}}
 		onconsider={onConsider}
 		onfinalize={onFinalize}
 		class="flex flex-row flex-wrap divide-y outline rounded-sm overflow-y-auto overflow-x-hidden h-full place-items-start place-content-start -outline-offset-1"
@@ -35,7 +53,7 @@
 				animate:flip={{ duration: 100 }}
 				out:fade={{ duration: 1000 }}
 			>
-				<IdeaPreview mode="compact" {idea} catalogId={props.catalogId} />
+				<IdeaPreview mode="delete" {idea} catalogId={props.catalogId} />
 			</div>
 		{/each}
 	</div>
