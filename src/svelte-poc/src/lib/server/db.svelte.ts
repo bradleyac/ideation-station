@@ -55,20 +55,22 @@ class Db {
       prop_id: catalog.id,
       prop_userId: userId,
       prop_name: catalog.name,
-      prop_desc: catalog.desc
+      prop_desc: catalog.desc,
     })
   }
 
   public async updateCatalog(userId: string, catalog: Catalog): Promise<void> {
     const createCatalogQuery = `g.V(prop_userId, prop_id)
       .property('name', prop_name)
-      .property('desc', prop_desc)`;
+      .property('desc', prop_desc)
+      .property('settings', prop_settings)`;
 
     let results = this.submitWithRetry(createCatalogQuery, {
       prop_id: catalog.id,
       prop_userId: userId,
       prop_name: catalog.name,
-      prop_desc: catalog.desc
+      prop_desc: catalog.desc,
+      prop_settings: JSON.stringify(catalog.settings)
     })
   }
 
@@ -90,30 +92,32 @@ class Db {
   }
 
   public async getAllCatalogs(userId: string): Promise<Catalog[]> {
-    const getAllCatalogsQuery = `g.V().has('userid',prop_userId).hasLabel('catalog').project('id','name','desc')
+    const getAllCatalogsQuery = `g.V().has('userid',prop_userId).hasLabel('catalog').project('id','name','desc','settings')
     .by('id')
     .by('name')
-    .by('desc')`
+    .by('desc')
+    .by(coalesce(values('settings'),constant('{}')))`
 
     let results = await this.submitWithRetry(getAllCatalogsQuery, {
       prop_userId: userId
     });
 
-    return results._items;
+    return results._items.map((i: any) => { return { ...i, settings: JSON.parse(i.settings) } });
   }
 
   public async getCatalog(userId: string, catalogId: string): Promise<Catalog> {
-    const getCatalogQuery = `g.V(prop_userId, prop_catalogId).project('id','name','desc')
+    const getCatalogQuery = `g.V(prop_userId, prop_catalogId).project('id','name','desc', 'settings')
       .by('id')
       .by('name')
-      .by('desc')`
+      .by('desc')
+      .by(coalesce(values('settings'),constant('{}')))`
 
     let results = await this.submitWithRetry(getCatalogQuery, {
       prop_userId: userId,
       prop_catalogId: catalogId
     })
 
-    return results._items[0];
+    return { ...results._items[0], settings: JSON.parse(results._items[0].settings) };
   }
 
   public async createIdea(userId: string, catalogId: string, idea: Idea): Promise<void> {

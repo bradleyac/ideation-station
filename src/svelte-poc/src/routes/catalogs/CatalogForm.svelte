@@ -63,6 +63,20 @@
 				>
 			</label>
 
+			<section>
+				<h2>Settings</h2>
+				<label class="flex place-items-center">
+					<input
+						type="checkbox"
+						class="max-w-1 me-2"
+						name="connections"
+						title="Connections"
+						checked={props.existingCatalog?.settings?.connections}
+					/>
+					Enable Connections
+				</label>
+			</section>
+
 			<Button
 				tabindex="0"
 				type="submit"

@@ -31,6 +31,9 @@
 	let whichModal = $state<'edit' | 'category' | 'idea'>('edit');
 	let catalog = $derived(data.catalogs.find((c) => c.id === params.catalogId));
 	let sortedCategories = $derived(data.categories.toSorted((a, b) => (a.name > b.name ? 1 : -1)));
+	let connections = $derived(!!catalog?.settings?.connections);
+
+	$inspect(connections);
 
 	function enhanceCallback(): ({
 		update,
@@ -95,11 +98,12 @@
 				}}
 				title="Create Category"><i class="block fi fi-rr-add"></i>New Category</Button
 			>
-
-			<form action="/catalogs/{params.catalogId}?/loadConnections" method="POST" use:enhance>
-				<input type="text" name="dummy" value="dummy" class="hidden" />
-				<Button type="submit"><i class="block fi fi-rr-add"></i>From Connections</Button>
-			</form>
+			{#if connections}
+				<form action="/catalogs/{params.catalogId}?/loadConnections" method="POST" use:enhance>
+					<input type="text" name="dummy" value="dummy" class="hidden" />
+					<Button type="submit"><i class="block fi fi-rr-add"></i>From Connections</Button>
+				</form>
+			{/if}
 		</div>
 
 		{#if aspirationsCategoryId}
@@ -121,7 +125,7 @@
 					<a class="block" href="/catalogs/{params.catalogId}/categories/{category.id}"
 						><h2>{category.name}</h2></a
 					>
-					<CategoryDndZone {category} catalogId={params.catalogId} />
+					<CategoryDndZone {connections} {category} catalogId={params.catalogId} />
 				</div>
 			{/each}
 			<DeleteIdeaDndZone catalogId={params.catalogId} />

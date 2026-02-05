@@ -5,7 +5,7 @@
 	import { flip } from 'svelte/animate';
 	import { getIdeas } from '$lib/remotes/idea.remote';
 
-	let { ...props }: { catalogId: string; category: CategoryFull } = $props();
+	let props: { catalogId: string; category: CategoryFull; connections: boolean } = $props();
 
 	let relatedIdeas = $derived(
 		(await getIdeas(props.catalogId)).filter((idea) => props.category.ideaIds.includes(idea.id)) ??
@@ -31,19 +31,23 @@
 
 <div class="grid grid-cols-1 grid-rows-[auto_1fr] gap-2 h-full overflow-scroll -outline-offset-1">
 	<div class="flex gap-2 p-1">
-		<input
-			type="checkbox"
-			class="max-w-1 place-self-center ms-1"
-			defaultChecked={true}
-			title={prefix ? 'Prefix' : 'Suffix'}
-			oninput={(e) => (prefix = (e.target as HTMLInputElement)?.checked)}
-		/>
-		<input
-			class="w-full"
-			type="text"
-			placeholder={prefix ? 'Prefix' : 'Suffix'}
-			oninput={(e) => (affix = (e.target as HTMLInputElement)?.value?.toUpperCase())}
-		/>
+		{#if props.connections}
+			<input
+				type="checkbox"
+				class="max-w-1 place-self-center ms-1"
+				defaultChecked={true}
+				title={prefix ? 'Prefix' : 'Suffix'}
+				oninput={(e) => (prefix = (e.target as HTMLInputElement)?.checked)}
+			/>
+			<input
+				class="w-full"
+				type="text"
+				placeholder={prefix ? 'Prefix' : 'Suffix'}
+				oninput={(e) => (affix = (e.target as HTMLInputElement)?.value?.toUpperCase())}
+			/>
+		{:else}
+			<div></div>
+		{/if}
 	</div>
 	<div class="h-full overflow-scroll">
 		{#await relatedIdeas}
@@ -68,7 +72,12 @@
 							>
 								<i class="text-2xl leading-2 fi fi-ts-grip-dots-vertical"></i>
 							</div>
-							<IdeaPreview {prefix} {affix} {idea} catalogId={props.catalogId} />
+							<IdeaPreview
+								prefix={props.connections ? prefix : undefined}
+								affix={props.connections ? affix : undefined}
+								{idea}
+								catalogId={props.catalogId}
+							/>
 						</div>
 					</li>
 				{/each}

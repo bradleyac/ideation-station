@@ -9,10 +9,11 @@ export const actions = {
     const data = await event.request.formData();
     const name = data.get('name')?.toString() ?? '';
     const desc = data.get('desc')?.toString() ?? '';
+    const settings = { connections: !!data.get('connections') }
 
     if (name === '' || desc === '') error(400);
 
-    await db.updateCatalog(userId, { id: event.params.catalogId, name, desc });
+    await db.updateCatalog(userId, { id: event.params.catalogId, name, desc, settings });
   },
   loadConnections: async (event) => {
     const userId = getUserId(event.platform);

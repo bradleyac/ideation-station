@@ -2,6 +2,7 @@ interface Catalog {
   id: string;
   name: string;
   desc: string;
+  settings: { connections: boolean }
 }
 
 interface Idea {
