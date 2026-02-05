@@ -2,6 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import { getCatalogIds } from '$lib/remotes/catalog.remote';
 	import type { ActionResult } from '@sveltejs/kit';
 	import CatalogForm from './CatalogForm.svelte';
 	import CatalogPreview from './CatalogPreview.svelte';
@@ -48,11 +49,15 @@
 		>
 	</div>
 
-	<div
-		class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-max sm:auto-rows-fr gap-4"
-	>
-		{#each data.catalogs as catalog (catalog.id)}
-			<CatalogPreview {catalog} />
-		{/each}
-	</div>
+	{#await getCatalogIds()}
+		Loading...
+	{:then catalogIds}
+		<div
+			class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-max sm:auto-rows-fr gap-4"
+		>
+			{#each catalogIds as catalogId (catalogId)}
+				<CatalogPreview {catalogId} />
+			{/each}
+		</div>
+	{/await}
 </section>

@@ -91,12 +91,37 @@ class Db {
     });
   }
 
+  public async getAllCatalogIds(userId: string): Promise<string[]> {
+    const getAllCatalogIdsQuery = `g.V().has('userid',prop_userId).hasLabel('catalog').values(id)`;
+
+    let results = await this.submitWithRetry(getAllCatalogIdsQuery, {
+      prop_userId: userId
+    });
+
+    return results._items;
+  }
+
+  public async getCatalogsByIds(userId: string, catalogIds: string[]): Promise<Catalog[]> {
+    const getCatalogsByIdsQuery = `g.V().has('userid',prop_userId).hasId(within(prop_catalogIds)).project('id','name','desc','settings')
+    .by('id')
+    .by('name')
+    .by('desc')
+    .by(coalesce(values('settings'),constant('{}')))`;
+
+    let results = await this.submitWithRetry(getCatalogsByIdsQuery, {
+      prop_userId: userId,
+      prop_catalogIds: catalogIds
+    });
+
+    return results._items;
+  }
+
   public async getAllCatalogs(userId: string): Promise<Catalog[]> {
     const getAllCatalogsQuery = `g.V().has('userid',prop_userId).hasLabel('catalog').project('id','name','desc','settings')
     .by('id')
     .by('name')
     .by('desc')
-    .by(coalesce(values('settings'),constant('{}')))`
+    .by(coalesce(values('settings'),constant('{}')))`;
 
     let results = await this.submitWithRetry(getAllCatalogsQuery, {
       prop_userId: userId
@@ -292,13 +317,37 @@ class Db {
     return [...getAllCategoriesResult._items, { id: 'Uncategorized', name: 'Uncategorized', desc: 'Ideas without categories.', ideaIds: uncategorizedCountResult._items }];
   }
 
+  public async getAllCategoryIds(userId: string, catalogId: string): Promise<string[]> {
+    const getAllCategoryIdsQuery = `g.V(prop_userId, prop_catalogId).out('contains').hasLabel('category').values('id')`;
+
+    let categoriesResult = await this.submitWithRetry(getAllCategoryIdsQuery, {
+      prop_userId: userId,
+      prop_catalogId: catalogId
+    });
+
+    return categoriesResult._items;
+  };
+
+  public async getAllCategoryMetadata(userId: string, catalogId: string): Promise<{ id: string, name: string }[]> {
+    const getAllCategoryIdsQuery = `g.V(prop_userId, prop_catalogId).out('contains').hasLabel('category').project('id','name')
+    .by('id')
+    .by('name')`;
+
+    let categoriesResult = await this.submitWithRetry(getAllCategoryIdsQuery, {
+      prop_userId: userId,
+      prop_catalogId: catalogId
+    });
+
+    return categoriesResult._items;
+  };
+
   public async getCategoryById(userId: string, categoryId: string): Promise<CategoryFull> {
     const getCategoryByIdQuery = `g.V(prop_userId, prop_id)
       .project('id','name','desc','ideaIds')
       .by('id')
       .by('name')
       .by('desc')
-      .by(coalesce(outE('contains').inV().values('id').fold(), constant([])))`;
+      .by(coalesce(out('contains').values('id').fold(), constant([])))`;
 
     let result = await this.submitWithRetry(getCategoryByIdQuery, {
       prop_userId: userId,
@@ -306,6 +355,63 @@ class Db {
     });
 
     return result._items[0];
+  }
+
+  public async getCategoriesByIds(userId: string, categoryIds: string[]): Promise<CategoryFull[]> {
+    const getCategoriesByIdsQuery = `g.V()
+      .hasId(within(prop_categoryIds))
+      .project('id','name','desc','ideaIds')
+      .by('id')
+      .by('name')
+      .by('desc')
+      .by(coalesce(out('contains').values('id').fold(), constant([])))`;
+
+    let result = await this.submitWithRetry(getCategoriesByIdsQuery, {
+      prop_userId: userId,
+      prop_categoryIds: categoryIds,
+    });
+
+    return result._items;
+  }
+
+  public async getAllIdeaIds(userId: string, catalogId: string): Promise<string[]> {
+    const getAllIdeaIdsInCatalogQuery = `g.V(prop_userId, prop_catalogId)
+      .outE('contains').inV().hasLabel('idea').values('id')`;
+
+    let ideaIdsResults = await this.submitWithRetry(getAllIdeaIdsInCatalogQuery, {
+      prop_userId: userId,
+      prop_catalogId: catalogId,
+    });
+
+    return ideaIdsResults._items;
+  }
+
+  public async getCategoryIdeaIds(userId: string, categoryId: string): Promise<string[]> {
+    const getAllIdeaIdsInCategoryQuery = `g.V(prop_userId, prop_categoryId)
+      .outE('contains').inV().hasLabel('idea').values('id')`;
+
+    let ideaIdsResults = await this.submitWithRetry(getAllIdeaIdsInCategoryQuery, {
+      prop_userId: userId,
+      prop_categoryId: categoryId,
+    });
+
+    return ideaIdsResults._items;
+  }
+
+  public async getIdeasByIds(userId: string, ideaIds: string[]): Promise<Idea[]> {
+    const getIdeasByIdsQuery = `g.V().has('userid',prop_userId).hasId(within(prop_ideaIds))
+    .project('id','name','desc','categoryId')
+    .by('id')
+    .by('name')
+    .by('desc')
+    .by(coalesce(outE('belongsTo').inV().hasLabel('category').values('id').limit(1), constant('')))`;
+
+    let ideasResults = await this.submitWithRetry(getIdeasByIdsQuery, {
+      prop_userId: userId,
+      prop_ideaIds: ideaIds
+    });
+
+    return ideasResults._items;
   }
 
   public async getAllIdeas(userId: string, catalogId: string): Promise<Idea[]> {
@@ -368,6 +474,27 @@ class Db {
       .by('desc')
       .by(coalesce(outE('belongsTo').inV().hasLabel('category').values('id').limit(1), constant('')))`;
     let results = await this.submitWithRetry(getRelatedIdeasQuery, {
+      prop_partition_key: userId,
+      prop_id: id
+    });
+    return results._items;
+  }
+
+  public async getRelatedIdeaIds(userId: string, id: string): Promise<string[]> {
+    const getRelatedIdeasQuery = `g.V(prop_partition_key, prop_id).out('relatesTo').hasLabel('idea').values('id')`;
+    let results = await this.submitWithRetry(getRelatedIdeasQuery, {
+      prop_partition_key: userId,
+      prop_id: id
+    });
+    return results._items;
+  }
+
+  public async getUnrelatedIdeaIds(userId: string, id: string): Promise<string[]> {
+    const getUnrelatedIdeasQuery = `g.V(prop_partition_key, prop_id)
+      .out('belongsTo').hasLabel('catalog')
+      .out('contains').hasLabel('idea')
+      .where(out('relatesTo').hasId(prop_id).count().is(0)).values('id')`;
+    let results = await this.submitWithRetry(getUnrelatedIdeasQuery, {
       prop_partition_key: userId,
       prop_id: id
     });

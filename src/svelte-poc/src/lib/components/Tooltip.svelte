@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { computePosition, flip, shift } from '@floating-ui/dom';
-	import type { Snippet } from 'svelte';
+	import { tick, type Snippet } from 'svelte';
 	import { on } from 'svelte/events';
 	let { children, parent }: { children: Snippet<[string, () => void]>; parent: HTMLElement } =
 		$props();
@@ -72,10 +72,12 @@
 		const id = getId(evt.target);
 		if (id) {
 			clearTimeout(timeoutId);
-			timeoutId = setTimeout(() => {
+			timeoutId = setTimeout(async () => {
 				currentId = id;
-				update(evt.target as HTMLElement);
 				visible = true;
+				await tick();
+				await tick();
+				update(evt.target as HTMLElement);
 			}, debounceTime);
 		}
 	}

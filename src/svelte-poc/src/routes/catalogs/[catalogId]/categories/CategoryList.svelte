@@ -4,17 +4,16 @@
 	import Collapse from '$lib/components/Collapse.svelte';
 	import PopoverMenuButton from '$lib/components/PopoverMenuButton.svelte';
 	import Tooltip from '$lib/components/Tooltip.svelte';
-	import { type CategoryFull } from '$lib/types';
 	import { flip } from 'svelte/animate';
 	import CategoryMenu from './CategoryMenu.svelte';
 	import CategoryPreview from './CategoryPreview.svelte';
 
 	const {
-		categories,
+		categoryIds,
 		allowAdd = false,
 		...props
 	}: {
-		categories: CategoryFull[];
+		categoryIds: string[];
 		allowAdd?: boolean;
 		title: string;
 		catalogId: string;
@@ -35,23 +34,23 @@
 		shook = undefined;
 	}
 
-	const sortedCategories = $derived(
-		categories.toSorted((a, b) =>
-			shook
-				? Math.random() - 0.5
-				: sortDir === 'alpha'
-					? a.name > b.name
-						? 1
-						: -1
-					: sortDir === 'alphaR'
-						? a.name > b.name
-							? -1
-							: 1
-						: 0
-		)
-	);
+	// const sortedCategories = $derived(
+	// 	categories.toSorted((a, b) =>
+	// 		shook
+	// 			? Math.random() - 0.5
+	// 			: sortDir === 'alpha'
+	// 				? a.name > b.name
+	// 					? 1
+	// 					: -1
+	// 				: sortDir === 'alphaR'
+	// 					? a.name > b.name
+	// 						? -1
+	// 						: 1
+	// 					: 0
+	// 	)
+	// );
 
-	const anyCategories = $derived(categories?.length > 0);
+	const anyCategories = $derived(categoryIds?.length > 0);
 	let container = $state<HTMLElement>();
 </script>
 
@@ -85,8 +84,8 @@
 	</div>
 	<div bind:this={container} class={['relative flex flex-col w-full', mode === 'default' && 'm-2']}>
 		<Tooltip parent={container}>
-			{#snippet children(id: string)}
-				<CategoryMenu category={categories.filter((cat) => cat.id === id)[0]} />
+			{#snippet children(categoryId: string)}
+				<CategoryMenu {categoryId} />
 			{/snippet}
 		</Tooltip>
 		<ul
@@ -96,9 +95,9 @@
 				mode === 'compact' && 'flex-col w-full divide-y'
 			]}
 		>
-			{#each sortedCategories as category (category.id)}
+			{#each categoryIds as categoryId (categoryId)}
 				<li animate:flip={{ duration: 500 }} class={[mode === 'compact' && 'ring-1']}>
-					<CategoryPreview catalogId={props.catalogId} {category} {mode} />
+					<CategoryPreview catalogId={props.catalogId} {categoryId} {mode} />
 				</li>
 			{/each}
 			{#if allowAdd}
