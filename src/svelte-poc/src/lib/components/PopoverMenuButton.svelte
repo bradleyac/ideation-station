@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import Button from './Button.svelte';
 	import { computePosition, flip, offset, shift } from '@floating-ui/dom';
 	import { trapFocus } from '@zag-js/focus-trap';
+	import type { Snippet } from 'svelte';
 	import { on } from 'svelte/events';
+	import Button from './Button.svelte';
 
 	const props: {
 		title: string;

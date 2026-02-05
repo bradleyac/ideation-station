@@ -1,25 +1,14 @@
 <script lang="ts">
-	import Collapse from '$lib/components/Collapse.svelte';
-	import IdeaPreview from './ideas/IdeaPreview.svelte';
-	import TextTicker from '$lib/components/TextTicker.svelte';
-	import IdeaForm from './ideas/IdeaForm.svelte';
-	import CategoryPreview from './categories/CategoryPreview.svelte';
-	import Modal from '$lib/components/Modal.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import CategoryForm from './categories/CategoryForm.svelte';
-	import { type Idea as IdeaT } from '$lib/types.js';
-	import { invalidateAll } from '$app/navigation';
-	import Idea from './ideas/Idea.svelte';
-	import IdeaMenu from './ideas/IdeaMenu.svelte';
-	import IdeaList from './ideas/IdeaList.svelte';
-	import CategoryList from './categories/CategoryList.svelte';
-	import type { ActionResult } from '@sveltejs/kit';
 	import { enhance } from '$app/forms';
-	import CatalogForm from '../CatalogForm.svelte';
-	import { fromEventPattern } from 'rxjs';
+	import { invalidateAll } from '$app/navigation';
+	import Button from '$lib/components/Button.svelte';
 	import CategoryDndZone from '$lib/components/dnd/CategoryDndZone.svelte';
-	import { getIdeas } from '$lib/remotes/idea.remote.js';
 	import DeleteIdeaDndZone from '$lib/components/dnd/DeleteIdeaDndZone.svelte';
+	import Modal from '$lib/components/Modal.svelte';
+	import type { ActionResult } from '@sveltejs/kit';
+	import CatalogForm from '../CatalogForm.svelte';
+	import CategoryForm from './categories/CategoryForm.svelte';
+	import IdeaForm from './ideas/IdeaForm.svelte';
 
 	const { data, params, ...props } = $props();
 	const aspirationsCategoryId = $derived(

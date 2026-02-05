@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
-	import type { Catalog } from '$lib/types';
 	import '../app.css';
 
 	let { children } = $props();

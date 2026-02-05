@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Button from '$lib/components/Button.svelte';
-	import Idea from './Idea.svelte';
-	import { type Idea as IdeaT } from '$lib/types';
 	import { invalidateAll } from '$app/navigation';
+	import Button from '$lib/components/Button.svelte';
+	import { type Idea as IdeaT } from '$lib/types';
+	import Idea from './Idea.svelte';
 	let props = $props();
 
 	function hideMenu() {

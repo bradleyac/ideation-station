@@ -1,5 +1,5 @@
-import { error, type RequestEvent } from "@sveltejs/kit";
 import { env } from '$env/dynamic/private';
+import { error } from "@sveltejs/kit";
 
 export default function getUserId(platform?: Readonly<App.Platform>) {
   if (import.meta.env.DEV) {

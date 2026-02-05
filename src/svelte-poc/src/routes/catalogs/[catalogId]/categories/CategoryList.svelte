@@ -1,13 +1,13 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import Button from '$lib/components/Button.svelte';
 	import Collapse from '$lib/components/Collapse.svelte';
-	import { type Category, type CategoryFull } from '$lib/types';
-	import { flip } from 'svelte/animate';
-	import CategoryPreview from './CategoryPreview.svelte';
-	import Tooltip from '$lib/components/Tooltip.svelte';
-	import CategoryMenu from './CategoryMenu.svelte';
-	import { enhance } from '$app/forms';
 	import PopoverMenuButton from '$lib/components/PopoverMenuButton.svelte';
+	import Tooltip from '$lib/components/Tooltip.svelte';
+	import { type CategoryFull } from '$lib/types';
+	import { flip } from 'svelte/animate';
+	import CategoryMenu from './CategoryMenu.svelte';
+	import CategoryPreview from './CategoryPreview.svelte';
 
 	const {
 		categories,

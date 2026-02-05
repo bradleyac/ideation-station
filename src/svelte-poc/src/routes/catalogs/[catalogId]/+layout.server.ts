@@ -1,7 +1,7 @@
-import { db } from "$lib/server/db.svelte";
 import { dev } from "$app/environment";
-import { error, redirect } from "@sveltejs/kit";
+import { db } from "$lib/server/db.svelte";
 import getUserId from "$lib/server/getUserId";
+import { redirect } from "@sveltejs/kit";
 
 export async function load({ depends, params, platform }) {
   depends("data:ideas");

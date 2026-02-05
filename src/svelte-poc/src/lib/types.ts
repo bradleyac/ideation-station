@@ -26,4 +26,4 @@ interface CategoryFull {
   ideaIds: string[];
 }
 
-export type { Catalog, Idea, Category, CategoryFull };
+export type { Catalog, Category, CategoryFull, Idea };

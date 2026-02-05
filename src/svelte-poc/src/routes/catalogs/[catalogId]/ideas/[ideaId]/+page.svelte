@@ -1,18 +1,14 @@
 <script lang="ts">
-	import { type Category, type Idea as IdeaT } from '$lib/types.js';
-	import Idea from '../Idea.svelte';
-	import IdeaPreview from '../IdeaPreview.svelte';
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
-	import Collapse from '$lib/components/Collapse.svelte';
-	import IdeaForm from '../IdeaForm.svelte';
-	import CategoryPreview from '../../categories/CategoryPreview.svelte';
-	import Modal from '$lib/components/Modal.svelte';
-	import { redirect, type ActionResult } from '@sveltejs/kit';
+	import { goto, invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
-	import IdeaList from '../IdeaList.svelte';
-	import CategoryList from '../../categories/CategoryList.svelte';
-	import CategoryDndZone from '$lib/components/dnd/CategoryDndZone.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 	import { getIdeas } from '$lib/remotes/idea.remote.js';
+	import { type Idea as IdeaT } from '$lib/types.js';
+	import { type ActionResult } from '@sveltejs/kit';
+	import CategoryPreview from '../../categories/CategoryPreview.svelte';
+	import Idea from '../Idea.svelte';
+	import IdeaForm from '../IdeaForm.svelte';
+	import IdeaList from '../IdeaList.svelte';
 	const { data, params } = $props();
 
 	const allIdeas = $derived(await getIdeas(params.catalogId));

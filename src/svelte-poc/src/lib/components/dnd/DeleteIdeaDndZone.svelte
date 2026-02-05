@@ -1,10 +1,9 @@
 <script lang="ts">
-	import type { CategoryFull, Idea } from '$lib/types';
-	import { dndzone, type DndEvent, TRIGGERS, dragHandleZone, dragHandle } from 'svelte-dnd-action';
-	import IdeaPreview from '../../../routes/catalogs/[catalogId]/ideas/IdeaPreview.svelte';
-	import { flip } from 'svelte/animate';
 	import { deleteIdea, getIdeas } from '$lib/remotes/idea.remote';
-	import { fade } from 'svelte/transition';
+	import type { Idea } from '$lib/types';
+	import { TRIGGERS, dragHandle, dragHandleZone, type DndEvent } from 'svelte-dnd-action';
+	import { flip } from 'svelte/animate';
+	import IdeaPreview from '../../../routes/catalogs/[catalogId]/ideas/IdeaPreview.svelte';
 
 	let props: { catalogId: string } = $props();
 

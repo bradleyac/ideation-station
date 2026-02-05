@@ -1,15 +1,15 @@
 <script lang="ts">
-	import type { Category, CategoryFull, Idea } from '$lib/types.js';
-	import IdeaForm from '../../ideas/IdeaForm.svelte';
-	import TextTicker from '$lib/components/TextTicker.svelte';
+	import { goto, invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import { goto, invalidateAll } from '$app/navigation';
-	import IdeaList from '../../ideas/IdeaList.svelte';
-	import type { ActionResult } from '@sveltejs/kit';
-	import CategoryForm from '../CategoryForm.svelte';
-	import { tick } from 'svelte';
+	import TextTicker from '$lib/components/TextTicker.svelte';
 	import { getIdeas } from '$lib/remotes/idea.remote.js';
+	import type { CategoryFull, Idea } from '$lib/types.js';
+	import type { ActionResult } from '@sveltejs/kit';
+	import { tick } from 'svelte';
+	import IdeaForm from '../../ideas/IdeaForm.svelte';
+	import IdeaList from '../../ideas/IdeaList.svelte';
+	import CategoryForm from '../CategoryForm.svelte';
 
 	const { data, params } = $props();
 

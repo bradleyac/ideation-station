@@ -1,6 +1,6 @@
-import gremlin from 'gremlin';
-import { type Category, type CategoryFull, type Idea, type Catalog } from "../types.js";
 import { env } from '$env/dynamic/private';
+import gremlin from 'gremlin';
+import { type Catalog, type CategoryFull, type Idea } from "../types.js";
 
 // Azure CosmosDB doesn't support gremlin bytecode, so all queries must be submitted as text!
 class Db {
@@ -436,4 +436,4 @@ class Db {
 }
 
 const db = new Db();
-export { type Db, db };
+export { db, type Db };

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 	import Collapse from '$lib/components/Collapse.svelte';
+	import Tooltip from '$lib/components/Tooltip.svelte';
 	import { type Idea as IdeaT } from '$lib/types';
 	import { flip } from 'svelte/animate';
+	import { fade } from 'svelte/transition';
 	import IdeaMenu from './IdeaMenu.svelte';
 	import IdeaPreview from './IdeaPreview.svelte';
-	import Tooltip from '$lib/components/Tooltip.svelte';
-	import { fade } from 'svelte/transition';
 
 	const props: {
 		ideas: IdeaT[];

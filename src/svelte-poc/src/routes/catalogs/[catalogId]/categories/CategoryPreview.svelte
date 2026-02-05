@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Category, CategoryFull } from '$lib/types';
+	import type { CategoryFull } from '$lib/types';
 
 	const {
 		category,

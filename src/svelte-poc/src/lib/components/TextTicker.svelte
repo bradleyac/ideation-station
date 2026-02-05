@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { on } from 'svelte/events';
 	import { onMount } from 'svelte';
+	import { on } from 'svelte/events';
 	import { fade } from 'svelte/transition';
 
 	const { labels, period } = $props();
