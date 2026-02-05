@@ -29,11 +29,8 @@
 	let showModal = $state(false);
 	let modalKey = $state(0);
 	let whichModal = $state<'edit' | 'category' | 'idea'>('edit');
-	let catalog = $derived(data.catalogs.find((c) => c.id === params.catalogId));
 	let sortedCategories = $derived(data.categories.toSorted((a, b) => (a.name > b.name ? 1 : -1)));
-	let connections = $derived(!!catalog?.settings?.connections);
-
-	$inspect(connections);
+	let connections = $derived(data.catalog.settings?.connections ?? false);
 
 	function enhanceCallback(): ({
 		update,
@@ -61,15 +58,15 @@
 		{:else if whichModal === 'category'}
 			<CategoryForm catalogId={params.catalogId} {enhanceCallback} />
 		{:else if whichModal === 'edit'}
-			<CatalogForm existingCatalog={catalog} {enhanceCallback} />
+			<CatalogForm existingCatalog={data.catalog} {enhanceCallback} />
 		{/if}
 	{/key}
 </Modal>
 
-{#if catalog}
+{#if data.catalog}
 	<section class="flex flex-col gap-4 m-3">
-		<h1>{catalog.name}</h1>
-		<pre>{catalog.desc}</pre>
+		<h1>{data.catalog.name}</h1>
+		<pre>{data.catalog.desc}</pre>
 
 		<div class="flex flex-wrap gap-2">
 			<Button
