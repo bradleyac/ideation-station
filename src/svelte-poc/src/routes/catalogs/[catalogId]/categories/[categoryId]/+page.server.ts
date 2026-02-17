@@ -12,6 +12,6 @@ export const actions = {
 
     if (name === '') error(400);
 
-    await db.updateCategory(userId, { id: event.params.categoryId, name, desc, ideaIds: [] });
+    await db.updateCategory(userId, { id: event.params.categoryId, name, desc });
   },
 };

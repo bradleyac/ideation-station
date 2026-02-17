@@ -24,6 +24,7 @@ interface CategoryFull {
   name: string;
   desc: string;
   ideaIds: string[];
+  isSystemCategory: boolean | undefined;
 }
 
 export type { Catalog, Category, CategoryFull, Idea };

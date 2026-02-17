@@ -1,63 +1,47 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import { getCatalogIds } from '$lib/remotes/catalog.remote';
-	import type { ActionResult } from '@sveltejs/kit';
+	import { getCatalogIds, upsertCatalog } from '$lib/remotes/catalog.remote';
 	import CatalogForm from './CatalogForm.svelte';
 	import CatalogPreview from './CatalogPreview.svelte';
 
 	const { params, data, ...props } = $props();
 	let showModal = $state(false);
-	let catalogKey = $state(0);
 
-	function enhanceCallback(): ({
-		update,
-		result
-	}: {
-		update: () => Promise<void>;
-		result: ActionResult;
-	}) => Promise<void> {
-		return async ({ update, result }) => {
-			if (result?.type === 'success') {
-				showModal = false;
-				await invalidateAll();
-			}
-			await update();
-		};
+	async function enhanceCallback(
+		opts: Parameters<Parameters<typeof upsertCatalog.enhance>[0]>[0]
+	): Promise<void> {
+		await opts.submit();
+		opts.form.reset();
+		showModal = false;
 	}
 </script>
 
 <svelte:head><title>Idea Catalogs</title></svelte:head>
 
 <Modal bind:showModal>
-	{#key catalogKey}
-		<CatalogForm {enhanceCallback} />
-	{/key}
+	<CatalogForm {enhanceCallback} />
 </Modal>
 
-<section class="flex flex-col gap-4 m-3">
+<section class="grid grid-cols-1 grid-rows-[auto_auto_1fr] gap-4 m-3 h-full">
 	<h1>Idea Catalogs</h1>
 
 	<div class="flex gap-2">
 		<Button
 			onclick={() => {
 				showModal = !showModal;
-				catalogKey++;
 			}}
 			title="Create Catalog"><i class="block fi fi-rr-add"></i>New Catalog</Button
 		>
 	</div>
 
-	{#await getCatalogIds()}
-		Loading...
-	{:then catalogIds}
-		<div
-			class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-max sm:auto-rows-fr gap-4"
-		>
-			{#each catalogIds as catalogId (catalogId)}
+	<div
+		class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grid-rows-4 gap-4 h-full w-full"
+	>
+		<svelte:boundary>
+			{#each await getCatalogIds() as catalogId (catalogId)}
 				<CatalogPreview {catalogId} />
 			{/each}
-		</div>
-	{/await}
+		</svelte:boundary>
+	</div>
 </section>

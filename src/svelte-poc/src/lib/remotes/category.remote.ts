@@ -1,4 +1,4 @@
-import { command, getRequestEvent, query } from "$app/server";
+import { command, form, getRequestEvent, query } from "$app/server";
 import { db } from "$lib/server/db.svelte";
 import getUserId from "$lib/server/getUserId";
 import * as v from 'valibot';
@@ -38,6 +38,8 @@ export const getCategory = query.batch(v.string(), async (categoryIds) => {
   const categories = await db.getCategoriesByIds(userId, categoryIds);
   const lookup = new Map(categories.map((c => [c.id, c])));
 
+  // await new Promise(resolve => setTimeout(resolve, 3000));
+
   return (categoryId) => lookup.get(categoryId);
 });
 
@@ -49,9 +51,32 @@ export const updateCategory = command(v.object({
   const event = getRequestEvent();
   const userId = getUserId(event.platform);
 
-  await db.updateCategory(userId, { ...category, ideaIds: [] });
+  await db.updateCategory(userId, { ...category });
 
   getCategory(category.id).refresh();
+})
+
+export const upsertCategory = form(v.object({
+  id: v.optional(v.string()),
+  name: v.string(),
+  desc: v.string(),
+  catalogId: v.string(),
+}), async (category) => {
+  const event = getRequestEvent();
+  const userId = getUserId(event.platform);
+
+  if (category.id) {
+    let toUpdate = { ...category, id: category.id! };
+    await db.updateCategory(userId, toUpdate)
+    getCategory(category.id).refresh();
+    getAllCategoryMetadata(category.catalogId).refresh();
+  }
+  else {
+    const id = crypto.randomUUID();
+    await db.createCategory(userId, category.catalogId, { ...category, id });
+    getCategoryIds(category.catalogId).refresh();
+    getAllCategoryMetadata(category.catalogId).refresh();
+  }
 })
 
 export const deleteCategory = command(v.object({ catalogId: v.string(), categoryId: v.string() }), async ({ catalogId, categoryId }) => {

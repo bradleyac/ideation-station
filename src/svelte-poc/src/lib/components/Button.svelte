@@ -34,13 +34,9 @@
 	{...props}
 	class={[
 		roundedClass,
-		'p-2',
 		'w-max',
-		'place-items-center',
-		'gap-2',
+		'h-full',
 		'flex',
-		'flex-row',
-		'place-content-center',
 		props.disabled && 'opacity-50',
 		colorScheme === 'eucalyptus' && 'bg-eucalyptus-400 dark:bg-eucalyptus-600',
 		props.disabled ||
@@ -50,5 +46,7 @@
 		props.class
 	]}
 >
-	{@render props.children?.()}
+	<div class="flex flex-row place-content-center place-items-center gap-2 p-2 w-full h-[44px]">
+		{@render props.children?.()}
+	</div>
 </button>

@@ -7,17 +7,17 @@
 
 	let props: { catalogId: string } = $props();
 
-	let ideaIds: { ideaId: string }[] = $state([]);
+	let ideaIds: { id: string }[] = $state([]);
 
-	function onConsider(e: CustomEvent<DndEvent<{ ideaId: string }>>) {
+	function onConsider(e: CustomEvent<DndEvent<{ id: string }>>) {
 		ideaIds = e.detail.items;
 	}
-	function onFinalize(e: CustomEvent<DndEvent<{ ideaId: string }>>) {
+	function onFinalize(e: CustomEvent<DndEvent<{ id: string }>>) {
 		if (e.detail.info.trigger === TRIGGERS.DROPPED_INTO_ZONE) {
 			// TODO: Confirm and put it back if declined?
 			ideaIds = e.detail.items;
-			deleteIdea(ideaIds[0].ideaId).updates(
-				getIdea(ideaIds[0].ideaId).withOverride((current) => undefined)
+			deleteIdea(ideaIds[0].id).updates(
+				getIdea(ideaIds[0].id).withOverride((current) => undefined)
 			);
 			ideaIds = [];
 		}
@@ -49,7 +49,7 @@
 		onfinalize={onFinalize}
 		class="flex flex-row flex-wrap divide-y outline rounded-sm overflow-y-auto overflow-x-hidden h-full place-items-start place-content-start -outline-offset-1"
 	>
-		{#each ideaIds as { ideaId } (ideaId)}
+		{#each ideaIds as { id } (id)}
 			<li
 				class="flex relative -outline-offset-1 w-full overflow-hidden"
 				out:fade={{ duration: 300 }}
@@ -62,7 +62,7 @@
 					>
 						<i class="text-2xl leading-2 fi fi-ts-grip-dots-vertical"></i>
 					</div>
-					<IdeaPreview {ideaId} catalogId={props.catalogId} />
+					<IdeaPreview ideaId={id} catalogId={props.catalogId} />
 				</div>
 			</li>
 		{/each}

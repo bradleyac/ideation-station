@@ -1,32 +1,38 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
+	import Spinner from '$lib/components/Spinner.svelte';
+	import { getCatalog } from '$lib/remotes/catalog.remote';
+	import { getCategory } from '$lib/remotes/category.remote';
+	import { getIdea } from '$lib/remotes/idea.remote';
 	import '../app.css';
 
 	let { children } = $props();
 
 	const route = $derived(page.route);
-	const catalogName = $derived(page.data.catalog?.name);
-	const categoryName = $derived(page.data.category?.name);
-	const ideaName = $derived(page.data.idea?.name);
-	const catalogId = $derived(page.data.catalog?.id);
 	const catalogs = $derived(page.data.catalogs);
-	// TODO: List out the catalogs in a menu
-	interface Page {
-		path: string;
-		name: string;
-		subpages: Page[] | string[];
-	}
+	const getCatalogPromise = $derived(
+		page.params.catalogId ? getCatalog(page.params.catalogId) : undefined
+	);
+	const getCategoryPromise = $derived(
+		page.params.categoryId ? getCategory(page.params.categoryId) : undefined
+	);
+	const getIdeaPromise = $derived(page.params.ideaId ? getIdea(page.params.ideaId) : undefined);
+	const catalogName = $derived(page.params.catalogId ? (await getCatalogPromise)?.name : undefined);
+	const categoryName = $derived(
+		page.params.categoryId ? (await getCategoryPromise)?.name : undefined
+	);
+	const ideaName = $derived(page.params.ideaId ? (await getIdeaPromise)?.name : undefined);
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div>
+<div class="h-svh flex flex-col">
 	<nav
 		data-sveltekit-reload
-		class="p-3 h-12 content-center sticky top-0 z-1 bg-gray-50 dark:bg-gray-900 shadow-black/30 shadow-xs"
+		class="p-3 h-(--nav-height) content-center sticky top-0 z-1 bg-gray-50 dark:bg-gray-900 shadow-black/30 shadow-xs"
 	>
 		<ul class="p-0 m-0 list-none flex gap-4 relative">
 			<li class="block border-black">
@@ -59,7 +65,7 @@
 					{#if route.id === '/catalogs/[catalogId]'}
 						<span class="border-b-2 border-eucalyptus-500">{catalogName}</span>
 					{:else}
-						<a href="/catalogs/{catalogId}">{catalogName}</a>
+						<a href="/catalogs/{page.params.catalogId}">{catalogName}</a>
 						/
 						{#if route.id === '/catalogs/[catalogId]/categories/[categoryId]'}
 							<span class="border-b-2 border-eucalyptus-500">Category: {categoryName}</span>
@@ -71,7 +77,13 @@
 			</li>
 		</ul>
 	</nav>
-	<div>
-		{@render children()}
+	<div class="h-[calc(100%_-_calc(var(--spacing)_*_var(--nav-height)_*_1.5))]">
+		<svelte:boundary>
+			{#snippet pending()}
+				<Spinner />
+			{/snippet}
+
+			{@render children()}
+		</svelte:boundary>
 	</div>
 </div>

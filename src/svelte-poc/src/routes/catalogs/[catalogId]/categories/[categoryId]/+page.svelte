@@ -13,7 +13,17 @@
 
 	const { params } = $props();
 
-	let category = $derived(await getCategory(params.categoryId));
+	let showModal = $state(false);
+	let whichModal = $state<'idea' | 'edit'>('edit');
+	let modalKey = $state(0);
+
+	let categoryPromise = $derived(getCategory(params.categoryId));
+	let categoryIdeaIdsPromise = $derived(getCategoryIdeaIds(params.categoryId));
+
+	$inspect(categoryPromise, categoryIdeaIdsPromise);
+
+	let category = $derived(await categoryPromise);
+	let categoryIdeaIds = $derived(await categoryIdeaIdsPromise);
 
 	async function deleteCategory(category?: CategoryFull) {
 		if (!category) return;
@@ -21,8 +31,7 @@
 			await fetch(`/catalogs/${params.catalogId}/categories/${category.id}`, {
 				method: 'DELETE'
 			});
-			await goto(`/catalogs/${params.catalogId}`);
-			await invalidateAll();
+			await goto(`/catalogs/${params.catalogId}`, { invalidateAll: true });
 		}
 	}
 
@@ -53,10 +62,6 @@
 			await update();
 		};
 	}
-
-	let showModal = $state(false);
-	let whichModal = $state<'idea' | 'edit'>('edit');
-	let modalKey = $state(0);
 </script>
 
 <svelte:head><title>{category?.name}</title></svelte:head>
@@ -72,74 +77,65 @@
 		{:else}
 			<CategoryForm
 				catalogId={params.catalogId}
-				existingCategorId={params.categoryId}
-				{enhanceCallback}
+				existingCategoryId={params.categoryId}
+				enhanceCallback={async (opts) => {
+					await opts.submit();
+					showModal = false;
+				}}
 			/>
 		{/if}
 	{/key}
 </Modal>
 
 {#key params.categoryId}
-	{#await category}
-		Loading...
-	{:then category}
-		{#if category}
-			<!-- <div class="fixed z-2 top-2.5 right-4 invisible lg:visible">
+	{#if category}
+		<!-- <div class="fixed z-2 top-2.5 right-4 invisible lg:visible">
 			<TextTicker labels={relatedIdeas.map((idea) => idea.name)} period={5000} />
 		</div> -->
 
-			<section class="flex flex-col gap-4 m-3">
-				<h1>{category.name}</h1>
-				<pre>{category.desc}</pre>
-				<div class="flex flex-wrap gap-2">
-					<Button
-						type="button"
-						title="Edit Category"
-						onclick={() => {
-							showModal = true;
-							whichModal = 'edit';
-							modalKey++;
-						}}><i class="fi fi-rr-edit"></i>Edit Category</Button
+		<section class="flex flex-col gap-4 m-3">
+			<h1>{category.name}</h1>
+			<pre>{category.desc}</pre>
+			<div class="flex flex-wrap gap-2">
+				<Button
+					title="Edit Category"
+					onclick={() => {
+						showModal = true;
+						whichModal = 'edit';
+						modalKey++;
+					}}><i class="fi fi-rr-edit"></i>Edit Category</Button
+				>
+
+				<Button
+					onclick={() => {
+						showModal = true;
+						whichModal = 'idea';
+						modalKey++;
+					}}
+					title="Create Idea"><i class="block fi fi-rr-add"></i>New Idea</Button
+				>
+
+				<Button onclick={() => deleteCategoryIdeas(category)} title="Delete All Ideas"
+					><i class="fi fi-rr-trash"></i>Delete All Ideas</Button
+				>
+
+				{#if params.categoryId !== 'Uncategorized'}
+					<Button onclick={() => deleteCategory(category)} title="Delete Category"
+						><i class="fi fi-rr-trash"></i>Delete Category</Button
 					>
+				{/if}
+			</div>
 
-					<Button
-						class="flex place-items-center w-max p-2"
-						onclick={() => {
-							showModal = true;
-							whichModal = 'idea';
-							modalKey++;
-						}}
-						title="Create Idea"><i class="block fi fi-rr-add"></i>New Idea</Button
-					>
-
-					<Button
-						class="flex place-items-center w-max p-2"
-						onclick={() => deleteCategoryIdeas(category)}
-						title="Delete All Ideas"><i class="fi fi-rr-trash"></i>Delete All Ideas</Button
-					>
-
-					{#if params.categoryId !== 'Uncategorized'}
-						<Button
-							class="flex place-items-center w-max p-2"
-							onclick={() => deleteCategory(category)}
-							title="Delete Category"><i class="fi fi-rr-trash"></i>Delete Category</Button
-						>
-					{/if}
-				</div>
-
-				{#await getCategoryIdeaIds(params.categoryId)}
-					Loading...
-				{:then relatedIdeaIds}
-					<IdeaList
-						catalogId={params.catalogId}
-						title="Contained Ideas"
-						ideaIds={relatedIdeaIds}
-						categoryId={params.categoryId}
-					/>
-				{/await}
-			</section>
-		{:else}
-			Category not found.
-		{/if}
-	{/await}
+			{#if categoryIdeaIds}
+				<IdeaList
+					catalogId={params.catalogId}
+					title="Contained Ideas"
+					ideaIds={categoryIdeaIds}
+					categoryId={params.categoryId}
+				/>
+			{/if}
+		</section>
+	{:else}
+		Category not found.
+	{/if}
 {/key}

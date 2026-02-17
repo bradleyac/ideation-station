@@ -9,15 +9,17 @@
 		affix?: string;
 	} = $props();
 	let mode = $derived(props.mode ?? 'default');
+	let idea = $derived(await getIdea(props.ideaId));
+
+	const sharedClasses =
+		'h-max inline-block text-ellipsis whitespace-nowrap overflow-hidden w-full shadow-sm bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800';
 </script>
 
-{#await getIdea(props.ideaId)}
-	Loading...
-{:then idea}
+<svelte:boundary>
 	{#if idea}
 		{#if mode === 'default'}
 			<a
-				class="h-max inline-block text-ellipsis whitespace-nowrap overflow-hidden w-full shadow-amber-500/30 shadow-sm px-4 py-3 bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800"
+				class={[sharedClasses, 'px-4 py-3']}
 				tabindex="0"
 				href="/catalogs/{props.catalogId}/ideas/{idea.id}"
 				data-id={idea.id}
@@ -32,7 +34,7 @@
 			</a>
 		{:else if mode === 'compact'}
 			<a
-				class="h-max inline-block p-2 px-3 text-ellipsis whitespace-nowrap overflow-hidden w-full bg-eucalyptus-400 hover:bg-eucalyptus-300 active:bg-eucalyptus-500 dark:bg-eucalyptus-600 dark:hover:bg-eucalyptus-700 dark:active:bg-eucalyptus-800"
+				class={[sharedClasses, 'p-2 px-3']}
 				href="/catalogs/{props.catalogId}/ideas/{idea.id}"
 				data-id={idea.id}
 			>
@@ -46,6 +48,6 @@
 			</a>
 		{/if}
 	{:else}
-		Idea not found.
+		<p class={[sharedClasses, 'px-4 py-3']}>Idea not found.</p>
 	{/if}
-{/await}
+</svelte:boundary>

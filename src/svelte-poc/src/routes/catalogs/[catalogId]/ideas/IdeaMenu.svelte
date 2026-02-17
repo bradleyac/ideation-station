@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
-	import { type Idea as IdeaT } from '$lib/types';
+	import { getIdea } from '$lib/remotes/idea.remote';
 	import Idea from './Idea.svelte';
 	let props = $props();
+	let idea = $derived(await getIdea(props.ideaId));
 
 	function hideMenu() {
 		props.close();
 	}
 
-	async function deleteIdea(idea: IdeaT) {
+	async function deleteIdea() {
+		if (!idea) return;
 		if (confirm(`Really delete "${idea.name}"?`)) {
 			await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}`, {
 				method: 'DELETE'
@@ -19,7 +21,8 @@
 		}
 	}
 
-	async function linkCategory(idea: IdeaT, categoryId: string) {
+	async function linkCategory(categoryId: string) {
+		if (!idea) return;
 		await fetch(`/catalog/${props.catalogId}/ideas/${idea.id}/categories/${categoryId}`, {
 			method: 'PUT'
 		});
@@ -27,7 +30,8 @@
 		invalidateAll();
 	}
 
-	async function unlinkCategory(idea: IdeaT, categoryId: string) {
+	async function unlinkCategory(categoryId: string) {
+		if (!idea) return;
 		if (confirm(`Really remove "${idea.name}" from category?`)) {
 			await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}/categories/${categoryId}`, {
 				method: 'DELETE'
@@ -37,7 +41,8 @@
 		}
 	}
 
-	async function linkIdea(idea: IdeaT, otherIdea: { id: string; related: boolean }) {
+	async function linkIdea(otherIdea: { id: string; related: boolean }) {
+		if (!idea) return;
 		await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}/related/${otherIdea?.id}`, {
 			method: 'PUT'
 		});
@@ -45,7 +50,8 @@
 		invalidateAll();
 	}
 
-	async function unlinkIdea(idea: IdeaT, otherIdea: { id: string; related: boolean }) {
+	async function unlinkIdea(otherIdea: { id: string; related: boolean }) {
+		if (!idea) return;
 		await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}/related/${otherIdea?.id}`, {
 			method: 'DELETE'
 		});
@@ -73,7 +79,7 @@
 				title="Delete Idea"
 				onclick={(e: Event) => {
 					e.stopPropagation();
-					deleteIdea(props.idea);
+					deleteIdea();
 				}}
 			>
 				<i class="fi fi-rr-trash"></i>
@@ -84,7 +90,7 @@
 						title="Remove From Category"
 						onclick={(e: Event) => {
 							e.stopPropagation();
-							unlinkCategory(props.idea, props.categoryId);
+							unlinkCategory(props.categoryId);
 						}}
 					>
 						<i class="fi fi-rr-link-slash"></i>
@@ -94,7 +100,7 @@
 						title="Add To Category"
 						onclick={(e: Event) => {
 							e.stopPropagation();
-							linkCategory(props.idea, props.categoryId);
+							linkCategory(props.categoryId);
 						}}
 					>
 						<i class="fi fi-rr-link"></i>
@@ -108,7 +114,7 @@
 						title="Unlink Related Idea"
 						onclick={(e: Event) => {
 							e.stopPropagation();
-							unlinkIdea(props.idea, props.otherIdea);
+							unlinkIdea(props.otherIdea);
 						}}
 					>
 						<i class="fi fi-rr-link-slash"></i>
@@ -119,7 +125,7 @@
 						title="Link Related Idea"
 						onclick={(e: Event) => {
 							e.stopPropagation();
-							linkIdea(props.idea, props.otherIdea);
+							linkIdea(props.otherIdea);
 						}}
 					>
 						<i class="fi fi-rr-link"></i>

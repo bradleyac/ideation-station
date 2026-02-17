@@ -9,6 +9,8 @@ export const getIdeaIds = query(v.string(), async (catalogId) => {
 
   const ideaIds = await db.getAllIdeaIds(userId, catalogId);
 
+  // await new Promise((resolve) => setTimeout(resolve, 3000));
+
   return ideaIds;
 });
 
@@ -26,6 +28,7 @@ export const getRelatedIdeaIds = query(v.string(), async (ideaId) => {
   const userId = getUserId(event.platform);
 
   const ideaIds = await db.getRelatedIdeaIds(userId, ideaId);
+  // await new Promise((resolve) => setTimeout(resolve, 3000));
 
   return ideaIds;
 });
@@ -35,6 +38,7 @@ export const getUnrelatedIdeaIds = query(v.string(), async (ideaId) => {
   const userId = getUserId(event.platform);
 
   const ideaIds = await db.getUnrelatedIdeaIds(userId, ideaId);
+  // await new Promise((resolve) => setTimeout(resolve, 3000));
 
   return ideaIds;
 });

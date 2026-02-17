@@ -75,6 +75,10 @@
 			timeoutId = setTimeout(async () => {
 				currentId = id;
 				visible = true;
+				// TODO: Fix this shenanigan.
+				// This is a workaround to ensure that the tooltip height/location is set before calling update.
+				// Otherwise it renders in the wrong position.
+				await tick();
 				await tick();
 				await tick();
 				update(evt.target as HTMLElement);

@@ -1,88 +1,55 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import Button from '$lib/components/Button.svelte';
-	import { getCategory } from '$lib/remotes/category.remote';
-	import type { ActionResult } from '@sveltejs/kit';
-	let props = $props();
-	const {
-		enhanceCallback,
-		catalogId
-	}: {
+	import { getCategory, upsertCategory } from '$lib/remotes/category.remote';
+	const props: {
 		catalogId: string;
 		existingCategoryId?: string;
-		enhanceCallback?: () => ({
-			update,
-			result
-		}: {
-			update: () => Promise<void>;
-			result: ActionResult;
-		}) => Promise<void>;
-	} = props;
+		enhanceCallback?: Parameters<typeof upsertCategory.enhance>[0];
+	} = $props();
 	let title = $derived(props.existingCategoryId ? 'Edit Category' : 'Create New Category');
-	let action = $derived(
-		props.existingCategoryId
-			? `/catalogs/${catalogId}/categories/${props.existingCategoryId}`
-			: `/catalogs/${catalogId}/categories`
-	);
 
 	let existingCategory = $derived(
 		props.existingCategoryId ? await getCategory(props.existingCategoryId) : undefined
 	);
 
-	let formKey = $state(0);
+	const { id, name, desc, catalogId } = upsertCategory.fields;
 </script>
 
-{#key formKey}
-	{#await existingCategory}
-		Loading...
-	{:then existingCategory}
-		<form
-			class="flex flex-col overflow-clip min-[32rem]:rounded-sm w-full max-w-lg"
-			method="POST"
-			{action}
-			use:enhance={enhanceCallback ??
-				(() => {
-					return async ({ update, result }) => {
-						if (result?.type === 'success') {
-							formKey += 1;
-						}
-						await update({ reset: false });
-					};
-				})}
+<form
+	class="flex flex-col overflow-clip min-[32rem]:rounded-sm w-full max-w-lg"
+	{...upsertCategory.enhance(props.enhanceCallback ?? (async (opts) => await opts.submit()))}
+>
+	<input hidden {...id.as('text')} value={props.existingCategoryId} />
+	<input hidden {...catalogId.as('text')} value={props.catalogId} />
+	<h2 class="bg-eucalyptus-300 dark:bg-eucalyptus-700 p-3">{title}</h2>
+	<div class="bg-neutral-200 dark:bg-neutral-800 p-3 gap-4 flex flex-col">
+		<label>
+			Name
+			<input
+				class="bg-neutral-300 dark:bg-neutral-700"
+				{...name.as('text')}
+				placeholder="Category name"
+				value={existingCategory?.name}
+			/>
+		</label>
+
+		<label>
+			Details
+			<textarea
+				class="bg-neutral-300 dark:bg-neutral-700"
+				{...desc.as('text')}
+				placeholder="Category details"
+				value={existingCategory?.desc}
+			></textarea>
+		</label>
+
+		<Button
+			tabindex="0"
+			type="submit"
+			class="place-self-end"
+			title={existingCategory ? 'Save Category' : 'Create Category'}
 		>
-			<h2 class="bg-eucalyptus-300 dark:bg-eucalyptus-700 p-3">{title}</h2>
-			<div class="bg-neutral-200 dark:bg-neutral-800 p-3 gap-4 flex flex-col">
-				<label>
-					Name
-					<input
-						class="bg-neutral-300 dark:bg-neutral-700"
-						required
-						name="name"
-						type="text"
-						placeholder="Category name"
-						value={existingCategory?.name}
-					/>
-				</label>
-
-				<label>
-					Details
-					<textarea
-						class="bg-neutral-300 dark:bg-neutral-700"
-						required
-						name="desc"
-						placeholder="Category details">{existingCategory?.desc}</textarea
-					>
-				</label>
-
-				<Button
-					tabindex="0"
-					type="submit"
-					class="place-self-end"
-					title={existingCategory ? 'Save Category' : 'Create Category'}
-				>
-					{existingCategory ? 'Save' : 'Create'}
-				</Button>
-			</div>
-		</form>
-	{/await}
-{/key}
+			{existingCategory ? 'Save' : 'Create'}
+		</Button>
+	</div>
+</form>

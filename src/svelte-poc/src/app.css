@@ -28,6 +28,7 @@
 }
 
 body {
+  --nav-height: 12;
   margin: 0;
   color: var(--text-color);
   color: #010101;
@@ -35,11 +36,6 @@ body {
   @media (prefers-color-scheme: dark) {
     color: #e0e0e0;
   }
-}
-
-button .fi {
-  line-height: calc(1em - 3px);
-  display: block;
 }
 
 input {
@@ -64,6 +60,11 @@ button {
     &:disabled {
       cursor: not-allowed;
     }
+  }
+
+  .fi:before {
+    /* This prevents the icon from wiggling during render in Safari */
+    vertical-align: -2px;
   }
 }
 

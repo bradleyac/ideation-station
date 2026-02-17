@@ -2,6 +2,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import Spinner from '$lib/components/Spinner.svelte';
 	import { getIdea, getRelatedIdeaIds, getUnrelatedIdeaIds } from '$lib/remotes/idea.remote.js';
 	import { type Idea as IdeaT } from '$lib/types.js';
 	import { type ActionResult } from '@sveltejs/kit';
@@ -11,9 +12,14 @@
 	import IdeaList from '../IdeaList.svelte';
 	const { params } = $props();
 
-	let idea = $derived(await getIdea(params.ideaId));
-
 	let showModal = $state(false);
+
+	let ideaPromise = $derived(getIdea(params.ideaId));
+	let relatedIdeaIdsPromise = $derived(getRelatedIdeaIds(params.ideaId));
+	let unrelatedIdeaIdsPromise = $derived(getUnrelatedIdeaIds(params.ideaId));
+	let idea = $derived(await ideaPromise);
+	let relatedIdeaIds = $derived(await relatedIdeaIdsPromise);
+	let unrelatedIdeaIds = $derived(await unrelatedIdeaIdsPromise);
 
 	function enhanceCallback(): ({
 		update,
@@ -49,17 +55,18 @@
 		<IdeaForm catalogId={params.catalogId} existingIdeaId={params.ideaId} {enhanceCallback} />
 	{/key}
 </Modal>
-{#await idea}
-	Loading...
-{:then idea}
-	{#if idea}
-		{#key idea.id}
-			<section class="flex flex-col gap-4 m-3">
+<section class="flex flex-col gap-4 m-3">
+	<svelte:boundary>
+		{#snippet pending()}
+			<Spinner />
+		{/snippet}
+		{#if idea}
+			{#key idea.id}
 				<Idea ideaId={params.ideaId} />
 
 				<div class="flex flex-wrap gap-2">
 					<Button type="button" title="Edit Idea" onclick={() => (showModal = !showModal)}
-						><i class="text-lg fi fi-rr-edit"></i> Edit Idea</Button
+						><i class="fi fi-rr-edit"></i> Edit Idea</Button
 					>
 
 					<Button type="button" title="Delete Idea" onclick={() => deleteIdea(idea)}>
@@ -72,31 +79,25 @@
 						<CategoryPreview categoryId={idea.categoryId} catalogId={params.catalogId} />
 					</div>
 				{/if}
-
-				<!-- TODO Is this a waterfall or is it handled correctly? -->
-				{#await getRelatedIdeaIds(params.ideaId)}
-					Loading...
-				{:then ideaIds}
-					<IdeaList
-						catalogId={params.catalogId}
-						title="Related Ideas"
-						{ideaIds}
-						otherIdea={{ id: params.ideaId, related: true }}
-					/>
-				{/await}
-				{#await getUnrelatedIdeaIds(params.ideaId)}
-					Loading...
-				{:then ideaIds}
-					<IdeaList
-						catalogId={params.catalogId}
-						title="Unrelated Ideas"
-						{ideaIds}
-						otherIdea={{ id: params.ideaId, related: false }}
-					/>
-				{/await}
-			</section>
-		{/key}
-	{:else}
-		Idea not found.
-	{/if}
-{/await}
+			{/key}
+		{:else}
+			Idea not found.
+		{/if}
+		{#if relatedIdeaIds}
+			<IdeaList
+				catalogId={params.catalogId}
+				title="Related Ideas"
+				ideaIds={relatedIdeaIds}
+				otherIdea={{ id: params.ideaId, related: true }}
+			/>
+		{/if}
+		{#if unrelatedIdeaIds}
+			<IdeaList
+				catalogId={params.catalogId}
+				title="Unrelated Ideas"
+				ideaIds={unrelatedIdeaIds}
+				otherIdea={{ id: params.ideaId, related: false }}
+			/>
+		{/if}
+	</svelte:boundary>
+</section>
