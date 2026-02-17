@@ -31,7 +31,6 @@
 
 <div class="h-svh flex flex-col">
 	<nav
-		data-sveltekit-reload
 		class="p-3 h-(--nav-height) content-center sticky top-0 z-1 bg-gray-50 dark:bg-gray-900 shadow-black/30 shadow-xs"
 	>
 		<ul class="p-0 m-0 list-none flex gap-4 relative">
