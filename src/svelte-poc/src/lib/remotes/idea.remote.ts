@@ -5,7 +5,7 @@ import * as v from 'valibot';
 
 export const getIdeaIds = query(v.string(), async (catalogId) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const ideaIds = await db.getAllIdeaIds(userId, catalogId);
 
@@ -16,7 +16,7 @@ export const getIdeaIds = query(v.string(), async (catalogId) => {
 
 export const getCategoryIdeaIds = query(v.string(), async (categoryId) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const ideaIds = await db.getCategoryIdeaIds(userId, categoryId);
 
@@ -25,7 +25,7 @@ export const getCategoryIdeaIds = query(v.string(), async (categoryId) => {
 
 export const getRelatedIdeaIds = query(v.string(), async (ideaId) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const ideaIds = await db.getRelatedIdeaIds(userId, ideaId);
   // await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -35,7 +35,7 @@ export const getRelatedIdeaIds = query(v.string(), async (ideaId) => {
 
 export const getUnrelatedIdeaIds = query(v.string(), async (ideaId) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const ideaIds = await db.getUnrelatedIdeaIds(userId, ideaId);
   // await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -45,7 +45,7 @@ export const getUnrelatedIdeaIds = query(v.string(), async (ideaId) => {
 
 export const getIdea = query.batch(v.string(), async (ideaIds) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const ideas = await db.getIdeasByIds(userId, ideaIds);
   const lookup = new Map(ideas.map((c => [c.id, c])));
@@ -60,7 +60,7 @@ export const updateIdea = command(v.object({
   categoryId: v.optional(v.string())
 }), async (idea) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   await db.updateIdea(userId, idea);
 
@@ -69,7 +69,7 @@ export const updateIdea = command(v.object({
 
 export const deleteIdea = command(v.string(), async (ideaId) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   await db.deleteIdea(userId, ideaId);
 })

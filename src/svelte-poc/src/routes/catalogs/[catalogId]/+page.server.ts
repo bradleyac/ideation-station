@@ -3,7 +3,7 @@ import getUserId from "$lib/server/getUserId";
 
 export const actions = {
   loadConnections: async (event) => {
-    const userId = getUserId(event.platform);
+    const userId = getUserId();
 
     async function loadConnections() {
       const today = new Date();

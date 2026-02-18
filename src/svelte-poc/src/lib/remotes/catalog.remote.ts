@@ -5,7 +5,7 @@ import * as v from 'valibot';
 
 export const getCatalogIds = query(async () => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const catalogIds = await db.getAllCatalogIds(userId);
 
@@ -14,7 +14,7 @@ export const getCatalogIds = query(async () => {
 
 export const getCatalog = query.batch(v.string(), async (catalogIds) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const catalogs = await db.getCatalogsByIds(userId, catalogIds);
   const lookup = new Map(catalogs.map((c => [c.id, c])));
@@ -33,7 +33,7 @@ export const upsertCatalog = form(v.object({
   }), { connections: false })
 }), async (catalog) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   if (catalog.id) {
     let toUpdate = { ...catalog, id: catalog.id! };
@@ -49,7 +49,7 @@ export const upsertCatalog = form(v.object({
 
 export const deleteCatalog = command(v.string(), async (catalogId) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   await db.deleteCatalog(userId, catalogId);
   getCatalogIds().refresh();

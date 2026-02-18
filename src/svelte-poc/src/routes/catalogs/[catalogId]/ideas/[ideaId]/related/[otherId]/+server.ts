@@ -3,7 +3,7 @@ import getUserId from "$lib/server/getUserId";
 import { error, type RequestHandler } from "@sveltejs/kit";
 
 export const DELETE: RequestHandler = async ({ params, platform }) => {
-  const userId = getUserId(platform);
+  const userId = getUserId();
   const id = params.ideaId;
   const otherId = params.otherId;
   if (!id || !otherId || id === otherId) error(400);
@@ -13,7 +13,7 @@ export const DELETE: RequestHandler = async ({ params, platform }) => {
 };
 
 export const PUT: RequestHandler = async ({ params, platform }) => {
-  const userId = getUserId(platform);
+  const userId = getUserId();
   const { ideaId, otherId } = params;
   if (!ideaId || !otherId || ideaId === otherId) error(400);
   await db.addRelation(userId, ideaId, otherId);

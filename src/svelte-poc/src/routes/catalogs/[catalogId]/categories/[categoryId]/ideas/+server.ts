@@ -3,7 +3,7 @@ import getUserId from "$lib/server/getUserId";
 import { error, type RequestHandler } from "@sveltejs/kit";
 
 export const DELETE: RequestHandler = async ({ params, platform }) => {
-  const userId = getUserId(platform);
+  const userId = getUserId();
   const { categoryId, catalogId } = params;
   if (!categoryId || !catalogId) error(400);
   if (categoryId === 'Uncategorized') {

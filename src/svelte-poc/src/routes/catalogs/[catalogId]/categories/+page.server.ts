@@ -4,7 +4,7 @@ import { error } from "@sveltejs/kit";
 
 export const actions = {
   default: async (event) => {
-    const userId = getUserId(event.platform);
+    const userId = getUserId();
 
     const data = await event.request.formData();
     const name = data.get('name')?.toString() ?? '';

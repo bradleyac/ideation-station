@@ -5,7 +5,7 @@ import * as v from 'valibot';
 
 export const getCategoryIdeaIds = query(v.string(), async (categoryId) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const ideaIds = await db.getCategoryIdeaIds(userId, categoryId);
 
@@ -15,7 +15,7 @@ export const getCategoryIdeaIds = query(v.string(), async (categoryId) => {
 
 export const getCategoryIds = query(v.string(), async (catalogId) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const categoryIds = await db.getAllCategoryIds(userId, catalogId);
 
@@ -24,7 +24,7 @@ export const getCategoryIds = query(v.string(), async (catalogId) => {
 
 export const getAllCategoryMetadata = query(v.string(), async (catalogId) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const categoryIds = await db.getAllCategoryMetadata(userId, catalogId);
 
@@ -33,7 +33,7 @@ export const getAllCategoryMetadata = query(v.string(), async (catalogId) => {
 
 export const getCategory = query.batch(v.string(), async (categoryIds) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   const categories = await db.getCategoriesByIds(userId, categoryIds);
   const lookup = new Map(categories.map((c => [c.id, c])));
@@ -49,7 +49,7 @@ export const updateCategory = command(v.object({
   desc: v.string(),
 }), async (category) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   await db.updateCategory(userId, { ...category });
 
@@ -63,7 +63,7 @@ export const upsertCategory = form(v.object({
   catalogId: v.string(),
 }), async (category) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   if (category.id) {
     let toUpdate = { ...category, id: category.id! };
@@ -81,7 +81,7 @@ export const upsertCategory = form(v.object({
 
 export const deleteCategory = command(v.object({ catalogId: v.string(), categoryId: v.string() }), async ({ catalogId, categoryId }) => {
   const event = getRequestEvent();
-  const userId = getUserId(event.platform);
+  const userId = getUserId();
 
   await db.deleteCategory(userId, categoryId);
 
