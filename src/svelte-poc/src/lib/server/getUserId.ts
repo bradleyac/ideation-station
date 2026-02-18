@@ -1,11 +1,22 @@
 import { env } from '$env/dynamic/private';
-import { error } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 
-export default function getUserId(platform?: Readonly<App.Platform>) {
+export default function getUserId(platform?: Readonly<App.Platform>, redirectIfNotAuthenticated: boolean = false) {
   if (import.meta.env.DEV) {
     return env.ME; // me!
   }
   else {
-    return platform?.clientPrincipal?.userId ?? error(401);
+    const userId = platform?.clientPrincipal?.userId;
+    if (userId) {
+      return userId;
+    }
+    else {
+      if (redirectIfNotAuthenticated) {
+        redirect(302, '/.auth/login/aad?post_login_redirect_uri=.referrer'); // Redirect to Azure AD login
+      }
+      else {
+        throw error(401, 'Unauthorized');
+      }
+    }
   }
 }
