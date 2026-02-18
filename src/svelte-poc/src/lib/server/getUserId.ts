@@ -1,8 +1,8 @@
 import { env } from '$env/dynamic/private';
 import { error, redirect } from "@sveltejs/kit";
 
-export default function getUserId(platform?: Readonly<App.Platform>, redirectIfNotAuthenticated: boolean = false) {
-  if (import.meta.env.DEV) {
+export default function getUserId(platform?: Readonly<App.Platform>, redirectIfNotAuthenticated: boolean = true) {
+  if (false/*import.meta.env.DEV*/) {
     return env.ME; // me!
   }
   else {
