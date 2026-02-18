@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
+	import Button from '$lib/components/Button.svelte';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import { getAllCatalogMetadata, getCatalog } from '$lib/remotes/catalog.remote';
 	import { getCategory } from '$lib/remotes/category.remote';
@@ -10,7 +12,6 @@
 	let { children } = $props();
 
 	const route = $derived(page.route);
-	const catalogsPromise = $derived(getAllCatalogMetadata());
 	const getCatalogPromise = $derived(
 		page.params.catalogId ? getCatalog(page.params.catalogId) : undefined
 	);
@@ -23,7 +24,14 @@
 		page.params.categoryId ? (await getCategoryPromise)?.name : undefined
 	);
 	const ideaName = $derived(page.params.ideaId ? (await getIdeaPromise)?.name : undefined);
-	const catalogs = $derived(await catalogsPromise);
+	const catalogs = $derived(await getAllCatalogMetadata());
+
+	// Invalidate the catalogs list whenever navigation occurs to ensure it doesn't stay open.
+	let invalidationKey = $state(0);
+
+	afterNavigate(() => {
+		invalidationKey += 1;
+	});
 </script>
 
 <svelte:head>
@@ -43,23 +51,48 @@
 				{/if}
 			</li>
 			<li class="flex gap-2 last:overflow-hidden block border-black">
-				<div class="group">
-					<a href="/catalogs">Idea Catalogs</a>
-					{#if catalogs}
-						<ul
-							class="hidden absolute rounded-sm group-hover:flex z-1 flex-col gap-1 p-2 bg-gray-100 dark:bg-gray-800"
-						>
-							{#each catalogs as catalog (catalog.id)}
-								<li class="w-full flex">
-									<a
-										class="p-2 rounded-sm w-full hover:bg-gray-200 dark:hover:bg-gray-700"
-										href="/catalogs/{catalog.id}">{catalog.name}</a
-									>
-								</li>
-							{/each}
-						</ul>
-					{/if}
-				</div>
+				{#key invalidationKey}
+					<div class="group">
+						<a href="/catalogs">Idea Catalogs</a>
+						<svelte:boundary>
+							{#if catalogs}
+								<ul
+									class="hidden absolute rounded-sm group-hover:flex z-1 flex-col gap-1 p-2 bg-gray-100 dark:bg-gray-800"
+								>
+									{#each catalogs as catalog (catalog.id)}
+										<li class="w-full flex">
+											<a
+												class="p-2 rounded-sm w-full hover:bg-gray-200 dark:hover:bg-gray-700"
+												href="/catalogs/{catalog.id}">{catalog.name}</a
+											>
+										</li>
+									{/each}
+								</ul>
+							{:else}
+								<div
+									class="hidden absolute rounded-sm group-hover:flex z-1 flex-col gap-1 p-2 bg-gray-100 dark:bg-gray-800"
+								>
+									<p>No catalogs available</p>
+								</div>
+							{/if}
+							{#snippet pending()}
+								<div
+									class="hidden absolute rounded-sm group-hover:flex z-1 flex-col gap-1 p-2 bg-gray-100 dark:bg-gray-800"
+								>
+									<p>Loading catalogs...</p>
+								</div>
+							{/snippet}
+							{#snippet failed(error, reset)}
+								<div
+									class="hidden absolute rounded-sm group-hover:flex z-1 flex-col gap-1 p-2 bg-gray-100 dark:bg-gray-800"
+								>
+									<p class="text-red-500">Error loading catalogs</p>
+									<Button onclick={reset}>Retry</Button>
+								</div>
+							{/snippet}
+						</svelte:boundary>
+					</div>
+				{/key}
 				{#if route.id?.startsWith('/catalogs/')}
 					/
 					{#if route.id === '/catalogs/[catalogId]'}
