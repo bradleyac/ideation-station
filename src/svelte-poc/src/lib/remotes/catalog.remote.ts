@@ -12,6 +12,15 @@ export const getCatalogIds = query(async () => {
   return catalogIds;
 });
 
+export const getAllCatalogMetadata = query(async () => {
+  const event = getRequestEvent();
+  const userId = getUserId();
+
+  const categoryIds = await db.getAllCatalogMetadata(userId);
+
+  return categoryIds;
+});
+
 export const getCatalog = query.batch(v.string(), async (catalogIds) => {
   const event = getRequestEvent();
   const userId = getUserId();

@@ -114,6 +114,18 @@ class Db {
     return results._items;
   }
 
+  public async getAllCatalogMetadata(userId: string): Promise<{ id: string, name: string }[]> {
+    const getAllCategoryIdsQuery = `g.V().has('catalog','userid',prop_userId).project('id','name')
+    .by('id')
+    .by('name')`;
+
+    let categoriesResult = await this.submitWithRetry(getAllCategoryIdsQuery, {
+      prop_userId: userId,
+    });
+
+    return categoriesResult._items;
+  };
+
   public async getCatalogsByIds(userId: string, catalogIds: string[]): Promise<Catalog[]> {
     const getCatalogsByIdsQuery = `g.V().has('userid',prop_userId).hasId(within(prop_catalogIds)).project('id','name','desc','settings')
     .by('id')
