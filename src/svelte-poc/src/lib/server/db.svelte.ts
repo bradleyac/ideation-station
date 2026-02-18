@@ -57,9 +57,9 @@ class Db {
       .as('catalog')
       .addV('category')
       .property('userid', prop_userId)
-      .property('name', constant('Uncategorized'))
-      .property('desc', constant('Uncategorized Ideas'))
-      .property('isSystemCategory', constant(true))
+      .property('name', 'Uncategorized')
+      .property('desc', 'Uncategorized Ideas')
+      .property('isSystemCategory', true)
       .as('category')
       .addE('contains').from('catalog').to('category')
       .addE('belongsTo').from('category').to('catalog')`;
