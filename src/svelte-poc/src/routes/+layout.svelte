@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
 	import Button from '$lib/components/Button.svelte';
@@ -28,9 +28,15 @@
 
 	// Invalidate the catalogs list whenever navigation occurs to ensure it doesn't stay open.
 	let invalidationKey = $state(0);
+	let navigating = $state(false);
+
+	beforeNavigate(() => {
+		navigating = true;
+	});
 
 	afterNavigate(() => {
 		invalidationKey += 1;
+		navigating = false;
 	});
 </script>
 
@@ -62,6 +68,7 @@
 									{#each catalogs as catalog (catalog.id)}
 										<li class="w-full flex">
 											<a
+												inert={navigating}
 												class="p-2 rounded-sm w-full hover:bg-gray-200 dark:hover:bg-gray-700"
 												href="/catalogs/{catalog.id}">{catalog.name}</a
 											>
