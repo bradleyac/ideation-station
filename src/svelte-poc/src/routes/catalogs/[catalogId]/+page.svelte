@@ -61,7 +61,7 @@
 
 <svelte:boundary>
 	{#if catalog}
-		<section class="flex flex-col gap-4 m-3">
+		<section class="flex flex-col gap-4 p-3">
 			<h1>{catalog.name}</h1>
 			<pre>{catalog.desc}</pre>
 
