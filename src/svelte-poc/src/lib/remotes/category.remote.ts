@@ -4,7 +4,6 @@ import getUserId from "$lib/server/getUserId";
 import * as v from 'valibot';
 
 export const getCategoryIdeaIds = query(v.string(), async (categoryId) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const ideaIds = await db.getCategoryIdeaIds(userId, categoryId);
@@ -14,7 +13,6 @@ export const getCategoryIdeaIds = query(v.string(), async (categoryId) => {
 
 
 export const getCategoryIds = query(v.string(), async (catalogId) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const categoryIds = await db.getAllCategoryIds(userId, catalogId);
@@ -23,7 +21,6 @@ export const getCategoryIds = query(v.string(), async (catalogId) => {
 });
 
 export const getAllCategoryMetadata = query(v.string(), async (catalogId) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const categoryIds = await db.getAllCategoryMetadata(userId, catalogId);
@@ -32,7 +29,6 @@ export const getAllCategoryMetadata = query(v.string(), async (catalogId) => {
 });
 
 export const getCategory = query.batch(v.string(), async (categoryIds) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const categories = await db.getCategoriesByIds(userId, categoryIds);

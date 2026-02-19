@@ -4,7 +4,6 @@ import getUserId from "$lib/server/getUserId";
 import * as v from 'valibot';
 
 export const getCatalogIds = query(async () => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const catalogIds = await db.getAllCatalogIds(userId);
@@ -13,7 +12,6 @@ export const getCatalogIds = query(async () => {
 });
 
 export const getAllCatalogMetadata = query(async () => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const categoryIds = await db.getAllCatalogMetadata(userId);
@@ -22,7 +20,6 @@ export const getAllCatalogMetadata = query(async () => {
 });
 
 export const getCatalog = query.batch(v.string(), async (catalogIds) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const catalogs = await db.getCatalogsByIds(userId, catalogIds);
@@ -57,7 +54,6 @@ export const upsertCatalog = form(v.object({
 })
 
 export const deleteCatalog = command(v.string(), async (catalogId) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   await db.deleteCatalog(userId, catalogId);

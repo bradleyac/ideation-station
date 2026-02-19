@@ -66,44 +66,42 @@
 						<div></div>
 					{/if}
 				</div>
-				<div class="h-full overflow-scroll">
-					<svelte:boundary>
-						{#snippet pending()}
-							<Spinner />
-						{/snippet}
+				<svelte:boundary>
+					{#snippet pending()}
+						<Spinner />
+					{/snippet}
 
-						{#if draggableItems}
-							<ul
-								use:dragHandleZone={{ items: draggableItems, useCursorForDetection: true }}
-								onconsider={onConsider}
-								onfinalize={onFinalize}
-								class="grid grid-cols-1 auto-rows-max p-1 gap-1 h-full rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start -outline-offset-1"
-							>
-								{#each draggableItems as { id } (id)}
-									<li
-										class="flex relative -outline-offset-1 w-full overflow-hidden"
-										animate:flip={{ duration: 50 }}
-									>
-										<div class="flex w-full outline rounded-sm overflow-hidden -outline-offset-1">
-											<div
-												use:dragHandle
-												class="p-1 w-4 flex place-items-center place-content-center w-max bg-eucalyptus-500"
-											>
-												<i class="text-2xl leading-2 fi fi-ts-grip-dots-vertical"></i>
-											</div>
-											<IdeaPreview
-												prefix={props.connections ? prefix : undefined}
-												affix={props.connections ? affix : undefined}
-												ideaId={id}
-												catalogId={props.catalogId}
-											/>
+					{#if draggableItems}
+						<ul
+							use:dragHandleZone={{ items: draggableItems, useCursorForDetection: true }}
+							onconsider={onConsider}
+							onfinalize={onFinalize}
+							class="grid grid-cols-1 snap-mandatory snap-y auto-rows-max p-1 gap-1 h-full overflow-scroll rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start -outline-offset-1"
+						>
+							{#each draggableItems as { id } (id)}
+								<li
+									class="flex relative -outline-offset-1 w-full overflow-hidden snap-start last:-mb-1"
+									animate:flip={{ duration: 50 }}
+								>
+									<div class="flex w-full outline rounded-sm overflow-hidden -outline-offset-1">
+										<div
+											use:dragHandle
+											class="p-1 w-4 flex place-items-center place-content-center w-max bg-eucalyptus-500"
+										>
+											<i class="text-2xl leading-2 fi fi-ts-grip-dots-vertical"></i>
 										</div>
-									</li>
-								{/each}
-							</ul>
-						{/if}
-					</svelte:boundary>
-				</div>
+										<IdeaPreview
+											prefix={props.connections ? prefix : undefined}
+											affix={props.connections ? affix : undefined}
+											ideaId={id}
+											catalogId={props.catalogId}
+										/>
+									</div>
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</svelte:boundary>
 			</div>
 		</div>
 	{:else}

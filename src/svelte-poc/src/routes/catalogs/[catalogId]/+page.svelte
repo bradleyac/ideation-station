@@ -76,7 +76,7 @@
 				>
 
 				<Button onclick={confirmDeleteCatalog} title="Delete Catalog"
-					><i class="fi fi-rr-edit"></i>Delete Catalog</Button
+					><i class="fi fi-rr-trash"></i>Delete Catalog</Button
 				>
 
 				<Button

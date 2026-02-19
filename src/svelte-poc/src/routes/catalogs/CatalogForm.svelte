@@ -1,17 +1,16 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 	import { getCatalog, upsertCatalog } from '$lib/remotes/catalog.remote';
-	const {
-		enhanceCallback,
-		...props
-	}: {
+	const props: {
 		existingCatalogId?: string;
 		enhanceCallback?: Parameters<typeof upsertCatalog.enhance>[0];
 	} = $props();
 	let title = $derived(props.existingCatalogId ? 'Edit Catalog' : 'Create New Catalog');
 
+	$inspect(props.existingCatalogId);
+
 	let existingCatalog = $derived(
-		props.existingCatalogId ? await getCatalog(props.existingCatalogId) : undefined
+		props.existingCatalogId !== undefined ? await getCatalog(props.existingCatalogId) : undefined
 	);
 
 	const { id, name, desc, settings } = upsertCatalog.fields;
@@ -19,7 +18,7 @@
 
 <form
 	class="flex flex-col overflow-clip min-[32rem]:rounded-sm w-full max-w-lg"
-	{...upsertCatalog.enhance(enhanceCallback ?? (async (opts) => await opts.submit()))}
+	{...upsertCatalog.enhance(props.enhanceCallback ?? (async (opts) => await opts.submit()))}
 >
 	<h2 class="bg-eucalyptus-300 dark:bg-eucalyptus-700 p-3">{title}</h2>
 	<div class="bg-neutral-200 dark:bg-neutral-800 p-3 gap-4 flex flex-col">
