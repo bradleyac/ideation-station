@@ -1,10 +1,10 @@
-import { command, getRequestEvent, query } from "$app/server";
+import { command, form, query } from "$app/server";
 import { db } from "$lib/server/db.svelte";
 import getUserId from "$lib/server/getUserId";
 import * as v from 'valibot';
+import { getCategoryIdeaIds } from "./category.remote";
 
 export const getIdeaIds = query(v.string(), async (catalogId) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const ideaIds = await db.getAllIdeaIds(userId, catalogId);
@@ -14,17 +14,7 @@ export const getIdeaIds = query(v.string(), async (catalogId) => {
   return ideaIds;
 });
 
-export const getCategoryIdeaIds = query(v.string(), async (categoryId) => {
-  const event = getRequestEvent();
-  const userId = getUserId();
-
-  const ideaIds = await db.getCategoryIdeaIds(userId, categoryId);
-
-  return ideaIds;
-});
-
 export const getRelatedIdeaIds = query(v.string(), async (ideaId) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const ideaIds = await db.getRelatedIdeaIds(userId, ideaId);
@@ -34,7 +24,6 @@ export const getRelatedIdeaIds = query(v.string(), async (ideaId) => {
 });
 
 export const getUnrelatedIdeaIds = query(v.string(), async (ideaId) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const ideaIds = await db.getUnrelatedIdeaIds(userId, ideaId);
@@ -44,7 +33,6 @@ export const getUnrelatedIdeaIds = query(v.string(), async (ideaId) => {
 });
 
 export const getIdea = query.batch(v.string(), async (ideaIds) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   const ideas = await db.getIdeasByIds(userId, ideaIds);
@@ -59,7 +47,6 @@ export const updateIdea = command(v.object({
   desc: v.string(),
   categoryId: v.optional(v.string())
 }), async (idea) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   await db.updateIdea(userId, idea);
@@ -68,8 +55,31 @@ export const updateIdea = command(v.object({
 })
 
 export const deleteIdea = command(v.string(), async (ideaId) => {
-  const event = getRequestEvent();
   const userId = getUserId();
 
   await db.deleteIdea(userId, ideaId);
+})
+
+export const upsertIdea = form(v.object({
+  id: v.optional(v.string()),
+  name: v.string(),
+  desc: v.string(),
+  categoryId: v.string(),
+  catalogId: v.string(),
+}), async (idea) => {
+  const userId = getUserId();
+
+  if (idea.id) {
+    let toUpdate = { ...idea, id: idea.id! };
+    await db.updateIdea(userId, toUpdate)
+    getIdea(idea.id).set(toUpdate);
+  }
+  else {
+    const id = crypto.randomUUID();
+    await db.createIdea(userId, idea.catalogId, { ...idea, id });
+    getIdeaIds(idea.catalogId).refresh();
+    if (idea.categoryId) {
+      getCategoryIdeaIds(idea.categoryId).refresh();
+    }
+  }
 })

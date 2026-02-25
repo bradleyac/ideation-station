@@ -2,10 +2,9 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import { getCategoryIdeaIds } from '$lib/remotes/category.remote';
 	import { getCategory } from '$lib/remotes/category.remote.js';
-	import { getCategoryIdeaIds } from '$lib/remotes/idea.remote';
 	import type { CategoryFull } from '$lib/types.js';
-	import type { ActionResult } from '@sveltejs/kit';
 	import { tick } from 'svelte';
 	import IdeaForm from '../../ideas/IdeaForm.svelte';
 	import IdeaList from '../../ideas/IdeaList.svelte';
@@ -47,20 +46,10 @@
 		}
 	}
 
-	function enhanceCallback(): ({
-		update,
-		result
-	}: {
-		update: () => Promise<void>;
-		result: ActionResult;
-	}) => Promise<void> {
-		return async ({ update, result }) => {
-			if (result?.type === 'success') {
-				showModal = false;
-				await invalidateAll();
-			}
-			await update();
-		};
+	async function enhanceCallback(opts: any): Promise<void> {
+		await opts.submit();
+		opts.form.reset();
+		showModal = false;
 	}
 </script>
 

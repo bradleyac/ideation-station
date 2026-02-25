@@ -7,10 +7,8 @@
 	} = $props();
 	let title = $derived(props.existingCatalogId ? 'Edit Catalog' : 'Create New Catalog');
 
-	$inspect(props.existingCatalogId);
-
 	let existingCatalog = $derived(
-		props.existingCatalogId !== undefined ? await getCatalog(props.existingCatalogId) : undefined
+		props?.existingCatalogId !== undefined ? await getCatalog(props.existingCatalogId) : undefined
 	);
 
 	const { id, name, desc, settings } = upsertCatalog.fields;

@@ -170,6 +170,17 @@ class Db {
     return { ...results._items[0], settings: JSON.parse(results._items[0].settings) };
   }
 
+  public async getCatalogUncategorizedCategoryId(userId: string, catalogId: string): Promise<string> {
+    const getUncategorizedCategoryIdQuery = `g.V(prop_userId, prop_catalogId).out('contains').hasLabel('category').has('name','Uncategorized').has('isSystemCategory', true).values(id)`;
+
+    let results = await this.submitWithRetry(getUncategorizedCategoryIdQuery, {
+      prop_userId: userId,
+      prop_catalogId: catalogId
+    });
+
+    return results._items[0];
+  }
+
   public async createIdea(userId: string, catalogId: string, idea: Idea): Promise<void> {
     // TODO: Transaction?
     const createIdeaQuery = `g.addV('idea')

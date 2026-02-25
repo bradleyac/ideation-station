@@ -5,8 +5,6 @@
 		ideaId: string;
 		mode?: 'default' | 'compact';
 		catalogId: string;
-		prefix?: boolean;
-		affix?: string;
 	} = $props();
 	let mode = $derived(props.mode ?? 'default');
 	let idea = $derived(await getIdea(props.ideaId));
@@ -24,13 +22,7 @@
 				href="/catalogs/{props.catalogId}/ideas/{idea.id}"
 				data-id={idea.id}
 			>
-				{#if props.prefix && props.affix}
-					{props.affix}
-				{/if}
 				{idea.name}
-				{#if !props.prefix && props.affix}
-					{props.affix}
-				{/if}
 			</a>
 		{:else if mode === 'compact'}
 			<a
@@ -38,13 +30,7 @@
 				href="/catalogs/{props.catalogId}/ideas/{idea.id}"
 				data-id={idea.id}
 			>
-				{#if props.prefix && props.affix}
-					{props.affix}
-				{/if}
 				{idea.name}
-				{#if !props.prefix && props.affix}
-					{props.affix}
-				{/if}
 			</a>
 		{/if}
 	{:else}

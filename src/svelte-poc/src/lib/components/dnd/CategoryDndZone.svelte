@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { getCategory } from '$lib/remotes/category.remote';
-	import { getCategoryIdeaIds } from '$lib/remotes/idea.remote';
+	import { getCategory, getCategoryIdeaIds } from '$lib/remotes/category.remote';
 	import { TRIGGERS, dragHandle, dragHandleZone, type DndEvent } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import IdeaPreview from '../../../routes/catalogs/[catalogId]/ideas/IdeaPreview.svelte';
@@ -8,8 +7,6 @@
 
 	let props: { catalogId: string; categoryId: string; connections: boolean } = $props();
 
-	let affix = $state('');
-	let prefix = $state(true);
 	let relatedIdeaIds = $state<{ id: string }[]>();
 
 	let draggableItemsPromise = $derived(getRelatedIdeaIds());
@@ -38,34 +35,13 @@
 <svelte:boundary>
 	{#if category}
 		<div
-			class="grid grid-cols-1 grid-rows-[auto_1fr] bg-eucalyptus-200 dark:bg-eucalyptus-800 rounded-sm p-3"
+			class="grid grid-cols-1 grid-rows-[auto_1fr] gap-3 bg-eucalyptus-200 dark:bg-eucalyptus-800 rounded-sm p-3"
 		>
 			<a class="block" href="/catalogs/{props.catalogId}/categories/{props.categoryId}"
 				><h2>{category.name}</h2></a
 			>
 
-			<div
-				class="grid grid-cols-1 grid-rows-[auto_1fr] gap-2 h-full overflow-scroll -outline-offset-1"
-			>
-				<div class="flex gap-2 p-1">
-					{#if props.connections}
-						<input
-							type="checkbox"
-							class="max-w-1 place-self-center ms-1"
-							defaultChecked={true}
-							title={prefix ? 'Prefix' : 'Suffix'}
-							oninput={(e) => (prefix = (e.target as HTMLInputElement)?.checked)}
-						/>
-						<input
-							class="w-full"
-							type="text"
-							placeholder={prefix ? 'Prefix' : 'Suffix'}
-							oninput={(e) => (affix = (e.target as HTMLInputElement)?.value?.toUpperCase())}
-						/>
-					{:else}
-						<div></div>
-					{/if}
-				</div>
+			<div class="grid grid-cols-1 gap-2 h-full overflow-scroll -outline-offset-2">
 				<svelte:boundary>
 					{#snippet pending()}
 						<Spinner />
@@ -76,11 +52,11 @@
 							use:dragHandleZone={{ items: draggableItems, useCursorForDetection: true }}
 							onconsider={onConsider}
 							onfinalize={onFinalize}
-							class="grid grid-cols-1 snap-mandatory snap-y auto-rows-max p-1 gap-1 h-full overflow-scroll rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start -outline-offset-1"
+							class="grid grid-cols-1 m-1 relative snap-mandatory snap-y auto-rows-max gap-1 h-full rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start"
 						>
 							{#each draggableItems as { id } (id)}
 								<li
-									class="flex relative -outline-offset-1 w-full overflow-hidden snap-start last:-mb-1"
+									class="flex relative -outline-offset-2 w-full overflow-hidden snap-start last:-mb-1"
 									animate:flip={{ duration: 50 }}
 								>
 									<div class="flex w-full outline rounded-sm overflow-hidden -outline-offset-1">
@@ -90,12 +66,7 @@
 										>
 											<i class="text-2xl leading-2 fi fi-ts-grip-dots-vertical"></i>
 										</div>
-										<IdeaPreview
-											prefix={props.connections ? prefix : undefined}
-											affix={props.connections ? affix : undefined}
-											ideaId={id}
-											catalogId={props.catalogId}
-										/>
+										<IdeaPreview ideaId={id} catalogId={props.catalogId} />
 									</div>
 								</li>
 							{/each}

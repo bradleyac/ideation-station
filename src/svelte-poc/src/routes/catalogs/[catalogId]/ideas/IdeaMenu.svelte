@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
-	import { getIdea } from '$lib/remotes/idea.remote';
+	import { deleteIdea as deleteIdeaCommand, getIdea } from '$lib/remotes/idea.remote';
 	import Idea from './Idea.svelte';
 	let props = $props();
 	let idea = $derived(await getIdea(props.ideaId));
@@ -13,9 +13,7 @@
 	async function deleteIdea() {
 		if (!idea) return;
 		if (confirm(`Really delete "${idea.name}"?`)) {
-			await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}`, {
-				method: 'DELETE'
-			});
+			await deleteIdeaCommand(idea.id);
 			hideMenu();
 			invalidateAll();
 		}

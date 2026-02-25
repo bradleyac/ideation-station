@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import CategoryDndZone from '$lib/components/dnd/CategoryDndZone.svelte';
 	import DeleteIdeaDndZone from '$lib/components/dnd/DeleteIdeaDndZone.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import Spinner from '$lib/components/Spinner.svelte';
-	import { deleteCatalog, getCatalog, upsertCatalog } from '$lib/remotes/catalog.remote';
+	import { deleteCatalog, getCatalog, loadConnections } from '$lib/remotes/catalog.remote';
 	import { getCategoryIds } from '$lib/remotes/category.remote';
 	import CatalogForm from '../CatalogForm.svelte';
 	import CategoryForm from './categories/CategoryForm.svelte';
@@ -36,9 +35,7 @@
 	}
 
 	// TODO: This doesn't work for all 3 forms.
-	async function enhanceCallback(
-		opts: Parameters<Parameters<typeof upsertCatalog.enhance>[0]>[0]
-	): Promise<void> {
+	async function enhanceCallback(opts: any): Promise<void> {
 		await opts.submit();
 		opts.form.reset();
 		showModal = false;
@@ -50,7 +47,7 @@
 <Modal bind:showModal>
 	{#key modalKey}
 		{#if whichModal === 'idea'}
-			<IdeaForm catalogId={params.catalogId} />
+			<IdeaForm catalogId={params.catalogId} {enhanceCallback} />
 		{:else if whichModal === 'category'}
 			<CategoryForm catalogId={params.catalogId} {enhanceCallback} />
 		{:else if whichModal === 'edit'}
@@ -97,9 +94,24 @@
 					title="Create Category"><i class="fi fi-rr-add"></i>New Category</Button
 				>
 				{#if connections}
-					<form action="/catalogs/{params.catalogId}?/loadConnections" method="POST" use:enhance>
-						<input type="text" name="dummy" value="dummy" class="hidden" />
-						<Button type="submit"><i class="fi fi-rr-add"></i>From Connections</Button>
+					<form
+						{...loadConnections.enhance(async (opts) => {
+							await opts.submit();
+						})}
+					>
+						<input hidden type="text" name="catalogId" value={params.catalogId} />
+						<Button
+							type="submit"
+							inert={loadConnections.pending}
+							title="Load Ideas from Connections"
+						>
+							{#if loadConnections.pending}
+								<i class="fi-rr-loading before:block before:animate-[spin_2s_linear_infinite]"></i>
+							{:else}
+								<i class="fi fi-rr-add"></i>
+							{/if}
+							From Connections
+						</Button>
 					</form>
 				{/if}
 			</div>

@@ -2,6 +2,8 @@ import { command, form, getRequestEvent, query } from "$app/server";
 import { db } from "$lib/server/db.svelte";
 import getUserId from "$lib/server/getUserId";
 import * as v from 'valibot';
+import { getCategoryIdeaIds } from "./category.remote";
+import { getIdeaIds } from "./idea.remote";
 
 export const getCatalogIds = query(async () => {
   const userId = getUserId();
@@ -58,4 +60,27 @@ export const deleteCatalog = command(v.string(), async (catalogId) => {
 
   await db.deleteCatalog(userId, catalogId);
   getCatalogIds().refresh();
+});
+
+export const loadConnections = form(v.object({
+  catalogId: v.string()
+}), async ({ catalogId }) => {
+  const userId = getUserId();
+
+  const today = new Date();
+  const formatted = today.toISOString().slice(0, 10);
+  const connectionsUrl = `https://www.nytimes.com/svc/connections/v2/${formatted}.json`;
+  const json = await (await fetch(connectionsUrl, { method: 'GET', referrer: '' })).json();
+
+  // TODO: This only works for strings. Sometimes they have SVGs.
+  const result = json.categories.map((cat: any) => cat.cards.map((c: any) => c.content)).reduce((acc: any, el: any) => [...acc, ...el]).toSorted();
+
+  for (let word of result) {
+    const id = crypto.randomUUID();
+    await db.createIdea(userId, catalogId, { id, name: word, desc: word });
+  }
+
+  const uncategorizedCategoryId = await db.getCatalogUncategorizedCategoryId(userId, catalogId);
+  getCategoryIdeaIds(uncategorizedCategoryId).refresh();
+  getIdeaIds(catalogId).refresh();
 });
