@@ -15,7 +15,7 @@
 	function onFinalize(e: CustomEvent<DndEvent<{ id: string }>>) {
 		ideaIds = e.detail.items;
 		if (e.detail.info.trigger === TRIGGERS.DROPPED_INTO_ZONE && ideaIds[0]) {
-			deleteIdea(ideaIds[0].id).updates(
+			deleteIdea({ id: ideaIds[0].id }).updates(
 				getIdea(ideaIds[0].id).withOverride((current) => undefined)
 			);
 			ideaIds = [];

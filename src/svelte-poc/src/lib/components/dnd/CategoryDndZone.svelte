@@ -8,8 +8,6 @@
 
 	let props: { catalogId: string; categoryId: string; connections: boolean } = $props();
 
-	let relatedIdeaIds = $state<{ id: string }[]>();
-
 	function logDndEvent(type: 'consider' | 'finalize', evt: CustomEvent<DndEvent<{ id: string }>>) {
 		const log = {
 			type,
@@ -21,9 +19,9 @@
 		console.log(log);
 	}
 
-	let draggableItemsPromise = $derived(getRelatedIdeaIds());
+	let draggableItemsPromise = $derived(getCategoryIdeaIds(props.categoryId));
 	let categoryPromise = $derived(getCategory(props.categoryId));
-	let draggableItems = $derived(await draggableItemsPromise);
+	let draggableItems = $derived((await draggableItemsPromise).map((id) => ({ id })));
 	let category = $derived(await categoryPromise);
 
 	function onConsider(e: CustomEvent<DndEvent<{ id: string }>>) {
@@ -34,10 +32,6 @@
 		if (e.detail.info.trigger === TRIGGERS.DROPPED_INTO_ZONE) {
 			await setCategory({ id: e.detail.info.id, categoryId: props.categoryId });
 		}
-	}
-
-	async function getRelatedIdeaIds() {
-		return (relatedIdeaIds = (await getCategoryIdeaIds(props.categoryId)).map((id) => ({ id })));
 	}
 </script>
 

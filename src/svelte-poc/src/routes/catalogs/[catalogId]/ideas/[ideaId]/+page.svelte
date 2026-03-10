@@ -33,7 +33,7 @@
 
 	async function deleteIdea(idea: IdeaT) {
 		if (confirm(`Really delete "${idea.name}"?`)) {
-			await deleteIdeaCommand(idea.id);
+			await deleteIdeaCommand({ id: idea.id });
 			await goto(`/catalogs/${params.catalogId}`);
 			await invalidateAll();
 		}

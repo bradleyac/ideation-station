@@ -21,12 +21,25 @@
 		if (!idea) return;
 		if (confirm(`Really delete "${idea.name}"?`)) {
 			hideMenu();
-			await deleteIdea(idea.id).updates(
-				getIdea(idea.id).withOverride((current) => undefined),
-				getCategoryIdeaIds(idea.categoryId).withOverride((current) =>
-					current.filter((id) => id !== idea.id)
-				)
-			);
+			if (props.otherIdea?.id) {
+				await deleteIdea({ id: props.ideaId, otherId: props.otherIdea?.id }).updates(
+					getCategoryIdeaIds(idea.categoryId).withOverride((current) =>
+						current.filter((id) => id !== idea.id)
+					),
+					getRelatedIdeaIds(props.otherIdea?.id).withOverride((current) =>
+						current.filter((id) => id !== props.otherIdea?.id)
+					),
+					getUnrelatedIdeaIds(props.otherIdea?.id).withOverride((current) =>
+						current.filter((id) => id !== props.otherIdea?.id)
+					)
+				);
+			} else {
+				await deleteIdea({ id: props.ideaId }).updates(
+					getCategoryIdeaIds(idea.categoryId).withOverride((current) =>
+						current.filter((id) => id !== idea.id)
+					)
+				);
+			}
 		}
 	}
 

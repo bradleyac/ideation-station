@@ -55,10 +55,18 @@ export const updateIdea = command(v.object({
   getIdea(idea.id).refresh();
 })
 
-export const deleteIdea = command(v.string(), async (ideaId) => {
+export const deleteIdea = command(v.object({
+  id: v.string(),
+  otherId: v.optional(v.string())
+}), async ({ id, otherId }) => {
   const userId = getUserId();
 
-  await db.deleteIdea(userId, ideaId);
+  await db.deleteIdea(userId, id);
+
+  if (otherId) {
+    getRelatedIdeaIds(otherId).refresh();
+    getUnrelatedIdeaIds(otherId).refresh();
+  }
 })
 
 export const upsertIdea = form(v.object({
