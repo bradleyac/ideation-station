@@ -9,7 +9,7 @@ interface Idea {
   id: string;
   name: string;
   desc: string;
-  categoryId?: string;
+  categoryId: string;
 }
 
 interface Category {

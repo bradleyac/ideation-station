@@ -74,13 +74,13 @@ export const loadConnections = form(v.object({
 
   // TODO: This only works for strings. Sometimes they have SVGs.
   const result = json.categories.map((cat: any) => cat.cards.map((c: any) => c.content)).reduce((acc: any, el: any) => [...acc, ...el]).toSorted();
+  const uncategorizedCategoryId = await db.getCatalogUncategorizedCategoryId(userId, catalogId);
 
   for (let word of result) {
     const id = crypto.randomUUID();
-    await db.createIdea(userId, catalogId, { id, name: word, desc: word });
+    await db.createIdea(userId, catalogId, { id, name: word, desc: word, categoryId: uncategorizedCategoryId });
   }
 
-  const uncategorizedCategoryId = await db.getCatalogUncategorizedCategoryId(userId, catalogId);
   getCategoryIdeaIds(uncategorizedCategoryId).refresh();
   getIdeaIds(catalogId).refresh();
 });

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getCategory, getCategoryIdeaIds } from '$lib/remotes/category.remote';
+	import { setCategory } from '$lib/remotes/idea.remote';
 	import { TRIGGERS, dragHandle, dragHandleZone, type DndEvent } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import IdeaPreview from '../../../routes/catalogs/[catalogId]/ideas/IdeaPreview.svelte';
@@ -9,23 +10,29 @@
 
 	let relatedIdeaIds = $state<{ id: string }[]>();
 
+	function logDndEvent(type: 'consider' | 'finalize', evt: CustomEvent<DndEvent<{ id: string }>>) {
+		const log = {
+			type,
+			draggedId: evt.detail.info.id,
+			eventTrigger: evt.detail.info.trigger,
+			itemCount: evt.detail.items.length,
+			items: evt.detail.items
+		};
+		console.log(log);
+	}
+
 	let draggableItemsPromise = $derived(getRelatedIdeaIds());
 	let categoryPromise = $derived(getCategory(props.categoryId));
 	let draggableItems = $derived(await draggableItemsPromise);
 	let category = $derived(await categoryPromise);
 
 	function onConsider(e: CustomEvent<DndEvent<{ id: string }>>) {
-		console.log(e.detail);
 		draggableItems = e.detail.items;
 	}
 	async function onFinalize(e: CustomEvent<DndEvent<{ id: string }>>) {
-		console.log(e.detail);
 		draggableItems = e.detail.items;
 		if (e.detail.info.trigger === TRIGGERS.DROPPED_INTO_ZONE) {
-			await fetch(
-				`/catalogs/${props.catalogId}/ideas/${e.detail.info.id}/categories/${props.categoryId}`,
-				{ method: 'PUT' }
-			);
+			await setCategory({ id: e.detail.info.id, categoryId: props.categoryId });
 		}
 	}
 
@@ -51,7 +58,11 @@
 
 					{#if draggableItems}
 						<ul
-							use:dragHandleZone={{ items: draggableItems, useCursorForDetection: true }}
+							use:dragHandleZone={{
+								items: draggableItems,
+								useCursorForDetection: true,
+								morphDisabled: true
+							}}
 							onconsider={onConsider}
 							onfinalize={onFinalize}
 							class="grid grid-cols-1 m-1 relative snap-mandatory snap-y auto-rows-max gap-1 h-full rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start"

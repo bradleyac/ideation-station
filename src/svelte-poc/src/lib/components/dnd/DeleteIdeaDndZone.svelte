@@ -13,9 +13,8 @@
 		ideaIds = e.detail.items;
 	}
 	function onFinalize(e: CustomEvent<DndEvent<{ id: string }>>) {
-		if (e.detail.info.trigger === TRIGGERS.DROPPED_INTO_ZONE) {
-			// TODO: Confirm and put it back if declined?
-			ideaIds = e.detail.items;
+		ideaIds = e.detail.items;
+		if (e.detail.info.trigger === TRIGGERS.DROPPED_INTO_ZONE && ideaIds[0]) {
 			deleteIdea(ideaIds[0].id).updates(
 				getIdea(ideaIds[0].id).withOverride((current) => undefined)
 			);
@@ -29,6 +28,7 @@
 		use:dragHandleZone={{
 			items: ideaIds,
 			useCursorForDetection: true,
+			morphDisabled: true,
 			dropTargetClasses: [
 				'ring',
 				'ring-red-500',

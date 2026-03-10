@@ -2,8 +2,6 @@
 	import Button from '$lib/components/Button.svelte';
 	import Collapse from '$lib/components/Collapse.svelte';
 	import Tooltip from '$lib/components/Tooltip.svelte';
-	import { flip } from 'svelte/animate';
-	import { fade } from 'svelte/transition';
 	import IdeaMenu from './IdeaMenu.svelte';
 	import IdeaPreview from './IdeaPreview.svelte';
 
@@ -89,11 +87,7 @@
 			]}
 		>
 			{#each props.ideaIds as ideaId (ideaId)}
-				<li
-					out:fade={{ duration: 500 }}
-					animate:flip={{ duration: 500 }}
-					class={[mode === 'compact' && 'ring-1', 'flex']}
-				>
+				<li class={[mode === 'compact' && 'ring-1', 'flex']}>
 					<IdeaPreview catalogId={props.catalogId} {ideaId} {mode} />
 				</li>
 			{/each}

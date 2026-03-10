@@ -1,7 +1,14 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
-	import { deleteIdea as deleteIdeaCommand, getIdea } from '$lib/remotes/idea.remote';
+	import { getCategoryIdeaIds } from '$lib/remotes/category.remote';
+	import {
+		deleteIdea,
+		getIdea,
+		getRelatedIdeaIds,
+		getUnrelatedIdeaIds,
+		linkIdea,
+		unlinkIdea
+	} from '$lib/remotes/idea.remote';
 	import Idea from './Idea.svelte';
 	let props = $props();
 	let idea = $derived(await getIdea(props.ideaId));
@@ -10,51 +17,47 @@
 		props.close();
 	}
 
-	async function deleteIdea() {
+	async function removeIdea() {
 		if (!idea) return;
 		if (confirm(`Really delete "${idea.name}"?`)) {
-			await deleteIdeaCommand(idea.id);
 			hideMenu();
-			invalidateAll();
+			await deleteIdea(idea.id).updates(
+				getIdea(idea.id).withOverride((current) => undefined),
+				getCategoryIdeaIds(idea.categoryId).withOverride((current) =>
+					current.filter((id) => id !== idea.id)
+				)
+			);
 		}
 	}
 
-	async function linkCategory(categoryId: string) {
+	async function addToIdea(otherIdea: { id: string; related: boolean }) {
 		if (!idea) return;
-		await fetch(`/catalog/${props.catalogId}/ideas/${idea.id}/categories/${categoryId}`, {
-			method: 'PUT'
-		});
 		hideMenu();
-		invalidateAll();
+		await linkIdea({ id: idea.id, otherId: otherIdea.id }).updates(
+			getUnrelatedIdeaIds(idea.id).withOverride((current) =>
+				current.filter((id) => id !== otherIdea.id)
+			),
+			getUnrelatedIdeaIds(otherIdea.id).withOverride((current) =>
+				current.filter((id) => id !== idea.id)
+			),
+			getRelatedIdeaIds(idea.id).withOverride((current) => [...current, otherIdea.id]),
+			getRelatedIdeaIds(otherIdea.id).withOverride((current) => [...current, idea.id])
+		);
 	}
 
-	async function unlinkCategory(categoryId: string) {
+	async function removeFromIdea(otherIdea: { id: string; related: boolean }) {
 		if (!idea) return;
-		if (confirm(`Really remove "${idea.name}" from category?`)) {
-			await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}/categories/${categoryId}`, {
-				method: 'DELETE'
-			});
-			hideMenu();
-			invalidateAll();
-		}
-	}
-
-	async function linkIdea(otherIdea: { id: string; related: boolean }) {
-		if (!idea) return;
-		await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}/related/${otherIdea?.id}`, {
-			method: 'PUT'
-		});
 		hideMenu();
-		invalidateAll();
-	}
-
-	async function unlinkIdea(otherIdea: { id: string; related: boolean }) {
-		if (!idea) return;
-		await fetch(`/catalogs/${props.catalogId}/ideas/${idea.id}/related/${otherIdea?.id}`, {
-			method: 'DELETE'
-		});
-		hideMenu();
-		invalidateAll();
+		await unlinkIdea({ id: idea.id, otherId: otherIdea.id }).updates(
+			getUnrelatedIdeaIds(idea.id).withOverride((current) => [...current, otherIdea.id]),
+			getUnrelatedIdeaIds(otherIdea.id).withOverride((current) => [...current, idea.id]),
+			getRelatedIdeaIds(idea.id).withOverride((current) =>
+				current.filter((id) => id !== otherIdea.id)
+			),
+			getRelatedIdeaIds(otherIdea.id).withOverride((current) =>
+				current.filter((id) => id !== idea.id)
+			)
+		);
 	}
 </script>
 
@@ -77,34 +80,11 @@
 				title="Delete Idea"
 				onclick={(e: Event) => {
 					e.stopPropagation();
-					deleteIdea();
+					removeIdea();
 				}}
 			>
 				<i class="fi fi-rr-trash"></i>
 			</Button>
-			{#if props.categoryId}
-				{#if props.idea.categoryIds?.includes(props.categoryId)}
-					<Button
-						title="Remove From Category"
-						onclick={(e: Event) => {
-							e.stopPropagation();
-							unlinkCategory(props.categoryId);
-						}}
-					>
-						<i class="fi fi-rr-link-slash"></i>
-					</Button>
-				{:else}
-					<Button
-						title="Add To Category"
-						onclick={(e: Event) => {
-							e.stopPropagation();
-							linkCategory(props.categoryId);
-						}}
-					>
-						<i class="fi fi-rr-link"></i>
-					</Button>
-				{/if}
-			{/if}
 			{#if props.otherIdea}
 				{#if props.otherIdea.related}
 					<Button
@@ -112,7 +92,7 @@
 						title="Unlink Related Idea"
 						onclick={(e: Event) => {
 							e.stopPropagation();
-							unlinkIdea(props.otherIdea);
+							removeFromIdea(props.otherIdea);
 						}}
 					>
 						<i class="fi fi-rr-link-slash"></i>
@@ -123,7 +103,7 @@
 						title="Link Related Idea"
 						onclick={(e: Event) => {
 							e.stopPropagation();
-							linkIdea(props.otherIdea);
+							addToIdea(props.otherIdea);
 						}}
 					>
 						<i class="fi fi-rr-link"></i>

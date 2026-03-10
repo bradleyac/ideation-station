@@ -1,6 +1,7 @@
 import { command, form, query } from "$app/server";
 import { db } from "$lib/server/db.svelte";
 import getUserId from "$lib/server/getUserId";
+import { error } from "@sveltejs/kit";
 import * as v from 'valibot';
 import { getCategoryIdeaIds } from "./category.remote";
 
@@ -45,7 +46,7 @@ export const updateIdea = command(v.object({
   id: v.string(),
   name: v.string(),
   desc: v.string(),
-  categoryId: v.optional(v.string())
+  categoryId: v.string()
 }), async (idea) => {
   const userId = getUserId();
 
@@ -83,3 +84,38 @@ export const upsertIdea = form(v.object({
     }
   }
 })
+
+export const setCategory = command(v.object({
+  id: v.string(),
+  categoryId: v.string(),
+}), async (idea) => {
+  const userId = getUserId();
+  if (!idea.id || !idea.categoryId) error(400);
+  await db.changeIdeaCategory(userId, idea.id, idea.categoryId);
+});
+
+export const unlinkIdea = command(v.object({
+  id: v.string(),
+  otherId: v.string()
+}), async ({ id, otherId }) => {
+  const userId = getUserId();
+  if (!id || !otherId || id === otherId) error(400);
+  await Promise.all([db.removeRelation(userId, id, otherId), db.removeRelation(userId, otherId, id)]);
+  getRelatedIdeaIds(id).refresh();
+  getRelatedIdeaIds(otherId).refresh();
+  getUnrelatedIdeaIds(id).refresh();
+  getUnrelatedIdeaIds(otherId).refresh();
+});
+
+export const linkIdea = command(v.object({
+  id: v.string(),
+  otherId: v.string()
+}), async ({ id, otherId }) => {
+  const userId = getUserId();
+  if (!id || !otherId || id === otherId) error(400);
+  await db.addRelation(userId, id, otherId);
+  getRelatedIdeaIds(id).refresh();
+  getRelatedIdeaIds(otherId).refresh();
+  getUnrelatedIdeaIds(id).refresh();
+  getUnrelatedIdeaIds(otherId).refresh();
+});

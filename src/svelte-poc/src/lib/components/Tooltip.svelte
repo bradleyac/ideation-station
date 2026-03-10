@@ -51,7 +51,6 @@
 	function maybeFocusAndPreventDefault(evt: Event) {
 		const anchor = evt.target as HTMLAnchorElement;
 		if (!!anchor?.href && anchor !== document.activeElement) {
-			console.log('Prevented touchend');
 			evt.preventDefault();
 			anchor.focus();
 		}

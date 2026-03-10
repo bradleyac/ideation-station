@@ -564,6 +564,7 @@ class Db {
     const getUnrelatedIdeasQuery = `g.V(prop_partition_key, prop_id)
       .out('belongsTo').hasLabel('catalog')
       .out('contains').hasLabel('idea')
+      .not(hasId(prop_id))
       .where(out('relatesTo').hasId(prop_id).count().is(0)).values('id')`;
     let results = await this.submitWithRetry(getUnrelatedIdeasQuery, {
       prop_partition_key: userId,
