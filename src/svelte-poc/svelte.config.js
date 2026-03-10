@@ -1,5 +1,5 @@
-import azure from 'svelte-adapter-azure-swa';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import azure from 'svelte-adapter-azure-swa';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -31,7 +31,7 @@ const config = {
 				responseOverrides: {
 					401: {
 						statusCode: 302,
-						"redirect": "/.auth/login/aad?post_login_redirect_uri=.referrer",
+						"redirect": "/.auth/login/aad",
 					}
 				},
 			}

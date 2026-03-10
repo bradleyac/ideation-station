@@ -15,9 +15,11 @@
 	let category = $derived(await categoryPromise);
 
 	function onConsider(e: CustomEvent<DndEvent<{ id: string }>>) {
+		console.log(e.detail);
 		draggableItems = e.detail.items;
 	}
 	async function onFinalize(e: CustomEvent<DndEvent<{ id: string }>>) {
+		console.log(e.detail);
 		draggableItems = e.detail.items;
 		if (e.detail.info.trigger === TRIGGERS.DROPPED_INTO_ZONE) {
 			await fetch(
