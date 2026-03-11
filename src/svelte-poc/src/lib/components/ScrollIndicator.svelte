@@ -61,17 +61,19 @@
 		}
 	}
 
-	onMount(onScroll);
 	onMount(() => {
 		if (target) {
 			return on(target, 'scroll', onScroll);
 		}
 	});
+
 	onMount(() => {
 		if (window) {
 			return on(window, 'resize', onScroll);
 		}
 	});
+
+	onMount(onScroll);
 </script>
 
 <div
