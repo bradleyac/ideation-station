@@ -74,6 +74,7 @@
 	});
 
 	onMount(() => {
+		// Hack because calling onScroll from onMount doesn't always work.
 		setTimeout(onScroll, 0);
 	});
 </script>
