@@ -73,7 +73,9 @@
 		}
 	});
 
-	onMount(onScroll);
+	onMount(() => {
+		setTimeout(onScroll, 0);
+	});
 </script>
 
 <div
