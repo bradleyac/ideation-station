@@ -4,6 +4,7 @@
 	import { TRIGGERS, dragHandle, dragHandleZone, type DndEvent } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import IdeaPreview from '../../../routes/catalogs/[catalogId]/ideas/IdeaPreview.svelte';
+	import ScrollIndicator from '../ScrollIndicator.svelte';
 	import Spinner from '../Spinner.svelte';
 
 	let props: { catalogId: string; categoryId: string; connections: boolean } = $props();
@@ -33,6 +34,8 @@
 			await setCategory({ id: e.detail.info.id, categoryId: props.categoryId });
 		}
 	}
+
+	let scrollArea = $state<HTMLElement>();
 </script>
 
 <svelte:boundary>
@@ -43,8 +46,7 @@
 			<a class="block" href="/catalogs/{props.catalogId}/categories/{props.categoryId}"
 				><h2>{category.name}</h2></a
 			>
-
-			<div class="grid grid-cols-1 gap-2 h-full overflow-scroll -outline-offset-2">
+			<div class="relative grid grid-cols-1 gap-2 h-full py-2 overflow-scroll -outline-offset-2">
 				<svelte:boundary>
 					{#snippet pending()}
 						<Spinner />
@@ -57,9 +59,11 @@
 								useCursorForDetection: true,
 								morphDisabled: true
 							}}
+							bind:this={scrollArea}
 							onconsider={onConsider}
 							onfinalize={onFinalize}
-							class="grid grid-cols-1 m-1 p-2 relative snap-mandatory snap-y auto-rows-max gap-1 h-[calc(100%-0.5em)] rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start"
+							class="grid grid-cols-1 m-1 relative snap-mandatory snap-y auto-rows-max gap-1 h-[calc(100%-0.5em)] rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start"
+							style="scrollbar-gutter: stable"
 						>
 							{#each draggableItems as { id } (id)}
 								<li
@@ -86,3 +90,5 @@
 		Category not found.
 	{/if}
 </svelte:boundary>
+
+<ScrollIndicator target={scrollArea} />
