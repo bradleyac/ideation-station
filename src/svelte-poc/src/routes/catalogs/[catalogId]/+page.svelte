@@ -118,7 +118,7 @@
 
 			<!-- {#if aspirationsCategoryId}
 			<div class="top-2.5 right-4 invisible lg:visible z-2 fixed">
-				<TextTicker
+				<TextTickers
 					period={5000}
 					labels={allIdeas
 						.filter((idea) => idea.categoryId === aspirationsCategoryId)
@@ -127,7 +127,7 @@
 			</div>
 		{/if} -->
 
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[20rem] gap-4">
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[20.5rem] gap-4">
 				<svelte:boundary>
 					{#snippet pending()}
 						<Spinner />

@@ -59,11 +59,11 @@
 							}}
 							onconsider={onConsider}
 							onfinalize={onFinalize}
-							class="grid grid-cols-1 m-1 relative snap-mandatory snap-y auto-rows-max gap-1 h-full rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start"
+							class="grid grid-cols-1 m-1 p-2 relative snap-mandatory snap-y auto-rows-max gap-1 h-[calc(100%-0.5em)] rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start"
 						>
 							{#each draggableItems as { id } (id)}
 								<li
-									class="flex relative -outline-offset-2 w-full overflow-hidden snap-start last:-mb-1"
+									class="flex relative w-full overflow-hidden snap-start last:-mb-1"
 									animate:flip={{ duration: 50 }}
 								>
 									<div class="flex w-full outline rounded-sm overflow-hidden -outline-offset-1">
