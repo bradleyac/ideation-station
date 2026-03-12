@@ -58,7 +58,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="h-svh flex flex-col">
+<div class="h-full flex flex-col">
 	<nav
 		class="p-3 h-(--nav-height) content-center sticky top-0 z-100 bg-gray-50 dark:bg-gray-900 shadow-black/30 shadow-xs"
 	>

@@ -63,7 +63,6 @@
 							onconsider={onConsider}
 							onfinalize={onFinalize}
 							class="grid grid-cols-1 m-1 relative snap-mandatory snap-y auto-rows-max gap-1 h-[calc(100%-0.5em)] rounded-sm overflow-y-scroll overflow-x-hidden place-items-start place-content-start"
-							style="scrollbar-gutter: stable"
 						>
 							{#each draggableItems as { id } (id)}
 								<li
