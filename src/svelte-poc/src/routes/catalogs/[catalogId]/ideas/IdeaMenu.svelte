@@ -75,7 +75,7 @@
 </script>
 
 <div
-	class="relative shadow-black shadow-sm rounded-sm w-max max-w-full md:max-w-md top-0 left-0 flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4"
+	class="z-1000 relative shadow-black shadow-sm rounded-sm w-max max-w-full min-[32rem]:max-w-md top-0 left-0 flex-col gap-4 bg-eucalyptus-200 dark:bg-eucalyptus-800 p-4"
 >
 	{#if props.ideaId}
 		<Idea ideaId={props.ideaId} />

@@ -187,7 +187,9 @@ class Db {
       .property('id', prop_id)
       .property('userid', prop_userId)
       .property('name', prop_name)
-      .property('desc', prop_desc).as('node')
+      .property('desc', prop_desc)
+      .choose(constant(prop_imgUrl).is(neq('')), property('imgUrl', prop_imgUrl), identity())
+      .choose(constant(prop_imgKey).is(neq('')), property('imgKey', prop_imgKey), identity()).as('node')
       .V(prop_userId, prop_catalogId).as('catalog')
       .addE('contains').from('catalog').to('node')
       .addE('belongsTo').from('node').to('catalog')`
@@ -210,6 +212,8 @@ class Db {
       prop_userId: userId,
       prop_name: idea.name,
       prop_desc: idea.desc,
+      prop_imgUrl: idea.imgUrl ?? '',
+      prop_imgKey: idea.imgKey ?? '',
     });
 
     if (idea.categoryId) {
@@ -233,6 +237,8 @@ class Db {
     const adjustIdeaAndDropAllEdgesToCategoriesQuery = `g.V(prop_userId, prop_id)
       .property('name', prop_name)
       .property('desc', prop_desc)
+      .choose(constant(prop_imgUrl).is(neq('')), property('imgUrl', prop_imgUrl), identity())
+      .choose(constant(prop_imgKey).is(neq('')), property('imgKey', prop_imgKey), identity())
       .union(
         g.V(prop_userId, prop_id).outE('belongsTo').where(inV().hasLabel('category')),
         g.V().hasLabel('category').has('userid', prop_userId).outE('contains').where(inV().hasId(prop_id))
@@ -248,6 +254,8 @@ class Db {
       prop_userId: userId,
       prop_name: idea.name,
       prop_desc: idea.desc,
+      prop_imgUrl: idea.imgUrl ?? '',
+      prop_imgKey: idea.imgKey ?? '',
     });
 
     if (idea.categoryId) {
@@ -471,10 +479,12 @@ class Db {
 
   public async getIdeasByIds(userId: string, ideaIds: string[]): Promise<Idea[]> {
     const getIdeasByIdsQuery = `g.V().has('userid',prop_userId).hasId(within(prop_ideaIds))
-    .project('id','name','desc','categoryId')
+    .project('id','name','desc','imgUrl','imgKey','categoryId')
     .by('id')
     .by('name')
     .by('desc')
+    .by(coalesce(values('imgUrl'), constant('')))
+    .by(coalesce(values('imgKey'), constant('')))
     .by(coalesce(out('belongsTo').hasLabel('category').values('id').limit(1), constant('')))`;
 
     let ideasResults = await this.submitWithRetry(getIdeasByIdsQuery, {

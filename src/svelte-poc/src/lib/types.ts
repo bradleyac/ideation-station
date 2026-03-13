@@ -9,6 +9,8 @@ interface Idea {
   id: string;
   name: string;
   desc: string;
+  imgKey?: string;
+  imgUrl?: string;
   categoryId: string;
 }
 

@@ -24,12 +24,13 @@
 			: props.defaultCategoryId || undefined
 	);
 
-	const { id, name, desc, categoryId: categoryField, catalogId } = upsertIdea.fields;
+	const { id, name, desc, img, categoryId: categoryField, catalogId } = upsertIdea.fields;
 </script>
 
 <form
 	class="flex flex-col overflow-clip min-[32rem]:rounded-sm w-full max-w-lg"
 	{...upsertIdea.enhance(props.enhanceCallback ?? (async (opts) => await opts.submit()))}
+	enctype="multipart/form-data"
 >
 	<h2 class="bg-eucalyptus-300 dark:bg-eucalyptus-700 p-3">{title}</h2>
 	<div class="bg-neutral-200 dark:bg-neutral-800 p-3 gap-4 flex flex-col">
@@ -54,6 +55,11 @@
 				{...desc.as('text')}
 				placeholder="Idea details">{existingIdea?.desc}</textarea
 			>
+		</label>
+
+		<label>
+			Image
+			<input {...img.as('file')} />
 		</label>
 
 		<label>

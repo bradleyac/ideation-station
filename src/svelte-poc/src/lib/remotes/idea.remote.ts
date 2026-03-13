@@ -1,6 +1,8 @@
 import { command, form, query } from "$app/server";
+import { blob } from "$lib/server/blob";
 import { db } from "$lib/server/db.svelte";
 import getUserId from "$lib/server/getUserId";
+import type { Idea } from "$lib/types";
 import { error } from "@sveltejs/kit";
 import * as v from 'valibot';
 import { getCategoryIdeaIds } from "./category.remote";
@@ -10,8 +12,6 @@ export const getIdeaIds = query(v.string(), async (catalogId) => {
 
   const ideaIds = await db.getAllIdeaIds(userId, catalogId);
 
-  // await new Promise((resolve) => setTimeout(resolve, 3000));
-
   return ideaIds;
 });
 
@@ -19,7 +19,6 @@ export const getRelatedIdeaIds = query(v.string(), async (ideaId) => {
   const userId = getUserId();
 
   const ideaIds = await db.getRelatedIdeaIds(userId, ideaId);
-  // await new Promise((resolve) => setTimeout(resolve, 3000));
 
   return ideaIds;
 });
@@ -28,7 +27,6 @@ export const getUnrelatedIdeaIds = query(v.string(), async (ideaId) => {
   const userId = getUserId();
 
   const ideaIds = await db.getUnrelatedIdeaIds(userId, ideaId);
-  // await new Promise((resolve) => setTimeout(resolve, 3000));
 
   return ideaIds;
 });
@@ -41,19 +39,6 @@ export const getIdea = query.batch(v.string(), async (ideaIds) => {
 
   return (ideaId) => lookup.get(ideaId);
 });
-
-export const updateIdea = command(v.object({
-  id: v.string(),
-  name: v.string(),
-  desc: v.string(),
-  categoryId: v.string()
-}), async (idea) => {
-  const userId = getUserId();
-
-  await db.updateIdea(userId, idea);
-
-  getIdea(idea.id).refresh();
-})
 
 export const deleteIdea = command(v.object({
   id: v.string(),
@@ -73,22 +58,27 @@ export const upsertIdea = form(v.object({
   id: v.optional(v.string()),
   name: v.string(),
   desc: v.string(),
+  img: v.optional(v.file()),
   categoryId: v.string(),
   catalogId: v.string(),
-}), async (idea) => {
+}), async (payload) => {
   const userId = getUserId();
 
-  if (idea.id) {
-    let toUpdate = { ...idea, id: idea.id! };
-    await db.updateIdea(userId, toUpdate)
-    getIdea(idea.id).set(toUpdate);
+  let toUpsert: Idea = { ...payload, id: payload.id || crypto.randomUUID() };
+
+  if (payload.img) {
+    ({ key: toUpsert.imgKey, url: toUpsert.imgUrl } = await blob.uploadImage(payload.img));
+  }
+
+  if (payload.id) {
+    await db.updateIdea(userId, toUpsert)
+    getIdea(payload.id).set(toUpsert);
   }
   else {
-    const id = crypto.randomUUID();
-    await db.createIdea(userId, idea.catalogId, { ...idea, id });
-    getIdeaIds(idea.catalogId).refresh();
-    if (idea.categoryId) {
-      getCategoryIdeaIds(idea.categoryId).refresh();
+    await db.createIdea(userId, payload.catalogId, toUpsert);
+    getIdeaIds(payload.catalogId).refresh();
+    if (payload.categoryId) {
+      getCategoryIdeaIds(payload.categoryId).refresh();
     }
   }
 })
