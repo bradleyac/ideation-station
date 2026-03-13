@@ -66,7 +66,7 @@
 	bind:this={popover}
 	style:top="{topPx}px"
 	style:left="{leftPx}px"
-	class={[visible || 'hidden', 'absolute z-5 max-w-full flex']}
+	class={[visible || 'hidden', 'absolute 1000 max-w-full flex']}
 >
 	{#if visible}
 		{@render props.menu?.(closePopover)}

@@ -64,7 +64,7 @@ export const upsertIdea = form(v.object({
 }), async (payload) => {
   const userId = getUserId();
 
-  let toUpsert: Idea = { ...payload, id: payload.id || crypto.randomUUID() };
+  let toUpsert: Idea = { categoryId: payload.categoryId, desc: payload.desc, name: payload.name, id: payload.id || crypto.randomUUID() };
 
   if (payload.img) {
     ({ key: toUpsert.imgKey, url: toUpsert.imgUrl } = await blob.uploadImage(payload.img));

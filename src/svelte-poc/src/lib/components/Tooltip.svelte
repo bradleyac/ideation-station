@@ -120,7 +120,7 @@
 	bind:this={tip}
 	style:top="{topPx}px"
 	style:left="{leftPx}px"
-	class={[visible || 'hidden', 'absolute z-5 max-w-full']}
+	class={[visible || 'hidden', 'absolute z-1000 max-w-full']}
 >
 	{#key currentId}
 		{@render children?.(currentId, hideNow)}

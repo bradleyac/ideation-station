@@ -8,11 +8,11 @@
 <button
 	class={[
 		restProps.class,
-		'shadow-md/50 h-max w-full outline-2 aspect-[4_/_3_auto] outline-eucalyptus-600 dark:outline-eucalyptus-400 rounded-sm'
+		'shadow-md/50 flex h-max w-full outline-2 outline-eucalyptus-600 dark:outline-eucalyptus-400 rounded-sm'
 	]}
 	onclick={() => (showModal = !showModal)}
 >
-	<img class="w-auto rounded-sm object-contain" {src} {alt} />
+	<img class="w-auto rounded-sm object-contain object-center" {src} {alt} />
 </button>
 
 <Modal bind:showModal>

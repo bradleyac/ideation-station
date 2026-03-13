@@ -13,7 +13,7 @@
 		<pre>{idea.desc}</pre>
 
 		{#if idea.imgUrl}
-			<div class="max-w-full min-[32rem]:max-w-lg flex">
+			<div class="max-w-full min-[32rem]:max-w-xs flex">
 				<ImageViewer src={idea.imgUrl} alt="User-Uploaded Content" />
 			</div>
 		{/if}
